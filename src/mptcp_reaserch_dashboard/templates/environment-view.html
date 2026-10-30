@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<head>
+    <title>{{ name }}</title>
+</head>
+
+<body>
+
+    Name: {{ name }}<br>
+    Type: {{ type }}<br>
+    Description: {{ description }}<br>
+    Version: {{ version }}<br>
+    Active: {{ "Yes" if isActive else "No" }}<br>
+    Configuration: {{ configuration }}<br>
+
+</body>
+
+<!-- {
+    "env-ns3": {
+        "name": "ns-3 Research Simulator",
+        "type": "NS3",
+        "description": "Środowisko symulacyjne MPTCP",
+        "version": "configured-version",
+        "isActive": true,
+        "configuration": {
+            "simulationMode": "discrete-event"
+        }
+    }
+} -->

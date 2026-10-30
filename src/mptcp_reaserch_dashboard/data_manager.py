@@ -16,7 +16,7 @@ SCENARIOS_SCHEMA_PATH = Path(r'scenarios.schema.jsonc')
 DATA_BASE_PATH = Path(r'database')
 
 ALGORITHMS_DATA_PATH = Path(r'algorithms.json')
-ENVIROMENTS_DATA_PATH = Path(r'enviroments.json')
+ENVIRONMENTS_DATA_PATH = Path(r'environments.json')
 EXPERIMENTS_DATA_PATH = Path(r'experiments.json')
 SCENARIOS_DATA_PATH = Path(r'scenarios.json')
 
@@ -141,7 +141,7 @@ class Enviroment:
         }
 
     def save(self) -> None:
-        with open(DATA_BASE_PATH / ENVIROMENTS_DATA_PATH, 'r+') as file:
+        with open(DATA_BASE_PATH / ENVIRONMENTS_DATA_PATH, 'r+') as file:
             old_json = json.load(file)
             old_json[self.id] = self.to_dict()
 

@@ -1,1 +1,12 @@
-{}
+{
+    "env-ns3": {
+        "name": "ns-3 Research Simulator",
+        "type": "NS3",
+        "description": "Środowisko symulacyjne MPTCP",
+        "version": "configured-version",
+        "isActive": true,
+        "configuration": {
+            "simulationMode": "discrete-event"
+        }
+    }
+}

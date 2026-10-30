@@ -18,5 +18,11 @@ def get_algorithms(id: str):
         data = json.load(file)[id]
     return flask.render_template(r'algorithm-view.html', **data)
 
+@app.route('/environments/<id>')
+def get_environments(id: str):
+    with open(database.DATA_BASE_PATH / database.ENVIRONMENTS_DATA_PATH) as file:
+        data = json.load(file)[id]
+    return flask.render_template(r'environment-view.html', **data)
+
 if __name__ == '__main__':
     app.run()
