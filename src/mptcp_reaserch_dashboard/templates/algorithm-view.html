@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<head>
+    <title>{{ shortName }}</title>
+</head>
+
+<body>
+
+    Name: {{ name }}<br>
+    Type: {{ type }}<br>
+    Description: {{ description }}<br>
+    Active: {{ "Yes" if isActive else "No" }}<br>
+    Parameters: {{ parameters }}<br>
+    Supported Environments: {{ supportedEnvironments }}<br>
+
+
+</body>
+
+<!-- {
+    "alg-lia": {
+        "code": "lia",
+        "name": "Linked Increases Algorithm",
+        "shortName": "LIA",
+        "type": "REFERENCE",
+        "description": "Algorytm Congestion Control MPTCP",
+        "isActive": true,
+        "parameters": {},
+        "supportedEnvironments": [
+            "UML",
+            "NS3"
+        ]
+    }
+} -->

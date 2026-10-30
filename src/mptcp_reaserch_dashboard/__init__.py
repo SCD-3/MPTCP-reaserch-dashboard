@@ -1,9 +1,11 @@
 import flask
 import json
-import mptcp_reaserch_dashboard.data_manager as data
+from pathlib import Path
+
+import mptcp_reaserch_dashboard.data_manager as database
 
 app = flask.Flask(__name__)
-
+TEMPLATES_BASE_PATH = r'templates/'
 
 
 @app.route('/')
@@ -12,8 +14,9 @@ def index():
 
 @app.route('/algorithms/<id>')
 def get_algorithms(id: str):
-    with open(data.DATA_BASE_PATH / data.ALGORITHMS_DATA_PATH) as file:
-        return str(json.load(file)[id]['name'])
+    with open(database.DATA_BASE_PATH / database.ALGORITHMS_DATA_PATH) as file:
+        data = json.load(file)[id]
+    return flask.render_template(r'algorithm-view.html', **data)
 
 if __name__ == '__main__':
     app.run()
