@@ -1,0 +1,25 @@
+{
+    "scenario-001": {
+        "name": "Dwie ścieżki o różnych opóźnieniach",
+        "description": "Badanie MPTCP w sieci asymetrycznej",
+        "durationSeconds": 120,
+        "repetitions": 10,
+        "receiverConsumptionMbps": 80,
+        "paths": [
+            {
+                "name": "Path 1",
+                "bandwidthMbps": 100,
+                "delayMs": 20,
+                "jitterMs": 2,
+                "packetLossPercent": 0
+            },
+            {
+                "name": "Path 2",
+                "bandwidthMbps": 50,
+                "delayMs": 80,
+                "jitterMs": 5,
+                "packetLossPercent": 1
+            }
+        ]
+    }
+}

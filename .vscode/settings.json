@@ -1,0 +1,22 @@
+{
+    "json.schemas": [
+        {
+            "fileMatch": [
+                "database/algorithms.json"
+            ],
+            "url": "./json-schemas/algorithms.schema.jsonc"
+        },
+        {
+            "fileMatch": [
+                "database/environments.json"
+            ],
+            "url": "./json-schemas/environments.schema.jsonc"
+        },
+        {
+            "fileMatch": [
+                "database/scenarios.json"
+            ],
+            "url": "./json-schemas/scenarios.schema.jsonc"
+        }
+    ]
+}
