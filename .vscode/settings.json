@@ -17,6 +17,12 @@
                 "database/scenarios.json"
             ],
             "url": "./json-schemas/scenarios.schema.jsonc"
+        },
+        {
+            "fileMatch": [
+                "database/experiments.json"
+            ],
+            "url": "./json-schemas/experiments.schema.jsonc"
         }
     ]
 }
