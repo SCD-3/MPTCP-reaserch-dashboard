@@ -39,31 +39,29 @@ class EnviromentsType(Enum):
     Mathematical = "MATHEMATICAL"
 
 
-def load_schemas() -> dict[DataKind, Draft202012Validator]:
-    with open(JSON_SCHEMA_BASE_PATH / ALGORITHMS_SCHEMA_PATH) as file:
-        SCHEMA_ALGORITHMS = json.load(file)
+def load_schemas(kind: DataKind) -> Draft202012Validator:
     
-    with open(JSON_SCHEMA_BASE_PATH / ENVIROMENTS_SCHEMA_PATH) as file:
-        SCHEMA_ENVIROMENTS = json.load(file)
+    match kind:
         
-    with open(JSON_SCHEMA_BASE_PATH / EXPERIMENTS_SCHEMA_PATH) as file:
-        SCHEMA_EXPERIMENTS = json.load(file)
+        case DataKind.Algorithms:
+            with open(JSON_SCHEMA_BASE_PATH / ALGORITHMS_SCHEMA_PATH) as file:
+                schema = json.load(file)
         
-    with open(JSON_SCHEMA_BASE_PATH / SCENARIOS_SCHEMA_PATH) as file:
-        SCHEMA_SCENARIOS = json.load(file)
+        case DataKind.Enviroments:
+            with open(JSON_SCHEMA_BASE_PATH / ENVIROMENTS_SCHEMA_PATH) as file:
+                schema = json.load(file)
+            
+        case DataKind.Experiments:
+            with open(JSON_SCHEMA_BASE_PATH / EXPERIMENTS_SCHEMA_PATH) as file:
+                schema = json.load(file)
+        
+        case DataKind.Scenarios:
+            with open(JSON_SCHEMA_BASE_PATH / SCENARIOS_SCHEMA_PATH) as file:
+                schema = json.load(file)
     
-    
-    Draft202012Validator.check_schema(SCHEMA_ALGORITHMS)
-    Draft202012Validator.check_schema(SCHEMA_ENVIROMENTS)
-    Draft202012Validator.check_schema(SCHEMA_EXPERIMENTS)
-    Draft202012Validator.check_schema(SCHEMA_SCENARIOS)
-    
-    return {
-        DataKind.Algorithms: Draft202012Validator(SCHEMA_ALGORITHMS),
-        DataKind.Enviroments: Draft202012Validator(SCHEMA_ENVIROMENTS),
-        DataKind.Experiments: Draft202012Validator(SCHEMA_EXPERIMENTS),
-        DataKind.Scenarios: Draft202012Validator(SCHEMA_SCENARIOS)
-    }
+    Draft202012Validator.check_schema(schema)
+    return Draft202012Validator(schema)
+
 
 
 class Alghorithm:
@@ -73,11 +71,11 @@ class Alghorithm:
                  code: str,
                  name: str,
                  short_name: str,
-                 type: AlghorithmType,
+                 type: AlghorithmType|str,
                  description: str,
                  is_active: bool,
                  parameters: dict[str, float],
-                 supported_environments: list[EnviromentsType]
+                 supported_environments: list[EnviromentsType|str]
                  ) -> None:
         self.id = id
         self.code = code
