@@ -21,7 +21,7 @@
                 },
                 "type": {
                     "type": "string",
-                    "minLength": 1
+                    "enum": ["OPENINTERNET", "UML", "NS3", "MATHEMATICAL"]
                 },
                 "description": {
                     "type": "string"
