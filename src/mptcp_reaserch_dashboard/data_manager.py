@@ -77,7 +77,7 @@ class Alghorithm:
                  description: str,
                  is_active: bool,
                  parameters: dict[str, float],
-                 supported_environments: list[Enviroment]
+                 supported_environments: list[EnviromentsType]
                  ) -> None:
         self.id = id
         self.code = code
@@ -98,7 +98,7 @@ class Alghorithm:
             'description': self.description,
             'isActive': self.is_active,
             'parameters': self.parameters,
-            'supportedEnvironments': [e.id for e in self.supported_environments]
+            'supportedEnvironments': [str(e) for e in self.supported_environments]
         }
 
     def save(self) -> None:

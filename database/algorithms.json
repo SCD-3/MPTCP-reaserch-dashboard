@@ -1,1 +1,15 @@
-{}
+{
+    "alg-lia": {
+        "code": "lia",
+        "name": "Linked Increases Algorithm",
+        "shortName": "LIA",
+        "type": "REFERENCE",
+        "description": "Algorytm Congestion Control MPTCP",
+        "isActive": true,
+        "parameters": {},
+        "supportedEnvironments": [
+            "UML",
+            "NS3"
+        ]
+    }
+}
