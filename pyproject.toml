@@ -13,7 +13,7 @@ dependencies = [
 ]
 
 [project.scripts]
-mptcp-reaserch-dashboard = "mptcp_reaserch_dashboard:main"
+mptcp-reaserch-dashboard = "mptcp_reaserch_dashboard:__main__"
 
 [build-system]
 requires = ["uv_build>=0.12.5,<0.13.0"]
