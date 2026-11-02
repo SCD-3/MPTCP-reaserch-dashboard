@@ -16,11 +16,11 @@ def not_found(resource_type: Literal["algorithm", "environment", "experiment", "
     return flask.render_template(f"not-found.html", resource=resource_type, resource_id=resource_id), 404
 
 
-@app.route('/')
+@app.get('/')
 def index():
     return flask.render_template('index.html')
 
-@app.route("/favicon.ico")
+@app.get("/favicon.ico")
 def favicon():
     
     if app.static_folder is None:
@@ -90,25 +90,25 @@ def get_experiments(id: str):
         return not_found('experiment', id)
 
 
-@app.route("/algorithms")
+@app.get("/algorithms")
 def algorithms_list():
     with open(database.DATA_BASE_PATH / database.ALGORITHMS_DATA_PATH) as file:
         data = json.load(file)
     return flask.render_template("algorithms/algorithms-list.html", algorithms=data)
 
-@app.route("/environments")
+@app.get("/environments")
 def environments_list():
     with open(database.DATA_BASE_PATH / database.ENVIRONMENTS_DATA_PATH) as file:
         data = json.load(file)
     return flask.render_template("environments/environments-list.html", environments=data)
 
-@app.route("/scenarios")
+@app.get("/scenarios")
 def scenarios_list():
     with open(database.DATA_BASE_PATH / database.SCENARIOS_DATA_PATH) as file:
         data = json.load(file)
     return flask.render_template("scenarios/scenarios-list.html", scenarios=data)
 
-@app.route("/experiments")
+@app.get("/experiments")
 def experiments_list():
     with open(database.DATA_BASE_PATH / database.EXPERIMENTS_DATA_PATH) as file:
         data = json.load(file)
