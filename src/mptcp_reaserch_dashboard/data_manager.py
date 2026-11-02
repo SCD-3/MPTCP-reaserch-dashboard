@@ -38,6 +38,15 @@ class EnviromentsType(Enum):
     Ns3 = "NS3"
     Mathematical = "MATHEMATICAL"
 
+class ExperimentStatus(Enum):
+    DRAFT = "DRAFT"
+    PLANNED = "PLANNED"
+    QUEUED = "QUEUED"
+    RUNNING = "RUNNING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+    CANCELLED = "CANCELLED"
+
 
 def load_schemas(kind: DataKind) -> Draft202012Validator:
     
@@ -204,6 +213,45 @@ class Scenario:
 
     def save(self) -> None:
         with open(DATA_BASE_PATH / SCENARIOS_DATA_PATH, 'r+') as file:
+            old_json = json.load(file)
+            old_json[self.id] = self.to_dict()
+
+            file.seek(0)
+            json.dump(old_json, file, indent=4)
+            file.truncate()
+
+
+class Experiment:
+
+    def __init__(self, /, *,
+                 id: str,
+                 name: str,
+                 scenario_id: str,
+                 environment_id: str,
+                 algorithm_ids: list[str],
+                 repetitions: int,
+                 status: ExperimentStatus|str
+                 ) -> None:
+        self.id = id
+        self.name = name
+        self.scenario_id = scenario_id
+        self.environment_id = environment_id
+        self.algorithm_ids = algorithm_ids
+        self.repetitions = repetitions
+        self.status = status
+
+    def to_dict(self) -> dict[str, typing.Any]:
+        return {
+            'name': self.name,
+            'scenarioId': self.scenario_id,
+            'environmentId': self.environment_id,
+            'algorithmIds': self.algorithm_ids,
+            'repetitions': self.repetitions,
+            'status': str(self.status)
+        }
+
+    def save(self) -> None:
+        with open(DATA_BASE_PATH / EXPERIMENTS_DATA_PATH, 'r+') as file:
             old_json = json.load(file)
             old_json[self.id] = self.to_dict()
 

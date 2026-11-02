@@ -48,5 +48,18 @@ def get_environments(id: str):
         data = json.load(file)[id]
     return flask.render_template(r'environment-view.html', **data)
 
+
+@app.get('/scenarios/<id>')
+def get_scenarios(id: str):
+    with open(database.DATA_BASE_PATH / database.SCENARIOS_DATA_PATH) as file:
+        data = json.load(file)[id]
+    return flask.render_template(r'scenario-view.html', **data)
+
+@app.get('/experiments/<id>')
+def get_experiments(id: str):
+    with open(database.DATA_BASE_PATH / database.EXPERIMENTS_DATA_PATH) as file:
+        data = json.load(file)[id]
+    return flask.render_template(r'experiment-view.html', **data)
+
 if __name__ == '__main__':
     app.run()

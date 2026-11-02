@@ -194,3 +194,7 @@ footer {
         padding: 18px;
     }
 }
+
+a {
+    text-decoration: none;
+}

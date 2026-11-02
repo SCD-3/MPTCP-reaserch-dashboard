@@ -1,1 +1,14 @@
-{}
+{
+    "experiment-001": {
+        "name": "Porównanie algorytmów w sieci asymetrycznej",
+        "scenarioId": "scenario-001",
+        "environmentId": "env-uml",
+        "algorithmIds": [
+            "alg-lia",
+            "alg-olia",
+            "alg-onoff"
+        ],
+        "repetitions": 10,
+        "status": "PLANNED"
+    }
+}
