@@ -13,7 +13,7 @@ def not_found(resource_type: Literal["algorithm", "environment", "experiment", "
     if resource_type not in ("algorithm", "environment", "experiment", "scenario"): # safety check
         return (None, 404) # type: ignore
     
-    return flask.render_template(f"{resource_type}_not_found.html", resource_id=resource_id), 404
+    return flask.render_template(f"{resource_type}s/{resource_type}-not-found.html", resource_id=resource_id), 404
 
 
 @app.route('/')
@@ -50,7 +50,7 @@ def get_algorithms(id: str):
     try:
         with open(database.DATA_BASE_PATH / database.ALGORITHMS_DATA_PATH) as file:
             data = json.load(file)[id]
-        return flask.render_template(r'algorithm-view.html', **data)
+        return flask.render_template(r'algorithms/algorithm-view.html', **data)
     except KeyError:
         return not_found('algorithm', id)
 
@@ -59,7 +59,7 @@ def get_environments(id: str):
     try:
         with open(database.DATA_BASE_PATH / database.ENVIRONMENTS_DATA_PATH) as file:
             data = json.load(file)[id]
-        return flask.render_template(r'environment-view.html', **data)
+        return flask.render_template(r'environments/environment-view.html', **data)
     except KeyError:
         return not_found('environment', id)
 
@@ -69,7 +69,7 @@ def get_scenarios(id: str):
     try:
         with open(database.DATA_BASE_PATH / database.SCENARIOS_DATA_PATH) as file:
             data = json.load(file)[id]
-        return flask.render_template(r'scenario-view.html', **data, scenarioId = id, round=round)
+        return flask.render_template(r'scenarios/scenario-view.html', **data, scenarioId = id, round=round)
     except KeyError:
         return not_found('scenario', id)
 
@@ -78,7 +78,7 @@ def get_experiments(id: str):
     try:
         with open(database.DATA_BASE_PATH / database.EXPERIMENTS_DATA_PATH) as file:
             data = json.load(file)[id]
-        return flask.render_template(r'experiment-view.html', **data, experimentId = id)
+        return flask.render_template(r'experiments/experiment-view.html', **data, experimentId = id)
     except KeyError:
         return not_found('experiment', id)
 
@@ -86,8 +86,26 @@ def get_experiments(id: str):
 @app.route("/algorithms")
 def algorithms_list():
     with open(database.DATA_BASE_PATH / database.ALGORITHMS_DATA_PATH) as file:
-        algorithms = json.load(file)
-    return flask.render_template("algorithms_list.html", algorithms=algorithms)
+        data = json.load(file)
+    return flask.render_template("algorithms/algorithms-list.html", algorithms=data)
+
+@app.route("/environments")
+def environments_list():
+    with open(database.DATA_BASE_PATH / database.ENVIRONMENTS_DATA_PATH) as file:
+        data = json.load(file)
+    return flask.render_template("environments/environments-list.html", environments=data)
+
+@app.route("/scenarios")
+def scenarios_list():
+    with open(database.DATA_BASE_PATH / database.SCENARIOS_DATA_PATH) as file:
+        data = json.load(file)
+    return flask.render_template("scenarios/scenarios-list.html", scenarios=data)
+
+@app.route("/experiments")
+def experiments_list():
+    with open(database.DATA_BASE_PATH / database.EXPERIMENTS_DATA_PATH) as file:
+        data = json.load(file)
+    return flask.render_template("experiments/experiments-list.html", experiments=data)
 
 if __name__ == '__main__':
     app.run()

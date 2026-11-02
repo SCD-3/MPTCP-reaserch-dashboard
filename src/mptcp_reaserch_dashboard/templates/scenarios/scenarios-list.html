@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Available Scenarios</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/scenarios.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/scenarios-list.css') }}">
 </head>
 <body>
     <main class="container">
@@ -22,7 +22,7 @@
             {% for scenario_id, scenario in scenarios.items() %}
                 <a
                     class="scenario-card"
-                    href="{{ url_for('scenario_details', scenario_id=scenario_id) }}"
+                    href="{{ url_for('get_scenarios', id=scenario_id) }}"
                 >
                     <div class="scenario-main">
                         <h2>{{ scenario.name }}</h2>

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Available Environments</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/environments.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/environments-list.css') }}">
 </head>
 <body>
     <main class="container">
@@ -23,7 +23,7 @@
             {% for environment_id, environment in environments.items() %}
                 <a
                     class="environment-card"
-                    href="{{ url_for('environment_details', environment_id=environment_id) }}"
+                    href="{{ url_for('get_environments, id=environment_id) }}"
                 >
                     <div class="environment-main">
                         <div class="environment-heading">
