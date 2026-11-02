@@ -10,5 +10,19 @@
         ],
         "repetitions": 10,
         "status": "PLANNED"
+    },
+    "experiment-002": {
+        "name": "Fooooooooooooooooooo",
+        "scenarioId": "scenario-002",
+        "environmentId": "env-bajo-jajo",
+        "algorithmIds": [
+            "test",
+            "test2",
+            "foo",
+            "a",
+            "b"
+        ],
+        "repetitions": 2137,
+        "status": "QUEUED"
     }
 }

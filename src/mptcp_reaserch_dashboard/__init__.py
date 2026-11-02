@@ -78,7 +78,7 @@ def get_experiments(id: str):
     try:
         with open(database.DATA_BASE_PATH / database.EXPERIMENTS_DATA_PATH) as file:
             data = json.load(file)[id]
-        return flask.render_template(r'experiment-view.html', **data)
+        return flask.render_template(r'experiment-view.html', **data, experimentId = id)
     except KeyError:
         return not_found('experiment', id)
 
