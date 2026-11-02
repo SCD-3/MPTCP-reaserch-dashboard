@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Scenarios</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/scenarios.css') }}">
+</head>
+<body>
+    <main class="container">
+        <header class="page-header">
+            <div>
+                <span class="eyebrow">MPTCP RESEARCH DASHBOARD</span>
+                <h1>Scenarios</h1>
+                <p class="subtitle">Browse available network simulation scenarios.</p>
+            </div>
+
+            <span class="count">{{ scenarios | length }} scenarios</span>
+        </header>
+
+        <section class="scenario-list">
+            {% for scenario_id, scenario in scenarios.items() %}
+                <a
+                    class="scenario-card"
+                    href="{{ url_for('scenario_details', scenario_id=scenario_id) }}"
+                >
+                    <div class="scenario-main">
+                        <h2>{{ scenario.name }}</h2>
+
+                        <div class="scenario-meta">
+                            <span class="meta-item">
+                                <strong>{{ scenario.paths | length }}</strong> paths
+                            </span>
+
+                            <span class="separator">·</span>
+
+                            <span class="meta-item">
+                                <strong>{{ scenario.durationSeconds }}</strong> seconds
+                            </span>
+
+                            <span class="separator">·</span>
+
+                            <span class="meta-item">
+                                <strong>{{ scenario.repetitions }}</strong> repetitions
+                            </span>
+                        </div>
+                    </div>
+
+                    <span class="arrow">→</span>
+                </a>
+            {% else %}
+                <div class="empty-state">
+                    <h2>No scenarios available</h2>
+                    <p>There are currently no scenarios registered in the dashboard.</p>
+                </div>
+            {% endfor %}
+        </section>
+    </main>
+</body>
+</html>

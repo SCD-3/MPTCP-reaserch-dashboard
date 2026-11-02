@@ -1,0 +1,60 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Environments</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/environments.css') }}">
+</head>
+<body>
+    <main class="container">
+        <header class="page-header">
+            <div>
+                <span class="eyebrow">MPTCP RESEARCH DASHBOARD</span>
+                <h1>Environments</h1>
+                <p class="subtitle">Browse available simulation environments.</p>
+            </div>
+
+            <span class="count">{{ environments | length }} environments</span>
+        </header>
+
+        <section class="environment-list">
+            {% for environment_id, environment in environments.items() %}
+                <a
+                    class="environment-card"
+                    href="{{ url_for('environment_details', environment_id=environment_id) }}"
+                >
+                    <div class="environment-main">
+                        <div class="environment-heading">
+                            <h2>{{ environment.name }}</h2>
+                            <span class="environment-type type-{{ environment.type | lower }}">
+                                {{ environment.type }}
+                            </span>
+                        </div>
+
+                        <div class="environment-meta">
+                            <span class="version">
+                                Version: {{ environment.version }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="environment-status">
+                        <span class="status {{ 'active' if environment.isActive else 'inactive' }}">
+                            <span class="status-dot"></span>
+                            {{ 'Active' if environment.isActive else 'Inactive' }}
+                        </span>
+                        <span class="arrow">→</span>
+                    </div>
+                </a>
+            {% else %}
+                <div class="empty-state">
+                    <h2>No environments available</h2>
+                    <p>There are currently no environments registered in the dashboard.</p>
+                </div>
+            {% endfor %}
+        </section>
+    </main>
+</body>
+</html>

@@ -83,26 +83,11 @@ def get_experiments(id: str):
         return not_found('experiment', id)
 
 
-
-@app.get('/algorithms')
-@app.get('/environments')
-@app.get('/scenarios')
-@app.get('/experiments')
-def id_not_specyfied():
-    match flask.request.path:
-        case '/algorithms':
-            type = 'algorithm'
-        case '/environments':
-            type = 'environment'
-        case '/scenarios':
-            type = 'scenario'
-        case '/experiments':
-            type = 'experiment'
-        
-        case _:
-            raise ValueError("somehow, you got to this site from non existen url. congrats") # unrechable, just so typechecker shuts up
-        
-    return not_found(type)
+@app.route("/algorithms")
+def algorithms_list():
+    with open(database.DATA_BASE_PATH / database.ALGORITHMS_DATA_PATH) as file:
+        algorithms = json.load(file)
+    return flask.render_template("algorithms_list.html", algorithms=algorithms)
 
 if __name__ == '__main__':
     app.run()

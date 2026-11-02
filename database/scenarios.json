@@ -7,18 +7,18 @@
         "receiverConsumptionMbps": 80,
         "paths": [
             {
-                "name": "Path 1",
+                "name": "Jerry",
                 "bandwidthMbps": 100,
                 "delayMs": 20,
                 "jitterMs": 2,
-                "packetLossPercent": 0.001
+                "packetLossPercent": 0.00
             },
             {
-                "name": "Path 2",
-                "bandwidthMbps": 50,
-                "delayMs": 80,
-                "jitterMs": 5,
-                "packetLossPercent": 0.51343435
+                "name": "The Best Path Possible TM",
+                "bandwidthMbps": 0,
+                "delayMs": 1000000,
+                "jitterMs": 9238492384274328,
+                "packetLossPercent": 1
             }
         ]
     }
