@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MPTCP Research Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+</head>
+<body>
+    <main class="container">
+        <header class="page-header">
+            <span class="eyebrow">RESEARCH PLATFORM</span>
+            <h1>MPTCP Research Dashboard</h1>
+            <p class="subtitle">
+                Manage algorithms, simulation environments, scenarios and experiments.
+            </p>
+        </header>
+
+        <section class="dashboard-grid">
+            <a class="dashboard-card" href="{{ url_for('algorithms_list') }}">
+                <div class="card-icon icon-algorithms">A</div>
+                <div class="card-content">
+                    <h2>Algorithms</h2>
+                    <p>
+                        Browse and manage MPTCP congestion control algorithms.
+                    </p>
+                </div>
+                <span class="arrow">→</span>
+            </a>
+
+            <a class="dashboard-card" href="{{ url_for('environments_list') }}">
+                <div class="card-icon icon-environments">E</div>
+                <div class="card-content">
+                    <h2>Environments</h2>
+                    <p>
+                        Browse and configure simulation environments.
+                    </p>
+                </div>
+                <span class="arrow">→</span>
+            </a>
+
+            <a class="dashboard-card" href="{{ url_for('scenarios_list') }}">
+                <div class="card-icon icon-scenarios">S</div>
+                <div class="card-content">
+                    <h2>Scenarios</h2>
+                    <p>
+                        Explore network configurations and simulation scenarios.
+                    </p>
+                </div>
+                <span class="arrow">→</span>
+            </a>
+
+            <a class="dashboard-card" href="{{ url_for('experiments_list') }}">
+                <div class="card-icon icon-experiments">X</div>
+                <div class="card-content">
+                    <h2>Experiments</h2>
+                    <p>
+                        Create, browse and monitor research experiments.
+                    </p>
+                </div>
+                <span class="arrow">→</span>
+            </a>
+        </section>
+
+        <footer>
+            MPTCP Research Dashboard
+        </footer>
+    </main>
+</body>
+</html>

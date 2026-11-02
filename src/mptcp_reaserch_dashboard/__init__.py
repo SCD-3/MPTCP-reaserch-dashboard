@@ -18,7 +18,7 @@ def not_found(resource_type: Literal["algorithm", "environment", "experiment", "
 
 @app.route('/')
 def index():
-    return flask.redirect(flask.url_for('get_algorithms', id="alg-lia"))
+    return flask.render_template('index.html')
 
 
 

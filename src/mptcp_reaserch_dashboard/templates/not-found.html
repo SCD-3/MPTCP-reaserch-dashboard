@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,11 @@
 
 <body>
     <main class="container">
+        <a class="back-button" href="{{ url_for('index') }}">
+            <span>←</span>
+            Back to Dashboard
+        </a>
+
         <section class="error-card">
             <span class="error-code">404</span>
             <span class="eyebrow">{{resource | upper}} NOT FOUND</span>
@@ -19,12 +25,12 @@
             </p>
 
             {% if resource_id %}
-                <div class="resource-id">
-                    {{ resource | capitalize }} ID: <strong>{{ resource_id }}</strong>
-                </div>
+            <div class="resource-id">
+                {{ resource | capitalize }} ID: <strong>{{ resource_id }}</strong>
+            </div>
             {% endif %}
 
-            <a href="{{ url_for(resource + 's_list') }}" class="back-button">
+            <a href="{{ url_for(resource + 's_list') }}" class="list-button">
                 Back to list
             </a>
         </section>
@@ -32,4 +38,5 @@
         <footer>MPTCP Research Dashboard</footer>
     </main>
 </body>
+
 </html>

@@ -1,14 +1,21 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Experiments</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/experiments-list.css') }}">
 </head>
+
 <body>
     <main class="container">
+
+        <a class="back-button" href="{{ url_for('index') }}">
+            <span>←</span>
+            Back
+        </a>
+
         <header class="page-header">
             <div>
                 <span class="eyebrow">MPTCP RESEARCH DASHBOARD</span>
@@ -21,53 +28,51 @@
 
         <section class="experiment-list">
             {% for experiment_id, experiment in experiments.items() %}
-                <a
-                    class="experiment-card"
-                    href="{{ url_for('get_experiments', id=experiment_id) }}"
-                >
-                    <div class="experiment-main">
-                        <h2>{{ experiment.name }}</h2>
+            <a class="experiment-card" href="{{ url_for('get_experiments', id=experiment_id) }}">
+                <div class="experiment-main">
+                    <h2>{{ experiment.name }}</h2>
 
-                        <div class="experiment-meta">
-                            <span class="meta-item">
-                                Scenario: <strong>{{ experiment.scenarioId }}</strong>
-                            </span>
-
-                            <span class="separator">·</span>
-
-                            <span class="meta-item">
-                                Environment: <strong>{{ experiment.environmentId }}</strong>
-                            </span>
-                        </div>
-
-                        <div class="experiment-meta secondary-meta">
-                            <span class="meta-item">
-                                <strong>{{ experiment.algorithmIds | length }}</strong> algorithms
-                            </span>
-
-                            <span class="separator">·</span>
-
-                            <span class="meta-item">
-                                <strong>{{ experiment.repetitions }}</strong> repetitions
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="experiment-right">
-                        <span class="status status-{{ experiment.status | lower }}">
-                            {{ experiment.status }}
+                    <div class="experiment-meta">
+                        <span class="meta-item">
+                            Scenario: <strong>{{ experiment.scenarioId }}</strong>
                         </span>
 
-                        <span class="arrow">→</span>
+                        <span class="separator">·</span>
+
+                        <span class="meta-item">
+                            Environment: <strong>{{ experiment.environmentId }}</strong>
+                        </span>
                     </div>
-                </a>
-            {% else %}
-                <div class="empty-state">
-                    <h2>No experiments available</h2>
-                    <p>There are currently no experiments registered in the dashboard.</p>
+
+                    <div class="experiment-meta secondary-meta">
+                        <span class="meta-item">
+                            <strong>{{ experiment.algorithmIds | length }}</strong> algorithms
+                        </span>
+
+                        <span class="separator">·</span>
+
+                        <span class="meta-item">
+                            <strong>{{ experiment.repetitions }}</strong> repetitions
+                        </span>
+                    </div>
                 </div>
+
+                <div class="experiment-right">
+                    <span class="status status-{{ experiment.status | lower }}">
+                        {{ experiment.status }}
+                    </span>
+
+                    <span class="arrow">→</span>
+                </div>
+            </a>
+            {% else %}
+            <div class="empty-state">
+                <h2>No experiments available</h2>
+                <p>There are currently no experiments registered in the dashboard.</p>
+            </div>
             {% endfor %}
         </section>
     </main>
 </body>
+
 </html>
