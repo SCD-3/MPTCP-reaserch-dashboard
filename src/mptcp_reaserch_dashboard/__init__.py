@@ -13,7 +13,7 @@ def not_found(resource_type: Literal["algorithm", "environment", "experiment", "
     if resource_type not in ("algorithm", "environment", "experiment", "scenario"): # safety check
         return (None, 404) # type: ignore
     
-    return flask.render_template(f"{resource_type}s/{resource_type}-not-found.html", resource_id=resource_id), 404
+    return flask.render_template(f"not-found.html", resource=resource_type, resource_id=resource_id), 404
 
 
 @app.route('/')
