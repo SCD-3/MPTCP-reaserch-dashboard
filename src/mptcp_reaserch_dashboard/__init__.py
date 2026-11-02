@@ -1,11 +1,19 @@
 import flask
 import json
-from pathlib import Path
+
+from typing import Literal
 
 import mptcp_reaserch_dashboard.data_manager as database
 
 app = flask.Flask(__name__)
 TEMPLATES_BASE_PATH = r'templates/'
+
+
+def not_found(resource_type: Literal["algorithm", "environment", "experiment", "scenario"], resource_id: str):
+    if resource_type not in ("algorithm", "environment", "experiment", "scenario"): # safety check
+        return (None, 404) # type: ignore
+    
+    return flask.render_template(f"{resource_type}_not_found.html", resource_id=resource_id), 404
 
 
 @app.route('/')
@@ -38,28 +46,41 @@ def post_algorithms(id: str):
 
 @app.get('/algorithms/<id>')
 def get_algorithms(id: str):
-    with open(database.DATA_BASE_PATH / database.ALGORITHMS_DATA_PATH) as file:
-        data = json.load(file)[id]
-    return flask.render_template(r'algorithm-view.html', **data)
+    
+    try:
+        with open(database.DATA_BASE_PATH / database.ALGORITHMS_DATA_PATH) as file:
+            data = json.load(file)[id]
+        return flask.render_template(r'algorithm-view.html', **data)
+    except KeyError:
+        return not_found('algorithm', id)
 
 @app.get('/environments/<id>')
 def get_environments(id: str):
-    with open(database.DATA_BASE_PATH / database.ENVIRONMENTS_DATA_PATH) as file:
-        data = json.load(file)[id]
-    return flask.render_template(r'environment-view.html', **data)
+    try:
+        with open(database.DATA_BASE_PATH / database.ENVIRONMENTS_DATA_PATH) as file:
+            data = json.load(file)[id]
+        return flask.render_template(r'environment-view.html', **data)
+    except KeyError:
+        return not_found('environment', id)
 
 
 @app.get('/scenarios/<id>')
 def get_scenarios(id: str):
-    with open(database.DATA_BASE_PATH / database.SCENARIOS_DATA_PATH) as file:
-        data = json.load(file)[id]
-    return flask.render_template(r'scenario-view.html', **data)
+    try:
+        with open(database.DATA_BASE_PATH / database.SCENARIOS_DATA_PATH) as file:
+            data = json.load(file)[id]
+        return flask.render_template(r'scenario-view.html', **data)
+    except KeyError:
+        return not_found('scenario', id)
 
 @app.get('/experiments/<id>')
 def get_experiments(id: str):
-    with open(database.DATA_BASE_PATH / database.EXPERIMENTS_DATA_PATH) as file:
-        data = json.load(file)[id]
-    return flask.render_template(r'experiment-view.html', **data)
+    try:
+        with open(database.DATA_BASE_PATH / database.EXPERIMENTS_DATA_PATH) as file:
+            data = json.load(file)[id]
+        return flask.render_template(r'experiment-view.html', **data)
+    except KeyError:
+        return not_found('experiment', id)
 
 if __name__ == '__main__':
     app.run()

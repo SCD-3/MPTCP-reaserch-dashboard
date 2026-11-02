@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experiment Not Found</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/not_found.css') }}">
+</head>
+
+<body>
+    <main class="container">
+        <section class="error-card">
+            <span class="error-code">404</span>
+            <span class="eyebrow">EXPERIMENT NOT FOUND</span>
+
+            <h1>Experiment not found</h1>
+            <p class="description">
+                The experiment you're looking for doesn't exist or may have been removed.
+            </p>
+
+            {% if resource_id %}
+                <div class="resource-id">
+                    Experiment ID: <strong>{{ resource_id }}</strong>
+                </div>
+            {% endif %}
+
+            <a href="{{ url_for('index') }}" class="back-button">
+                Back to dashboard
+            </a>
+        </section>
+
+        <footer>MPTCP Research Dashboard</footer>
+    </main>
+</body>
+</html>
