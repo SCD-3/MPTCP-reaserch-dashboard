@@ -69,7 +69,7 @@ def get_scenarios(id: str):
     try:
         with open(database.DATA_BASE_PATH / database.SCENARIOS_DATA_PATH) as file:
             data = json.load(file)[id]
-        return flask.render_template(r'scenario-view.html', **data, scenarioId = id)
+        return flask.render_template(r'scenario-view.html', **data, scenarioId = id, round=round)
     except KeyError:
         return not_found('scenario', id)
 

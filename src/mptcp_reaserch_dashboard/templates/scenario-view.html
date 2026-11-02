@@ -79,7 +79,7 @@
 
                             <div class="detail">
                                 <span class="label">Packet loss</span>
-                                <span class="value">{{ path.packetLossPercent*100 }}%</span>
+                                <span class="value">{{ round(path.packetLossPercent * 100, 2) }}%</span>
                             </div>
                         </div>
                     </div>

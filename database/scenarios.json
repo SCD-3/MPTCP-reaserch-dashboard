@@ -11,14 +11,14 @@
                 "bandwidthMbps": 100,
                 "delayMs": 20,
                 "jitterMs": 2,
-                "packetLossPercent": 0
+                "packetLossPercent": 0.001
             },
             {
                 "name": "Path 2",
                 "bandwidthMbps": 50,
                 "delayMs": 80,
                 "jitterMs": 5,
-                "packetLossPercent": 1
+                "packetLossPercent": 0.51343435
             }
         ]
     }
