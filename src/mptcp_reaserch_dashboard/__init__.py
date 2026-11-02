@@ -9,7 +9,7 @@ app = flask.Flask(__name__)
 TEMPLATES_BASE_PATH = r'templates/'
 
 
-def not_found(resource_type: Literal["algorithm", "environment", "experiment", "scenario"], resource_id: str):
+def not_found(resource_type: Literal["algorithm", "environment", "experiment", "scenario"], resource_id: str|None = None):
     if resource_type not in ("algorithm", "environment", "experiment", "scenario"): # safety check
         return (None, 404) # type: ignore
     
@@ -81,6 +81,28 @@ def get_experiments(id: str):
         return flask.render_template(r'experiment-view.html', **data)
     except KeyError:
         return not_found('experiment', id)
+
+
+
+@app.get('/algorithms')
+@app.get('/environments')
+@app.get('/scenarios')
+@app.get('/experiments')
+def id_not_specyfied():
+    match flask.request.path:
+        case '/algorithms':
+            type = 'algorithm'
+        case '/environments':
+            type = 'environment'
+        case '/scenarios':
+            type = 'scenario'
+        case '/experiments':
+            type = 'experiment'
+        
+        case _:
+            raise ValueError("somehow, you got to this site from non existen url. congrats") # unrechable, just so typechecker shuts up
+        
+    return not_found(type)
 
 if __name__ == '__main__':
     app.run()
