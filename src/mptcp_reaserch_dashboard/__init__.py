@@ -9,7 +9,11 @@ app = flask.Flask(__name__)
 TEMPLATES_BASE_PATH = r'templates/'
 
 
-def not_found(resource_type: Literal["algorithm", "environment", "experiment", "scenario"], resource_id: str|None = None):
+def resource_not_found(
+    resource_type: Literal["algorithm", "environment", "experiment", "scenario"], 
+    resource_id: str|None = None
+    ):
+    
     if resource_type not in ("algorithm", "environment", "experiment", "scenario"): # safety check
         return (None, 404) # type: ignore
     
@@ -59,7 +63,7 @@ def get_algorithms(id: str):
             data = json.load(file)[id]
         return flask.render_template(r'algorithms/algorithm-view.html', **data)
     except KeyError:
-        return not_found('algorithm', id)
+        return resource_not_found('algorithm', id)
 
 @app.get('/environments/<id>')
 def get_environments(id: str):
@@ -68,7 +72,7 @@ def get_environments(id: str):
             data = json.load(file)[id]
         return flask.render_template(r'environments/environment-view.html', **data)
     except KeyError:
-        return not_found('environment', id)
+        return resource_not_found('environment', id)
 
 
 @app.get('/scenarios/<id>')
@@ -78,7 +82,7 @@ def get_scenarios(id: str):
             data = json.load(file)[id]
         return flask.render_template(r'scenarios/scenario-view.html', **data, scenarioId = id, round=round)
     except KeyError:
-        return not_found('scenario', id)
+        return resource_not_found('scenario', id)
 
 @app.get('/experiments/<id>')
 def get_experiments(id: str):
@@ -87,7 +91,7 @@ def get_experiments(id: str):
             data = json.load(file)[id]
         return flask.render_template(r'experiments/experiment-view.html', **data, experimentId = id)
     except KeyError:
-        return not_found('experiment', id)
+        return resource_not_found('experiment', id)
 
 
 @app.get("/algorithms")
