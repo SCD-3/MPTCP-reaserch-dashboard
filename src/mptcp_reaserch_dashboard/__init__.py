@@ -3,7 +3,7 @@ import json
 
 from typing import Literal
 
-import mptcp_reaserch_dashboard.data_manager as database
+import mptcp_reaserch_dashboard.resource_manager as resource
 
 app = flask.Flask(__name__)
 TEMPLATES_BASE_PATH = r'templates/'
@@ -40,7 +40,7 @@ def post_algorithms(id: str):
     # validator.validate(data)
     #TODO ill have to rewrite schemas to work with single entries
     
-    entry = database.Alghorithm(
+    entry = resource.Alghorithm(
         id=data['id'],
         code=data['code'],
         name=data['name'],
@@ -59,7 +59,7 @@ def post_algorithms(id: str):
 def get_algorithms(id: str):
     
     try:
-        with open(database.DATA_BASE_PATH / database.ALGORITHMS_DATA_PATH) as file:
+        with open(resource.DATA_BASE_PATH / resource.ALGORITHMS_DATA_PATH) as file:
             data = json.load(file)[id]
         return flask.render_template(r'algorithms/algorithm-view.html', **data)
     except KeyError:
@@ -68,7 +68,7 @@ def get_algorithms(id: str):
 @app.get('/environments/<id>')
 def get_environments(id: str):
     try:
-        with open(database.DATA_BASE_PATH / database.ENVIRONMENTS_DATA_PATH) as file:
+        with open(resource.DATA_BASE_PATH / resource.ENVIRONMENTS_DATA_PATH) as file:
             data = json.load(file)[id]
         return flask.render_template(r'environments/environment-view.html', **data)
     except KeyError:
@@ -78,7 +78,7 @@ def get_environments(id: str):
 @app.get('/scenarios/<id>')
 def get_scenarios(id: str):
     try:
-        with open(database.DATA_BASE_PATH / database.SCENARIOS_DATA_PATH) as file:
+        with open(resource.DATA_BASE_PATH / resource.SCENARIOS_DATA_PATH) as file:
             data = json.load(file)[id]
         return flask.render_template(r'scenarios/scenario-view.html', **data, scenarioId = id, round=round)
     except KeyError:
@@ -87,7 +87,7 @@ def get_scenarios(id: str):
 @app.get('/experiments/<id>')
 def get_experiments(id: str):
     try:
-        with open(database.DATA_BASE_PATH / database.EXPERIMENTS_DATA_PATH) as file:
+        with open(resource.DATA_BASE_PATH / resource.EXPERIMENTS_DATA_PATH) as file:
             data = json.load(file)[id]
         return flask.render_template(r'experiments/experiment-view.html', **data, experimentId = id)
     except KeyError:
@@ -96,25 +96,25 @@ def get_experiments(id: str):
 
 @app.get("/algorithms")
 def algorithms_list():
-    with open(database.DATA_BASE_PATH / database.ALGORITHMS_DATA_PATH) as file:
+    with open(resource.DATA_BASE_PATH / resource.ALGORITHMS_DATA_PATH) as file:
         data = json.load(file)
     return flask.render_template("algorithms/algorithms-list.html", algorithms=data)
 
 @app.get("/environments")
 def environments_list():
-    with open(database.DATA_BASE_PATH / database.ENVIRONMENTS_DATA_PATH) as file:
+    with open(resource.DATA_BASE_PATH / resource.ENVIRONMENTS_DATA_PATH) as file:
         data = json.load(file)
     return flask.render_template("environments/environments-list.html", environments=data)
 
 @app.get("/scenarios")
 def scenarios_list():
-    with open(database.DATA_BASE_PATH / database.SCENARIOS_DATA_PATH) as file:
+    with open(resource.DATA_BASE_PATH / resource.SCENARIOS_DATA_PATH) as file:
         data = json.load(file)
     return flask.render_template("scenarios/scenarios-list.html", scenarios=data)
 
 @app.get("/experiments")
 def experiments_list():
-    with open(database.DATA_BASE_PATH / database.EXPERIMENTS_DATA_PATH) as file:
+    with open(resource.DATA_BASE_PATH / resource.EXPERIMENTS_DATA_PATH) as file:
         data = json.load(file)
     return flask.render_template("experiments/experiments-list.html", experiments=data)
 
