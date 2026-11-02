@@ -1,32 +1,80 @@
 <!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>{{ shortName }}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ shortName }} - Algorithm Details</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/algorithm-view.css') }}">
 </head>
 
 <body>
+    <main class="container">
+        <header class="page-header">
+            <div>
+                <span class="eyebrow">ALGORITHM DETAILS</span>
+                <h1>{{ name }}</h1>
+                <p class="subtitle">{{ description }}</p>
+            </div>
 
-    Name: {{ name }}<br>
-    Type: {{ type }}<br>
-    Description: {{ description }}<br>
-    Active: {{ "Yes" if isActive else "No" }}<br>
-    Parameters: {{ parameters }}<br>
-    Supported Environments: {{ supportedEnvironments }}<br>
+            <span class="status {{ 'active' if isActive else 'inactive' }}">
+                {{ "Active" if isActive else "Inactive" }}
+            </span>
+        </header>
 
+        <section class="card">
+            <h2>General information</h2>
 
+            <div class="details-grid">
+                <div class="detail">
+                    <span class="label">Short name</span>
+                    <span class="value">{{ shortName }}</span>
+                </div>
+
+                <div class="detail">
+                    <span class="label">Algorithm code</span>
+                    <span class="value"><code>{{ code }}</code></span>
+                </div>
+
+                <div class="detail">
+                    <span class="label">Algorithm type</span>
+                    <span class="value">{{ type }}</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="section-header">
+                <div>
+                    <h2>Supported environments</h2>
+                    <p>Environments where this algorithm can be executed</p>
+                </div>
+                <span class="tag">{{ supportedEnvironments | length }} environments</span>
+            </div>
+
+            <div class="tag-list">
+                {% for environment in supportedEnvironments %}
+                    <span class="environment-tag">{{ environment }}</span>
+                {% else %}
+                    <span class="empty-state">No supported environments</span>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="section-header">
+                <div>
+                    <h2>Parameters</h2>
+                    <p>Algorithm configuration parameters</p>
+                </div>
+                <span class="tag">JSON</span>
+            </div>
+
+            <pre class="code-block"><code>{{ parameters | tojson(indent=4) }}</code></pre>
+        </section>
+
+        <footer>
+            Algorithm management
+        </footer>
+    </main>
 </body>
-
-<!-- {
-    "alg-lia": {
-        "code": "lia",
-        "name": "Linked Increases Algorithm",
-        "shortName": "LIA",
-        "type": "REFERENCE",
-        "description": "Algorytm Congestion Control MPTCP",
-        "isActive": true,
-        "parameters": {},
-        "supportedEnvironments": [
-            "UML",
-            "NS3"
-        ]
-    }
-} -->
+</html>

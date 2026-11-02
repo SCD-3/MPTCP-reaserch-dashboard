@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ name }} - Scenario Details</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/scenario-view.css') }}">
+</head>
+
+<body>
+    <main class="container">
+        <header class="page-header">
+            <div>
+                <span class="eyebrow">SCENARIO DETAILS</span>
+                <h1>{{ name }}</h1>
+                <p class="subtitle">{{ description }}</p>
+            </div>
+            <span class="tag">{{ paths | length }} paths</span>
+        </header>
+
+        <section class="card">
+            <h2>General information</h2>
+
+            <div class="details-grid">
+                <div class="detail">
+                    <span class="label">Scenario ID</span>
+                    <span class="value">{{ scenarioId }}</span>
+                </div>
+
+                <div class="detail">
+                    <span class="label">Duration</span>
+                    <span class="value">{{ durationSeconds }} seconds</span>
+                </div>
+
+                <div class="detail">
+                    <span class="label">Repetitions</span>
+                    <span class="value">{{ repetitions }}</span>
+                </div>
+
+                <div class="detail">
+                    <span class="label">Receiver consumption</span>
+                    <span class="value">{{ receiverConsumptionMbps }} Mbps</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="section-header">
+                <div>
+                    <h2>Network paths</h2>
+                    <p>Network configuration for each simulation path</p>
+                </div>
+                <span class="tag">{{ paths | length }} paths</span>
+            </div>
+
+            <div class="paths-list">
+                {% for path in paths %}
+                    <div class="path-card">
+                        <div class="path-header">
+                            <h3>{{ path.name }}</h3>
+                            <span class="path-index">PATH {{ loop.index }}</span>
+                        </div>
+
+                        <div class="details-grid">
+                            <div class="detail">
+                                <span class="label">Bandwidth</span>
+                                <span class="value">{{ path.bandwidthMbps }} Mbps</span>
+                            </div>
+
+                            <div class="detail">
+                                <span class="label">Delay</span>
+                                <span class="value">{{ path.delayMs }} ms</span>
+                            </div>
+
+                            <div class="detail">
+                                <span class="label">Jitter</span>
+                                <span class="value">{{ path.jitterMs }} ms</span>
+                            </div>
+
+                            <div class="detail">
+                                <span class="label">Packet loss</span>
+                                <span class="value">{{ path.packetLossPercent }}%</span>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="empty-state">No network paths configured.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <footer>
+            MPTCP Research Dashboard
+        </footer>
+    </main>
+</body>
+</html>

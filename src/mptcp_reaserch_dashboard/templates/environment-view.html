@@ -1,28 +1,57 @@
 <!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/environment-view.css') }}">
 </head>
 
 <body>
+    <main class="container">
+        <header class="page-header">
+            <div>
+                <span class="eyebrow">ENVIRONMENT DETAILS</span>
+                <h1>{{ name }}</h1>
+                <p class="subtitle">{{ description }}</p>
+            </div>
 
-    Name: {{ name }}<br>
-    Type: {{ type }}<br>
-    Description: {{ description }}<br>
-    Version: {{ version }}<br>
-    Active: {{ "Yes" if isActive else "No" }}<br>
-    Configuration: {{ configuration }}<br>
+            <span class="status {{ 'active' if isActive else 'inactive' }}">
+                {{ "Active" if isActive else "Inactive" }}
+            </span>
+        </header>
 
+        <section class="card">
+            <h2>General information</h2>
+
+            <div class="details-grid">
+                <div class="detail">
+                    <span class="label">Environment type</span>
+                    <span class="value">{{ type }}</span>
+                </div>
+
+                <div class="detail">
+                    <span class="label">Version</span>
+                    <span class="value">{{ version }}</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="section-header">
+                <div>
+                    <h2>Configuration</h2>
+                    <p>Environment configuration parameters</p>
+                </div>
+                <span class="tag">JSON</span>
+            </div>
+
+            <pre class="code-block"><code>{{ configuration | tojson(indent=4) }}</code></pre>
+        </section>
+
+        <footer>
+            Environment management
+        </footer>
+    </main>
 </body>
-
-<!-- {
-    "env-ns3": {
-        "name": "ns-3 Research Simulator",
-        "type": "NS3",
-        "description": "Środowisko symulacyjne MPTCP",
-        "version": "configured-version",
-        "isActive": true,
-        "configuration": {
-            "simulationMode": "discrete-event"
-        }
-    }
-} -->
+</html>
