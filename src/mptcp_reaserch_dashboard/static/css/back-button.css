@@ -16,3 +16,7 @@
 .back-button span {
     font-size: 18px;
 }
+
+a {
+    text-decoration: none;
+}

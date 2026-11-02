@@ -1,9 +1,7 @@
+@import url(back-button.css);
+
 * {
     box-sizing: border-box;
-}
-
-a {
-    text-decoration: none;
 }
 
 body {
