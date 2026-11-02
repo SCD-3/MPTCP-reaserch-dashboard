@@ -20,6 +20,13 @@ def not_found(resource_type: Literal["algorithm", "environment", "experiment", "
 def index():
     return flask.render_template('index.html')
 
+@app.route("/favicon.ico")
+def favicon():
+    
+    if app.static_folder is None:
+        raise OSError("Failed to find static folder")
+    
+    return flask.send_from_directory(app.static_folder, "favicon.ico", mimetype="image/vnd.microsoft.icon")
 
 
 @app.post('/algorithms/<id>')
