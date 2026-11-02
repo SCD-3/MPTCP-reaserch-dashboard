@@ -4,7 +4,7 @@
         "type": "NS3",
         "description": "Środowisko symulacyjne MPTCP",
         "version": "configured-version",
-        "isActive": true,
+        "isActive": false,
         "configuration": {
             "simulationMode": "discrete-event"
         }

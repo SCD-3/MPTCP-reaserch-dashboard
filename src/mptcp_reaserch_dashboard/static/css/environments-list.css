@@ -155,11 +155,11 @@ h1 {
 }
 
 .inactive {
-    color: #94a3b8;
+    color: #fca5a5;
 }
 
 .inactive .status-dot {
-    background: #64748b;
+    background: #ef4444;
 }
 
 .arrow {

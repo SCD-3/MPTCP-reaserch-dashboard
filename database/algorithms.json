@@ -11,5 +11,21 @@
             "UML",
             "NS3"
         ]
+    },
+    "alg-lie": {
+        "code": "lie",
+        "name": "Lying Increases Algorithm",
+        "shortName": "LIE",
+        "type": "AUTHORIAL",
+        "description": "Algorytm Congestion Control MPTCP",
+        "isActive": false,
+        "parameters": {
+            "foo": 1,
+            "bar": 2.1
+        },
+        "supportedEnvironments": [
+            "UML",
+            "NS3"
+        ]
     }
 }
