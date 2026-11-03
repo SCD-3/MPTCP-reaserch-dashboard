@@ -110,7 +110,7 @@ function validateForm(): boolean {
 
     setFieldError("name", nameInput.value.trim().length > 0 ? "" : "Name is required.");
     setFieldError("short-name", shortNameInput.value.trim().length > 0 ? "" : "Short name is required.");
-    setFieldError("description", descriptionInput.value.trim().length > 0 ? "" : "Description is required.");
+    // setFieldError("description", descriptionInput.value.trim().length > 0 ? "" : "Description is required.");
 
     const parameterNames = new Set<string>();
     let parameterError = "";
