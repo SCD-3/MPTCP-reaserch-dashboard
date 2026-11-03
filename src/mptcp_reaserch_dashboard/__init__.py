@@ -1,5 +1,6 @@
 import flask
 import json
+from werkzeug import http
 
 from typing import Literal
 
@@ -20,6 +21,9 @@ def resource_not_found(
     return flask.render_template(f"not-found.html", resource=resource_type, resource_id=resource_id), 404
 
 
+def code_message(code: int):
+    return http.HTTP_STATUS_CODES[code], code
+
 @app.get('/')
 def index():
     return flask.render_template('index.html')
@@ -35,7 +39,15 @@ def favicon():
 
 @app.route('/new/algorithms', methods=['GET', 'POST'])
 def add_algorithm_form():
-    return flask.render_template(r'algorithms/algorithm-create.html')
+    match flask.request.method:
+        case 'GET':
+            return flask.render_template(r'algorithms/algorithm-create.html')
+        
+        case 'POST':
+            return "NOT YET IMPLEMENTED", 200
+        
+        case _:
+            return code_message(415)
 
 @app.route('/new/environments', methods=['GET', 'POST'])
 def add_environment_form():
