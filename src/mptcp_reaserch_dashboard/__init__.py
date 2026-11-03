@@ -33,21 +33,22 @@ def favicon():
     return flask.send_from_directory(app.static_folder, "favicon.ico", mimetype="image/vnd.microsoft.icon")
 
 
-@app.get('/new/algorithms')
+@app.route('/new/algorithms', methods=['GET', 'POST'])
 def add_algorithm_form():
     return 'not yet added', 404
 
-@app.get('/new/environments')
+@app.route('/new/environments', methods=['GET', 'POST'])
 def add_environment_form():
     return 'not yet added', 404
 
-@app.get('/new/experiments')
+@app.route('/new/experiments', methods=['GET', 'POST'])
 def add_experiment_form():
     return 'not yet added', 404
 
-@app.get('/new/scenarios')
+@app.route('/new/scenarios', methods=['GET', 'POST'])
 def add_scenario_form():
     return 'not yet added', 404
+
 
 @app.get('/algorithms/<id>')
 def get_algorithms(id: str):
