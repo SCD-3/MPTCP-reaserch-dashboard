@@ -26,14 +26,14 @@ if (!form || !parameterList || !addParameterButton || !messageBox || !parameters
 }
 
 function showMessage(message: string, isSuccess = false): void {
-    messageBox.textContent = message;
-    messageBox.classList.add("visible");
-    messageBox.classList.toggle("success", isSuccess);
+    messageBox!.textContent = message;
+    messageBox!.classList.add("visible");
+    messageBox!.classList.toggle("success", isSuccess);
 }
 
 function clearMessage(): void {
-    messageBox.textContent = "";
-    messageBox.classList.remove("visible", "success");
+    messageBox!.textContent = "";
+    messageBox!.classList.remove("visible", "success");
 }
 
 function setFieldError(fieldId: string, message: string): void {
@@ -79,13 +79,13 @@ function addParameterRow(): void {
     removeButton.addEventListener("click", () => row.remove());
 
     row.append(keyLabel, valueLabel, removeButton);
-    parameterList.append(row);
+    parameterList!.append(row);
     keyInput.focus();
 }
 
 function validateForm(): boolean {
     clearMessage();
-    parametersError.textContent = "";
+    parametersError!.textContent = "";
 
     const idInput = document.querySelector<HTMLInputElement>("#algorithm-id");
     const codeInput = document.querySelector<HTMLInputElement>("#code");
@@ -115,7 +115,7 @@ function validateForm(): boolean {
     const parameterNames = new Set<string>();
     let parameterError = "";
 
-    for (const row of parameterList.querySelectorAll<HTMLDivElement>(".parameter-row")) {
+    for (const row of parameterList!.querySelectorAll<HTMLDivElement>(".parameter-row")) {
         const keyInput = row.querySelector<HTMLInputElement>(".parameter-name");
         const valueInput = row.querySelector<HTMLInputElement>(".parameter-value");
 
@@ -150,11 +150,11 @@ function validateForm(): boolean {
         }
     }
 
-    parametersError.textContent = parameterError;
+    parametersError!.textContent = parameterError;
 
-    const valid = form.checkValidity();
+    const valid = form!.checkValidity();
     if (!valid) {
-        form.reportValidity();
+        form!.reportValidity();
         showMessage("Please correct the highlighted fields before creating the algorithm.");
     }
 
@@ -165,7 +165,7 @@ function buildAlgorithm(): { id: string; databaseEntry: Record<string, Algorithm
     const id = (document.querySelector<HTMLInputElement>("#algorithm-id")?.value ?? "").trim();
     const parameters: Record<string, number> = {};
 
-    for (const row of parameterList.querySelectorAll<HTMLDivElement>(".parameter-row")) {
+    for (const row of parameterList!.querySelectorAll<HTMLDivElement>(".parameter-row")) {
         const key = row.querySelector<HTMLInputElement>(".parameter-name")?.value.trim();
         const value = row.querySelector<HTMLInputElement>(".parameter-value")?.value.trim();
 
@@ -175,7 +175,7 @@ function buildAlgorithm(): { id: string; databaseEntry: Record<string, Algorithm
     }
 
     const supportedEnvironments = Array.from(
-        form.querySelectorAll<HTMLInputElement>('input[name="supportedEnvironments"]:checked')
+        form!.querySelectorAll<HTMLInputElement>('input[name="supportedEnvironments"]:checked')
     ).map((input) => input.value as SupportedEnvironment);
 
     const algorithm: Algorithm = {
