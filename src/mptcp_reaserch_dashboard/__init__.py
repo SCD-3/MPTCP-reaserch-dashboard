@@ -1,5 +1,6 @@
 import flask
 import json
+import jsonschema.exceptions
 from werkzeug import http
 
 from typing import Literal
@@ -44,7 +45,33 @@ def add_algorithm_form():
             return flask.render_template(r'algorithms/algorithm-create.html')
         
         case 'POST':
-            return "NOT YET IMPLEMENTED", 200
+            
+            
+            try:
+                schema = resource.load_schemas(resource.DataKind.Algorithms)
+                data = flask.request.json
+                schema.validate(data)
+                
+                with open(resource.DATA_BASE_PATH / resource.ALGORITHMS_DATA_PATH, 'r+') as file:
+                    database = json.load(file)
+                    for i in data:
+                        database[i] = data[i]
+                        
+                        
+                    file.truncate()
+                    file.seek(0)
+                    json.dump(database, file)
+                
+                return 'ok', 200
+            
+            except jsonschema.exceptions.ValidationError:
+                return code_message(422)
+            
+            except jsonschema.exceptions.SchemaError:
+                return code_message(500)
+
+            except json.decoder.JSONDecodeError:
+                return code_message(400)
         
         case _:
             return code_message(415)

@@ -1,6 +1,4 @@
-a {
-    text-decoration: none;
-}
+@import url("common.css");
 
 .header-actions {
     display: flex;
