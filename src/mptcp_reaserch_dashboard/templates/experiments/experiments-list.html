@@ -23,7 +23,14 @@
                 <p class="subtitle">Browse and monitor research experiments.</p>
             </div>
 
-            <span class="count">{{ experiments | length }} experiments</span>
+            <div class="header-actions">
+                <span class="count">{{ experiments | length }} algorithms</span>
+                <a class="add-button" href="{{ url_for('add_experiment_form') }}" aria-label="Add experiments"
+                    title="Add experiments">
+                    <span class="add-button-icon" aria-hidden="true">+</span>
+                    <span class="add-button-label">Add experiments</span>
+                </a>
+            </div>
         </header>
 
         <section class="experiment-list">

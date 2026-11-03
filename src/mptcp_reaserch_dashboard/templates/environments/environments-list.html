@@ -23,7 +23,14 @@
                 <p class="subtitle">Browse available simulation environments.</p>
             </div>
 
-            <span class="count">{{ environments | length }} environments</span>
+            <div class="header-actions">
+                <span class="count">{{ environments | length }} algorithms</span>
+                <a class="add-button" href="{{ url_for('add_environment_form') }}" aria-label="Add environments"
+                    title="Add environments">
+                    <span class="add-button-icon" aria-hidden="true">+</span>
+                    <span class="add-button-label">Add environments</span>
+                </a>
+            </div>
         </header>
 
         <section class="environment-list">

@@ -33,27 +33,21 @@ def favicon():
     return flask.send_from_directory(app.static_folder, "favicon.ico", mimetype="image/vnd.microsoft.icon")
 
 
-@app.post('/algorithms/<id>')
-def post_algorithms(id: str):
-    data = flask.request.get_json()
-    # validator = database.load_schemas(database.DataKind.Algorithms)
-    # validator.validate(data)
-    #TODO ill have to rewrite schemas to work with single entries
-    
-    entry = resource.Alghorithm(
-        id=data['id'],
-        code=data['code'],
-        name=data['name'],
-        short_name=data['shortName'],
-        type=data['type'],
-        description=data['description'],
-        is_active=data['isActive'],
-        parameters=data['parameters'],
-        supported_environments=data['supportedEnvironments']
-    )
-    entry.save()
-    
-    return 'ok'
+@app.get('/new/algorithms')
+def add_algorithm_form():
+    return 'not yet added', 404
+
+@app.get('/new/environments')
+def add_environment_form():
+    return 'not yet added', 404
+
+@app.get('/new/experiments')
+def add_experiment_form():
+    return 'not yet added', 404
+
+@app.get('/new/scenarios')
+def add_scenario_form():
+    return 'not yet added', 404
 
 @app.get('/algorithms/<id>')
 def get_algorithms(id: str):

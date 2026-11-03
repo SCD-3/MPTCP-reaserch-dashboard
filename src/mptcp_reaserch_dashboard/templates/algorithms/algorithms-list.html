@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Available Algorithms</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/algorithms-list.css') }}">
 </head>
+
 <body>
     <main class="container">
 
@@ -21,44 +23,49 @@
                 <p class="subtitle">Browse available congestion control algorithms.</p>
             </div>
 
-            <span class="count">{{ algorithms | length }} algorithms</span>
+            <div class="header-actions">
+                <span class="count">{{ algorithms | length }} algorithms</span>
+                <a class="add-button" href="{{ url_for('add_algorithm_form') }}" aria-label="Add algorithm"
+                    title="Add algorithm">
+                    <span class="add-button-icon" aria-hidden="true">+</span>
+                    <span class="add-button-label">Add algorithm</span>
+                </a>
+            </div>
         </header>
 
         <section class="algorithm-list">
             {% for algorithm_id, algorithm in algorithms.items() %}
-                <a
-                    class="algorithm-card"
-                    href="{{ url_for('get_algorithms', id=algorithm_id) }}"
-                >
-                    <div class="algorithm-main">
-                        <div class="algorithm-heading">
-                            <h2>{{ algorithm.name }}</h2>
-                            <span class="short-name">{{ algorithm.shortName }}</span>
-                        </div>
-
-                        <div class="algorithm-meta">
-                            <span class="code">{{ algorithm.code }}</span>
-                            <span class="type type-{{ algorithm.type | lower }}">
-                                {{ algorithm.type }}
-                            </span>
-                        </div>
+            <a class="algorithm-card" href="{{ url_for('get_algorithms', id=algorithm_id) }}">
+                <div class="algorithm-main">
+                    <div class="algorithm-heading">
+                        <h2>{{ algorithm.name }}</h2>
+                        <span class="short-name">{{ algorithm.shortName }}</span>
                     </div>
 
-                    <div class="algorithm-status">
-                        <span class="status {{ 'active' if algorithm.isActive else 'inactive' }}">
-                            <span class="status-dot"></span>
-                            {{ 'Active' if algorithm.isActive else 'Inactive' }}
+                    <div class="algorithm-meta">
+                        <span class="code">{{ algorithm.code }}</span>
+                        <span class="type type-{{ algorithm.type | lower }}">
+                            {{ algorithm.type }}
                         </span>
-                        <span class="arrow">→</span>
                     </div>
-                </a>
-            {% else %}
-                <div class="empty-state">
-                    <h2>No algorithms available</h2>
-                    <p>There are currently no algorithms registered in the dashboard.</p>
                 </div>
+
+                <div class="algorithm-status">
+                    <span class="status {{ 'active' if algorithm.isActive else 'inactive' }}">
+                        <span class="status-dot"></span>
+                        {{ 'Active' if algorithm.isActive else 'Inactive' }}
+                    </span>
+                    <span class="arrow">→</span>
+                </div>
+            </a>
+            {% else %}
+            <div class="empty-state">
+                <h2>No algorithms available</h2>
+                <p>There are currently no algorithms registered in the dashboard.</p>
+            </div>
             {% endfor %}
         </section>
     </main>
 </body>
+
 </html>

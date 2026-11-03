@@ -23,7 +23,14 @@
                 <p class="subtitle">Browse available network simulation scenarios.</p>
             </div>
 
-            <span class="count">{{ scenarios | length }} scenarios</span>
+            <div class="header-actions">
+                <span class="count">{{ scenarios | length }} algorithms</span>
+                <a class="add-button" href="{{ url_for('add_scenario_form') }}" aria-label="Add scenarios"
+                    title="Add scenarios">
+                    <span class="add-button-icon" aria-hidden="true">+</span>
+                    <span class="add-button-label">Add scenarios</span>
+                </a>
+            </div>
         </header>
 
         <section class="scenario-list">
