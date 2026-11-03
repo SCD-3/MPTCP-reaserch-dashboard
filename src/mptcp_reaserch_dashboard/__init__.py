@@ -35,7 +35,7 @@ def favicon():
 
 @app.route('/new/algorithms', methods=['GET', 'POST'])
 def add_algorithm_form():
-    return 'not yet added', 404
+    return flask.render_template(r'algorithms/algorithm-create.html')
 
 @app.route('/new/environments', methods=['GET', 'POST'])
 def add_environment_form():

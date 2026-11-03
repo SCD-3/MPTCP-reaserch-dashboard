@@ -204,6 +204,7 @@ form.addEventListener("submit", async (event: SubmitEvent) => {
     }
 
     const submitButton = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+
     if (submitButton) {
         submitButton.disabled = true;
         submitButton.textContent = "Creating...";
@@ -211,11 +212,12 @@ form.addEventListener("submit", async (event: SubmitEvent) => {
 
     try {
         const { databaseEntry } = buildAlgorithm();
+
         const response = await fetch(form.action, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Accept": "application/json, text/html"
+                "Accept": "application/json"
             },
             body: JSON.stringify(databaseEntry)
         });
@@ -225,19 +227,12 @@ form.addEventListener("submit", async (event: SubmitEvent) => {
             throw new Error(responseText || `Request failed with status ${response.status}.`);
         }
 
-        if (response.redirected) {
-            window.location.assign(response.url);
-            return;
-        }
+        window.location.assign(form.dataset.successUrl!);
 
-        showMessage("Algorithm created successfully.", true);
-        form.reset();
-        parameterList.replaceChildren();
-        document.querySelector<HTMLInputElement>("#is-active")!.checked = true;
     } catch (error) {
         const message = error instanceof Error ? error.message : "An unexpected error occurred.";
         showMessage(`Could not create algorithm: ${message}`);
-    } finally {
+
         if (submitButton) {
             submitButton.disabled = false;
             submitButton.textContent = "Create algorithm";

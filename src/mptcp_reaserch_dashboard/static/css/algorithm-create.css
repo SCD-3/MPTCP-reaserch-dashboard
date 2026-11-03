@@ -1,9 +1,7 @@
+@import url("back-button.css");
+
 * {
     box-sizing: border-box;
-}
-
-a {
-    text-decoration: none;
 }
 
 body {
@@ -19,24 +17,6 @@ body {
     width: 100%;
     max-width: 850px;
     margin: 0 auto;
-}
-
-.back-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 24px;
-    color: #a5b4fc;
-    font-size: 14px;
-    transition: color 0.2s ease;
-}
-
-.back-button:hover {
-    color: #818cf8;
-}
-
-.back-button span {
-    font-size: 18px;
 }
 
 .page-header {
