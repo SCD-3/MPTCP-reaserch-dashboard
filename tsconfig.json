@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "target": "ES2020",
+        "module": "es2020",
+        "strict": true,
+
+        "rootDir": "src/mptcp_reaserch_dashboard/static/ts",
+        "outDir": "src/mptcp_reaserch_dashboard/static/js",
+
+        "lib": [
+            "ES2020",
+            "DOM"
+        ],
+
+        "noEmitOnError": true,
+        "removeComments": true,
+        "sourceMap": true
+    },
+    "include": [
+        "src/mptcp_reaserch_dashboard/static/ts/**/*.ts"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}

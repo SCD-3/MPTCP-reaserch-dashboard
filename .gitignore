@@ -8,3 +8,7 @@ wheels/
 
 # Virtual environments
 .venv
+
+# ts
+/node_modules/*
+*.js

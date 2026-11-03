@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Algorithm</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/algorithm-create.css') }}">
+    <script src="{{ url_for('static', filename='js/add-algorithm.js') }}" defer></script>
+</head>
+<body>
+    <main class="container">
+        <a class="back-button" href="{{ url_for('algorithms_list') }}">
+            <span>←</span>
+            Back to algorithms
+        </a>
+
+        <header class="page-header">
+            <span class="eyebrow">MPTCP RESEARCH DASHBOARD</span>
+            <h1>Add algorithm</h1>
+            <p class="subtitle">Register a congestion control algorithm in the dashboard.</p>
+        </header>
+
+        <form id="algorithm-form"
+              class="form-card"
+              action="{{ url_for('add_algorithm_form') }}"
+              method="post"
+              novalidate>
+            <div id="form-message" class="form-message" role="status" aria-live="polite"></div>
+
+            <section class="form-section">
+                <h2>Identification</h2>
+                <p class="section-description">The algorithm ID is the key used in the database JSON object.</p>
+
+                <div class="field">
+                    <label for="algorithm-id">Algorithm ID <span class="required">*</span></label>
+                    <input id="algorithm-id" name="algorithmId" type="text"
+                           placeholder="alg-lia" required
+                           pattern="[a-z](?:[a-z0-9-]*[a-z0-9])?"
+                           autocomplete="off">
+                    <small>Lowercase letters, digits and hyphens. Must start with a letter.</small>
+                    <span class="field-error" data-error-for="algorithm-id"></span>
+                </div>
+
+                <div class="field-grid">
+                    <div class="field">
+                        <label for="code">Code <span class="required">*</span></label>
+                        <input id="code" name="code" type="text" maxlength="3"
+                               placeholder="lia" required pattern="[a-z]{3}"
+                               autocomplete="off">
+                        <small>Exactly 3 lowercase letters.</small>
+                        <span class="field-error" data-error-for="code"></span>
+                    </div>
+
+                    <div class="field">
+                        <label for="short-name">Short name <span class="required">*</span></label>
+                        <input id="short-name" name="shortName" type="text"
+                               placeholder="LIA" required>
+                        <span class="field-error" data-error-for="short-name"></span>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="name">Name <span class="required">*</span></label>
+                    <input id="name" name="name" type="text"
+                           placeholder="Linked Increases Algorithm" required minlength="1">
+                    <span class="field-error" data-error-for="name"></span>
+                </div>
+
+                <div class="field">
+                    <label for="description">Description <span class="required">*</span></label>
+                    <textarea id="description" name="description" rows="3"
+                              placeholder="Describe the algorithm..." required></textarea>
+                    <span class="field-error" data-error-for="description"></span>
+                </div>
+
+                <div class="field-grid">
+                    <div class="field">
+                        <label for="type">Algorithm type <span class="required">*</span></label>
+                        <select id="type" name="type" required>
+                            <option value="REFERENCE">Reference</option>
+                            <option value="AUTHORIAL">Authorial</option>
+                        </select>
+                        <span class="field-error" data-error-for="type"></span>
+                    </div>
+
+                    <label class="toggle-field" for="is-active">
+                        <input id="is-active" name="isActive" type="checkbox" checked>
+                        <span>
+                            <strong>Active</strong>
+                            <small>Make this algorithm available for use.</small>
+                        </span>
+                    </label>
+                </div>
+            </section>
+
+            <section class="form-section">
+                <div class="section-heading">
+                    <div>
+                        <h2>Parameters</h2>
+                        <p class="section-description">Optional numeric configuration values.</p>
+                    </div>
+                    <button class="secondary-button" id="add-parameter" type="button">+ Add parameter</button>
+                </div>
+
+                <div id="parameters-list" class="parameters-list"></div>
+                <span class="field-error" id="parameters-error"></span>
+            </section>
+
+            <section class="form-section">
+                <h2>Supported environments</h2>
+                <p class="section-description">Select the environments where this algorithm can run.</p>
+
+                <div class="checkbox-grid">
+                    <label class="choice"><input type="checkbox" name="supportedEnvironments" value="OPENINTERNET"><span>Open Internet</span></label>
+                    <label class="choice"><input type="checkbox" name="supportedEnvironments" value="UML"><span>UML</span></label>
+                    <label class="choice"><input type="checkbox" name="supportedEnvironments" value="NS3"><span>NS-3</span></label>
+                    <label class="choice"><input type="checkbox" name="supportedEnvironments" value="MATHEMATICAL"><span>Mathematical</span></label>
+                </div>
+            </section>
+
+            <div class="form-actions">
+                <a class="cancel-button" href="{{ url_for('algorithms_list') }}">Cancel</a>
+                <button class="submit-button" type="submit">Create algorithm</button>
+            </div>
+        </form>
+    </main>
+</body>
+</html>
