@@ -239,3 +239,5 @@ form.addEventListener("submit", async (event: SubmitEvent) => {
         }
     }
 });
+
+export {} // weird

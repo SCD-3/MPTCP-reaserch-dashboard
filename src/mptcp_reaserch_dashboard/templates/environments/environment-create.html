@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Environment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/resource-create.css') }}">
+    <script src="{{ url_for('static', filename='js/add-environment.js') }}" defer></script>
+</head>
+
+<body>
+    <main class="container">
+        <a class="back-button" href="{{ url_for('environments_list') }}">
+            <span>←</span>
+            Back
+        </a>
+
+        <header class="page-header">
+            <span class="eyebrow">MPTCP RESEARCH DASHBOARD</span>
+            <h1>Add environment</h1>
+            <p class="subtitle">Register a simulation or testing environment in the dashboard.</p>
+        </header>
+
+        <form id="environment-form" class="form-card"
+            action="{{ url_for('add_environment_form') }}"
+            data-success-url="{{ url_for('environments_list') }}"
+            method="post" novalidate>
+
+            <div id="form-message" class="form-message" role="status" aria-live="polite"></div>
+
+            <section class="form-section">
+                <h2>Identification</h2>
+                <p class="section-description">
+                    The environment ID is the key used in the database JSON object.
+                </p>
+
+                <div class="field">
+                    <label for="environment-id">
+                        Environment ID <span class="required">*</span>
+                    </label>
+                    <input id="environment-id" name="environmentId" type="text"
+                        placeholder="linux-ns3" required
+                        pattern="[a-z](?:[a-z0-9-]*[a-z0-9])?"
+                        autocomplete="off">
+                    <small>
+                        Lowercase letters, digits and hyphens. Must start with a letter.
+                    </small>
+                    <span class="field-error" data-error-for="environment-id"></span>
+                </div>
+
+                <div class="field">
+                    <label for="name">Name <span class="required">*</span></label>
+                    <input id="name" name="name" type="text"
+                        placeholder="Linux NS-3" required minlength="1">
+                    <span class="field-error" data-error-for="name"></span>
+                </div>
+
+                <div class="field-grid">
+                    <div class="field">
+                        <label for="type">
+                            Environment type <span class="required">*</span>
+                        </label>
+                        <select id="type" name="type" required>
+                            <option value="OPENINTERNET">Open Internet</option>
+                            <option value="UML">UML</option>
+                            <option value="NS3">NS-3</option>
+                            <option value="MATHEMATICAL">Mathematical</option>
+                        </select>
+                        <span class="field-error" data-error-for="type"></span>
+                    </div>
+
+                    <div class="field">
+                        <label for="version">
+                            Version <span class="required">*</span>
+                        </label>
+                        <input id="version" name="version" type="text"
+                            placeholder="3.42" required minlength="1">
+                        <span class="field-error" data-error-for="version"></span>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" rows="3"
+                        placeholder="Describe the environment..."></textarea>
+                    <span class="field-error" data-error-for="description"></span>
+                </div>
+
+                <label class="toggle-field" for="is-active">
+                    <input id="is-active" name="isActive" type="checkbox" checked>
+                    <span>
+                        <strong>Active</strong>
+                        <small>Make this environment available for use.</small>
+                    </span>
+                </label>
+            </section>
+
+            <section class="form-section">
+                <div class="section-heading">
+                    <div>
+                        <h2>Configuration</h2>
+                        <p class="section-description">
+                            Optional string key-value configuration entries.
+                        </p>
+                    </div>
+                    <button class="secondary-button" id="add-configuration"
+                        type="button">
+                        + Add configuration
+                    </button>
+                </div>
+
+                <div id="configuration-list" class="parameters-list"></div>
+                <span class="field-error" id="configuration-error"></span>
+            </section>
+
+            <div class="form-actions">
+                <a class="cancel-button" href="{{ url_for('environments_list') }}">
+                    Cancel
+                </a>
+                <button class="submit-button" type="submit">
+                    Create environment
+                </button>
+            </div>
+        </form>
+    </main>
+</body>
+
+</html>
