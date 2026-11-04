@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Experiment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/resource-create.css') }}">
+    <script src="{{ url_for('static', filename='js/add-experiment.js') }}" type="module"></script>
+</head>
+
+<body>
+    <main class="container">
+        <a class="back-button" href="{{ url_for('experiments_list') }}">
+            <span>←</span>
+            Back
+        </a>
+
+        <header class="page-header">
+            <span class="eyebrow">MPTCP RESEARCH DASHBOARD</span>
+            <h1>Add experiment</h1>
+            <p class="subtitle">Configure an experiment to run in the dashboard.</p>
+        </header>
+
+        <form id="experiment-form" class="form-card"
+            action="{{ url_for('add_experiment_form') }}"
+            data-success-url="{{ url_for('experiments_list') }}"
+            method="post" novalidate>
+
+            <div id="form-message" class="form-message" role="status" aria-live="polite"></div>
+
+            <section class="form-section">
+                <h2>Identification</h2>
+                <p class="section-description">
+                    The experiment ID is the key used in the database JSON object.
+                </p>
+
+                <div class="field">
+                    <label for="experiment-id">
+                        Experiment ID <span class="required">*</span>
+                    </label>
+                    <input id="experiment-id" name="experimentId" type="text"
+                        placeholder="experiment-001" required
+                        pattern="[a-z](?:[a-z0-9-]*[a-z0-9])?"
+                        autocomplete="off">
+                    <small>
+                        Lowercase letters, digits and hyphens. Must start with a letter.
+                    </small>
+                    <span class="field-error" data-error-for="experiment-id"></span>
+                </div>
+
+                <div class="field">
+                    <label for="name">Name <span class="required">*</span></label>
+                    <input id="name" name="name" type="text"
+                        placeholder="Experiment 001" required minlength="1">
+                    <span class="field-error" data-error-for="name"></span>
+                </div>
+            </section>
+
+            <section class="form-section">
+                <h2>Configuration</h2>
+                <p class="section-description">
+                    Select the scenario, environment and algorithms used in this experiment.
+                </p>
+
+                <div class="field">
+                    <label for="scenario-id">
+                        Scenario ID <span class="required">*</span>
+                    </label>
+                    <input id="scenario-id" name="scenarioId" type="text"
+                        placeholder="scenario-001" required
+                        pattern="[a-z](?:[a-z0-9-]*[a-z0-9])?"
+                        autocomplete="off">
+                    <span class="field-error" data-error-for="scenario-id"></span>
+                </div>
+
+                <div class="field">
+                    <label for="environment-id">
+                        Environment ID <span class="required">*</span>
+                    </label>
+                    <input id="environment-id" name="environmentId" type="text"
+                        placeholder="linux-ns3" required
+                        pattern="[a-z](?:[a-z0-9-]*[a-z0-9])?"
+                        autocomplete="off">
+                    <span class="field-error" data-error-for="environment-id"></span>
+                </div>
+            </section>
+
+            <section class="form-section">
+                <div class="section-heading">
+                    <div>
+                        <h2>Algorithms</h2>
+                        <p class="section-description">
+                            Add at least one algorithm ID. Duplicate IDs are not allowed.
+                        </p>
+                    </div>
+                    <button class="secondary-button" id="add-algorithm"
+                        type="button">
+                        + Add algorithm
+                    </button>
+                </div>
+
+                <div id="algorithms-list" class="parameters-list"></div>
+                <span class="field-error" id="algorithms-error"></span>
+            </section>
+
+            <section class="form-section">
+                <h2>Execution</h2>
+                <p class="section-description">
+                    Configure how many times the experiment should be repeated.
+                </p>
+
+                <div class="field-grid">
+                    <div class="field">
+                        <label for="repetitions">
+                            Repetitions <span class="required">*</span>
+                        </label>
+                        <input id="repetitions" name="repetitions" type="number"
+                            min="1" step="1" value="10" required>
+                        <small>Must be a positive integer.</small>
+                        <span class="field-error" data-error-for="repetitions"></span>
+                    </div>
+
+                    <div class="field">
+                        <label for="status">
+                            Status <span class="required">*</span>
+                        </label>
+                        <select id="status" name="status" required>
+                            <option value="DRAFT">Draft</option>
+                            <option value="PLANNED">Planned</option>
+                            <option value="QUEUED">Queued</option>
+                            <option value="RUNNING">Running</option>
+                            <option value="COMPLETED">Completed</option>
+                            <option value="FAILED">Failed</option>
+                            <option value="CANCELLED">Cancelled</option>
+                        </select>
+                        <span class="field-error" data-error-for="status"></span>
+                    </div>
+                </div>
+            </section>
+
+            <div class="form-actions">
+                <a class="cancel-button" href="{{ url_for('experiments_list') }}">
+                    Cancel
+                </a>
+                <button class="submit-button" type="submit">
+                    Create experiment
+                </button>
+            </div>
+        </form>
+    </main>
+</body>
+
+</html>
