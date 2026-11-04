@@ -57,9 +57,9 @@ def add_algorithm_form():
                         database[i] = data[i]
                         
                         
-                    file.truncate()
+                    file.truncate(0)
                     file.seek(0)
-                    json.dump(database, file)
+                    json.dump(database, file, indent=4)
                 
                 return 'ok', 200
             
@@ -94,9 +94,9 @@ def add_environment_form():
                         database[i] = data[i]
                         
                         
-                    file.truncate()
+                    file.truncate(0)
                     file.seek(0)
-                    json.dump(database, file)
+                    json.dump(database, file, indent=4)
                 
                 return 'ok', 200
             
@@ -131,9 +131,9 @@ def add_experiment_form():
                         database[i] = data[i]
                         
                         
-                    file.truncate()
+                    file.truncate(0)
                     file.seek(0)
-                    json.dump(database, file)
+                    json.dump(database, file, indent=4)
                 
                 return 'ok', 200
             
@@ -168,9 +168,9 @@ def add_scenario_form():
                         database[i] = data[i]
                         
                         
-                    file.truncate()
+                    file.truncate(0)
                     file.seek(0)
-                    json.dump(database, file)
+                    json.dump(database, file, indent=4)
                 
                 return 'ok', 200
             
