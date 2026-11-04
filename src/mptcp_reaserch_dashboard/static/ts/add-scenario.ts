@@ -1,3 +1,4 @@
+
 interface NetworkPath {
     name: string;
     bandwidthMbps: number;
@@ -20,107 +21,122 @@ const scenarioIdPattern = /^[a-z](?:[a-z0-9-]*[a-z0-9])?$/;
 const form = document.querySelector<HTMLFormElement>("#scenario-form");
 const pathsList = document.querySelector<HTMLDivElement>("#paths-list");
 const addPathButton = document.querySelector<HTMLButtonElement>("#add-path");
-const pathsError = document.querySelector<HTMLParagraphElement>("#paths-error");
-const formMessage = document.querySelector<HTMLDivElement>("#form-message");
-const submitButton = document.querySelector<HTMLButtonElement>("#submit-button");
+const messageBox = document.querySelector<HTMLDivElement>("#form-message");
+const pathsError = document.querySelector<HTMLSpanElement>("#paths-error");
 
-const scenarioIdInput = document.querySelector<HTMLInputElement>("#scenario-id");
-const nameInput = document.querySelector<HTMLInputElement>("#name");
-const descriptionInput = document.querySelector<HTMLTextAreaElement>("#description");
-const durationInput = document.querySelector<HTMLInputElement>("#duration-seconds");
-const repetitionsInput = document.querySelector<HTMLInputElement>("#repetitions");
-const receiverConsumptionInput = document.querySelector<HTMLInputElement>("#receiver-consumption");
-
-if (
-    !form ||
-    !pathsList ||
-    !addPathButton ||
-    !pathsError ||
-    !formMessage ||
-    !submitButton ||
-    !scenarioIdInput ||
-    !nameInput ||
-    !descriptionInput ||
-    !durationInput ||
-    !repetitionsInput ||
-    !receiverConsumptionInput
-) {
-    throw new Error("Scenario form elements are missing.");
+if (!form || !pathsList || !addPathButton || !messageBox || !pathsError) {
+    throw new Error("The scenario creation form is missing required elements.");
 }
 
-function showMessage(message: string, isError: boolean = false): void {
-    formMessage!.textContent = message;
-    formMessage!.classList.toggle("error", isError);
+function showMessage(message: string, isSuccess = false): void {
+    messageBox!.textContent = message;
+    messageBox!.classList.add("visible");
+    messageBox!.classList.toggle("success", isSuccess);
 }
 
 function clearMessage(): void {
-    formMessage!.textContent = "";
-    formMessage!.classList.remove("error");
+    messageBox!.textContent = "";
+    messageBox!.classList.remove("visible", "success");
 }
 
-function addPath(): void {
+function setFieldError(fieldId: string, message: string): void {
+    const field = document.getElementById(fieldId) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null;
+    const error = document.querySelector<HTMLElement>(`[data-error-for="${fieldId}"]`);
+
+    if (field) {
+        field.setCustomValidity(message);
+        field.classList.toggle("input-invalid", message.length > 0);
+    }
+
+    if (error) {
+        error.textContent = message;
+    }
+}
+
+function addPathRow(): void {
     const row = document.createElement("div");
     row.className = "parameter-row path-row";
 
-    row.innerHTML = `
-        <div class="field-grid">
-            <div class="field">
-                <label>Path name</label>
-                <input type="text" data-field="name" placeholder="Path 1" required>
-            </div>
+    const nameLabel = document.createElement("label");
+    nameLabel.textContent = "Path name";
 
-            <div class="field">
-                <label>Bandwidth (Mbps)</label>
-                <input type="number" data-field="bandwidthMbps" min="0" step="any" value="100" required>
-            </div>
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.placeholder = "Path 1";
+    nameInput.className = "path-name";
+    nameInput.required = true;
+    nameLabel.append(nameInput);
 
-            <div class="field">
-                <label>Delay (ms)</label>
-                <input type="number" data-field="delayMs" min="0" step="any" value="20" required>
-            </div>
+    const bandwidthLabel = document.createElement("label");
+    bandwidthLabel.textContent = "Bandwidth (Mbps)";
 
-            <div class="field">
-                <label>Jitter (ms)</label>
-                <input type="number" data-field="jitterMs" min="0" step="any" value="2" required>
-            </div>
+    const bandwidthInput = document.createElement("input");
+    bandwidthInput.type = "number";
+    bandwidthInput.min = "0";
+    bandwidthInput.step = "any";
+    bandwidthInput.value = "100";
+    bandwidthInput.className = "path-bandwidth";
+    bandwidthInput.required = true;
+    bandwidthLabel.append(bandwidthInput);
 
-            <div class="field">
-                <label>Packet loss (0–1)</label>
-                <input type="number" data-field="packetLossPercent" min="0" max="1" step="any" value="0" required>
-            </div>
-        </div>
+    const delayLabel = document.createElement("label");
+    delayLabel.textContent = "Delay (ms)";
 
-        <button type="button" class="remove-parameter" aria-label="Remove path">
-            Remove
-        </button>
-    `;
+    const delayInput = document.createElement("input");
+    delayInput.type = "number";
+    delayInput.min = "0";
+    delayInput.step = "any";
+    delayInput.value = "20";
+    delayInput.className = "path-delay";
+    delayInput.required = true;
+    delayLabel.append(delayInput);
 
-    const removeButton = row.querySelector<HTMLButtonElement>(".remove-parameter");
+    const jitterLabel = document.createElement("label");
+    jitterLabel.textContent = "Jitter (ms)";
 
-    removeButton!.addEventListener("click", () => {
-        row.remove();
-        validatePaths();
-    });
+    const jitterInput = document.createElement("input");
+    jitterInput.type = "number";
+    jitterInput.min = "0";
+    jitterInput.step = "any";
+    jitterInput.value = "2";
+    jitterInput.className = "path-jitter";
+    jitterInput.required = true;
+    jitterLabel.append(jitterInput);
 
-    row.querySelectorAll("input").forEach(input => {
-        input.addEventListener("input", validatePaths);
-    });
+    const packetLossLabel = document.createElement("label");
+    packetLossLabel.textContent = "Packet loss (0-1)";
 
-    pathsList!.appendChild(row);
-    validatePaths();
-}
+    const packetLossInput = document.createElement("input");
+    packetLossInput.type = "number";
+    packetLossInput.min = "0";
+    packetLossInput.max = "1";
+    packetLossInput.step = "any";
+    packetLossInput.value = "0";
+    packetLossInput.className = "path-packet-loss";
+    packetLossInput.required = true;
+    packetLossLabel.append(packetLossInput);
 
-function getPathRows(): HTMLDivElement[] {
-    return Array.from(pathsList!.querySelectorAll<HTMLDivElement>(".path-row"));
-}
+    const removeButton = document.createElement("button");
+    removeButton.type = "button";
+    removeButton.className = "remove-parameter";
+    removeButton.textContent = "Remove";
+    removeButton.addEventListener("click", () => row.remove());
 
-function getPathInput(row: HTMLDivElement, field: string): HTMLInputElement {
-    return row.querySelector<HTMLInputElement>(`[data-field="${field}"]`)!;
+    row.append(
+        nameLabel,
+        bandwidthLabel,
+        delayLabel,
+        jitterLabel,
+        packetLossLabel,
+        removeButton
+    );
+
+    pathsList!.append(row);
+    nameInput.focus();
 }
 
 function validatePaths(): boolean {
-    const rows = getPathRows();
-    let valid = true;
+    const rows = pathsList!.querySelectorAll<HTMLDivElement>(".path-row");
 
     pathsError!.textContent = "";
 
@@ -129,158 +145,208 @@ function validatePaths(): boolean {
         return false;
     }
 
-    for (const row of rows) {
-        const name = getPathInput(row, "name");
-        const bandwidth = getPathInput(row, "bandwidthMbps");
-        const delay = getPathInput(row, "delayMs");
-        const jitter = getPathInput(row, "jitterMs");
-        const packetLoss = getPathInput(row, "packetLossPercent");
+    let valid = true;
 
-        const inputs = [name, bandwidth, delay, jitter, packetLoss];
+    for (const row of rows) {
+        const nameInput = row.querySelector<HTMLInputElement>(".path-name");
+        const bandwidthInput = row.querySelector<HTMLInputElement>(".path-bandwidth");
+        const delayInput = row.querySelector<HTMLInputElement>(".path-delay");
+        const jitterInput = row.querySelector<HTMLInputElement>(".path-jitter");
+        const packetLossInput = row.querySelector<HTMLInputElement>(".path-packet-loss");
+
+        if (!nameInput || !bandwidthInput || !delayInput || !jitterInput || !packetLossInput) {
+            valid = false;
+            continue;
+        }
+
+        const inputs = [
+            nameInput,
+            bandwidthInput,
+            delayInput,
+            jitterInput,
+            packetLossInput
+        ];
 
         for (const input of inputs) {
             input.setCustomValidity("");
+            input.classList.remove("input-invalid");
         }
 
-        if (name.value.trim().length === 0) {
-            name.setCustomValidity("Path name is required.");
+        if (nameInput.value.trim().length === 0) {
+            nameInput.setCustomValidity("Path name is required.");
+            nameInput.classList.add("input-invalid");
             valid = false;
         }
 
-        for (const input of [bandwidth, delay, jitter, packetLoss]) {
+        for (const input of [
+            bandwidthInput,
+            delayInput,
+            jitterInput,
+            packetLossInput
+        ]) {
             if (!Number.isFinite(input.valueAsNumber) || input.valueAsNumber < 0) {
-                input.setCustomValidity("Enter a number greater than or equal to zero.");
+                input.setCustomValidity("Enter a valid non-negative number.");
+                input.classList.add("input-invalid");
                 valid = false;
             }
         }
 
-        if (packetLoss.valueAsNumber > 1) {
-            packetLoss.setCustomValidity("Packet loss must be between 0 and 1.");
+        if (packetLossInput.valueAsNumber > 1) {
+            packetLossInput.setCustomValidity("Packet loss must be between 0 and 1.");
+            packetLossInput.classList.add("input-invalid");
             valid = false;
         }
+    }
+
+    if (!valid) {
+        pathsError!.textContent = "One or more network paths are invalid.";
     }
 
     return valid;
 }
 
 function validateForm(): boolean {
-    let valid = true;
-
     clearMessage();
+    pathsError!.textContent = "";
 
-    scenarioIdInput!.setCustomValidity("");
-    nameInput!.setCustomValidity("");
-    durationInput!.setCustomValidity("");
-    repetitionsInput!.setCustomValidity("");
-    receiverConsumptionInput!.setCustomValidity("");
+    const idInput = document.querySelector<HTMLInputElement>("#scenario-id");
+    const nameInput = document.querySelector<HTMLInputElement>("#name");
+    const durationInput = document.querySelector<HTMLInputElement>("#duration-seconds");
+    const repetitionsInput = document.querySelector<HTMLInputElement>("#repetitions");
+    const receiverConsumptionInput = document.querySelector<HTMLInputElement>("#receiver-consumption");
 
-    if (!scenarioIdPattern.test(scenarioIdInput!.value)) {
-        scenarioIdInput!.setCustomValidity(
-            "ID must start with a lowercase letter and contain only lowercase letters, numbers, and hyphens."
-        );
-        valid = false;
+    if (!idInput || !nameInput || !durationInput || !repetitionsInput || !receiverConsumptionInput) {
+        showMessage("The form is incomplete. Please reload the page.");
+        return false;
     }
 
-    if (nameInput!.value.trim().length === 0) {
-        nameInput!.setCustomValidity("Scenario name is required.");
-        valid = false;
-    }
+    setFieldError(
+        "scenario-id",
+        scenarioIdPattern.test(idInput.value)
+            ? ""
+            : "Use lowercase letters, digits and hyphens; start with a letter and do not end with a hyphen."
+    );
 
-    if (!Number.isFinite(durationInput!.valueAsNumber) || durationInput!.valueAsNumber < 0) {
-        durationInput!.setCustomValidity("Duration must be a non-negative number.");
-        valid = false;
-    }
+    setFieldError(
+        "name",
+        nameInput.value.trim().length > 0 ? "" : "Scenario name is required."
+    );
 
-    if (
-        !Number.isSafeInteger(repetitionsInput!.valueAsNumber) ||
-        repetitionsInput!.valueAsNumber < 1
-    ) {
-        repetitionsInput!.setCustomValidity("Repetitions must be a positive integer.");
-        valid = false;
-    }
+    setFieldError(
+        "duration-seconds",
+        Number.isFinite(durationInput.valueAsNumber) && durationInput.valueAsNumber >= 0
+            ? ""
+            : "Duration must be a non-negative number."
+    );
 
-    if (
-        !Number.isFinite(receiverConsumptionInput!.valueAsNumber) ||
-        receiverConsumptionInput!.valueAsNumber < 0
-    ) {
-        receiverConsumptionInput!.setCustomValidity(
-            "Receiver consumption must be a non-negative number."
-        );
-        valid = false;
-    }
+    setFieldError(
+        "repetitions",
+        Number.isSafeInteger(repetitionsInput.valueAsNumber) && repetitionsInput.valueAsNumber >= 1
+            ? ""
+            : "Repetitions must be a positive integer."
+    );
 
-    if (!validatePaths()) {
-        valid = false;
+    setFieldError(
+        "receiver-consumption",
+        Number.isFinite(receiverConsumptionInput.valueAsNumber) &&
+        receiverConsumptionInput.valueAsNumber >= 0
+            ? ""
+            : "Receiver consumption must be a non-negative number."
+    );
+
+    validatePaths();
+
+    const valid = form!.checkValidity() && validatePaths();
+
+    if (!valid) {
+        form!.reportValidity();
+        showMessage("Please correct the highlighted fields before creating the scenario.");
     }
 
     return valid;
 }
 
-function buildScenario(): Record<string, Scenario> {
-    const paths: NetworkPath[] = getPathRows().map(row => ({
-        name: getPathInput(row, "name").value.trim(),
-        bandwidthMbps: getPathInput(row, "bandwidthMbps").valueAsNumber,
-        delayMs: getPathInput(row, "delayMs").valueAsNumber,
-        jitterMs: getPathInput(row, "jitterMs").valueAsNumber,
-        packetLossPercent: getPathInput(row, "packetLossPercent").valueAsNumber
-    }));
+function buildScenario(): { id: string; databaseEntry: Record<string, Scenario> } {
+    const id = (document.querySelector<HTMLInputElement>("#scenario-id")?.value ?? "").trim();
+
+    const paths: NetworkPath[] = [];
+
+    for (const row of pathsList!.querySelectorAll<HTMLDivElement>(".path-row")) {
+        const name = row.querySelector<HTMLInputElement>(".path-name")?.value.trim() ?? "";
+        const bandwidth = row.querySelector<HTMLInputElement>(".path-bandwidth")?.valueAsNumber;
+        const delay = row.querySelector<HTMLInputElement>(".path-delay")?.valueAsNumber;
+        const jitter = row.querySelector<HTMLInputElement>(".path-jitter")?.valueAsNumber;
+        const packetLoss = row.querySelector<HTMLInputElement>(".path-packet-loss")?.valueAsNumber;
+
+        paths.push({
+            name,
+            bandwidthMbps: bandwidth!,
+            delayMs: delay!,
+            jitterMs: jitter!,
+            packetLossPercent: packetLoss!
+        });
+    }
 
     const scenario: Scenario = {
-        name: nameInput!.value.trim(),
-        description: descriptionInput!.value,
-        durationSeconds: durationInput!.valueAsNumber,
-        repetitions: repetitionsInput!.valueAsNumber,
-        receiverConsumptionMbps: receiverConsumptionInput!.valueAsNumber,
+        name: document.querySelector<HTMLInputElement>("#name")!.value.trim(),
+        description: document.querySelector<HTMLTextAreaElement>("#description")!.value.trim(),
+        durationSeconds: document.querySelector<HTMLInputElement>("#duration-seconds")!.valueAsNumber,
+        repetitions: document.querySelector<HTMLInputElement>("#repetitions")!.valueAsNumber,
+        receiverConsumptionMbps: document.querySelector<HTMLInputElement>("#receiver-consumption")!.valueAsNumber,
         paths
     };
 
-    return {
-        [scenarioIdInput!.value.trim()]: scenario
-    };
+    // The schema describes the entire database, so the new record is wrapped
+    // in an object whose property name is the scenario ID.
+    return { id, databaseEntry: { [id]: scenario } };
 }
 
-form.addEventListener("submit", async event => {
+addPathButton.addEventListener("click", addPathRow);
+
+form.addEventListener("submit", async (event: SubmitEvent) => {
     event.preventDefault();
 
     if (!validateForm()) {
-        form!.reportValidity();
         return;
     }
 
-    clearMessage();
-    submitButton!.disabled = true;
-    submitButton!.textContent = "Creating...";
+    const submitButton = form!.querySelector<HTMLButtonElement>('button[type="submit"]');
+
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = "Creating...";
+    }
 
     try {
+        const { databaseEntry } = buildScenario();
+
         const response = await fetch(form!.action, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json"
             },
-            body: JSON.stringify(buildScenario())
+            body: JSON.stringify(databaseEntry)
         });
 
         if (!response.ok) {
-            const result = await response.json().catch(() => null);
-            throw new Error(result?.error ?? `Request failed with status ${response.status}.`);
+            const responseText = await response.text();
+            throw new Error(responseText || `Request failed with status ${response.status}.`);
         }
 
-        window.location.href = form!.dataset.successUrl!;
-    } catch (error) {
-        showMessage(
-            error instanceof Error ? error.message : "An unexpected error occurred.",
-            true
-        );
+        window.location.assign(form!.dataset.successUrl!);
 
-        submitButton!.disabled = false;
-        submitButton!.textContent = "Create Scenario";
+    } catch (error) {
+        const message = error instanceof Error ? error.message : "An unexpected error occurred.";
+        showMessage(`Could not create scenario: ${message}`);
+
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = "Create scenario";
+        }
     }
 });
 
-addPathButton.addEventListener("click", addPath);
-
-// Start with one path, since the schema requires at least one.
-addPath();
+addPathRow();
 
 export {};

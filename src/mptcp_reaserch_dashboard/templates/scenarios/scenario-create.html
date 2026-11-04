@@ -1,140 +1,107 @@
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Scenario</title>
-
     <link rel="stylesheet" href="{{ url_for('static', filename='css/resource-create.css') }}">
-    <script type="module" src="{{ url_for('static', filename='js/add-scenario.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/add-scenario.js') }}" type="module" defer></script>
 </head>
+
 <body>
     <main class="container">
+        <a class="back-button" href="{{ url_for('scenarios_list') }}">
+            <span>←</span>
+            Back
+        </a>
+
         <header class="page-header">
-            <a href="{{ url_for('scenarios_list') }}" class="back-button">← Back to scenarios</a>
-            <p class="eyebrow">Scenario management</p>
-            <h1>Add Scenario</h1>
-            <p class="subtitle">Define a network scenario and its paths.</p>
+            <span class="eyebrow">MPTCP RESEARCH DASHBOARD</span>
+            <h1>Add scenario</h1>
+            <p class="subtitle">Define a network scenario for evaluating congestion control algorithms.</p>
         </header>
 
-        <form
-            id="scenario-form"
-            class="form-card"
-            action="{{ url_for('add_scenario_form') }}"
-            method="POST"
-            data-success-url="{{ url_for('scenarios_list') }}"
-        >
+        <form id="scenario-form" class="form-card" action="{{ url_for('add_scenario_form') }}"
+            data-success-url="{{ url_for('scenarios_list') }}" method="post" novalidate>
+            <div id="form-message" class="form-message" role="status" aria-live="polite"></div>
+
             <section class="form-section">
-                <div class="section-heading">
-                    <h2>General information</h2>
+                <h2>Identification</h2>
+                <p class="section-description">The scenario ID is the key used in the database JSON object.</p>
+
+                <div class="field">
+                    <label for="scenario-id">Scenario ID <span class="required">*</span></label>
+                    <input id="scenario-id" name="scenarioId" type="text" placeholder="scenario-001" required
+                        pattern="[a-z](?:[a-z0-9-]*[a-z0-9])?" autocomplete="off">
+                    <small>Lowercase letters, digits and hyphens. Must start with a letter.</small>
+                    <span class="field-error" data-error-for="scenario-id"></span>
                 </div>
 
                 <div class="field">
-                    <label for="scenario-id">Scenario ID</label>
-                    <input
-                        type="text"
-                        id="scenario-id"
-                        name="id"
-                        placeholder="scenario-001"
-                        pattern="[a-z](?:[a-z0-9-]*[a-z0-9])?"
-                        required
-                    >
-                    <small>Lowercase letters, numbers, and hyphens. Must start with a letter.</small>
-                </div>
-
-                <div class="field">
-                    <label for="name">Name</label>
-                    <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        placeholder="Two paths with different delays"
-                        required
-                    >
+                    <label for="name">Name <span class="required">*</span></label>
+                    <input id="name" name="name" type="text" placeholder="Two paths with different delays"
+                        required minlength="1">
+                    <span class="field-error" data-error-for="name"></span>
                 </div>
 
                 <div class="field">
                     <label for="description">Description</label>
-                    <textarea
-                        id="description"
-                        name="description"
-                        rows="4"
-                        placeholder="Describe the scenario..."
-                    ></textarea>
+                    <textarea id="description" name="description" rows="3"
+                        placeholder="Describe the scenario..."></textarea>
+                    <span class="field-error" data-error-for="description"></span>
                 </div>
             </section>
 
             <section class="form-section">
-                <div class="section-heading">
-                    <h2>Simulation settings</h2>
-                </div>
+                <h2>Simulation settings</h2>
+                <p class="section-description">Configure the duration and parameters of the simulation.</p>
 
                 <div class="field-grid">
                     <div class="field">
-                        <label for="duration-seconds">Duration (seconds)</label>
-                        <input
-                            type="number"
-                            id="duration-seconds"
-                            name="durationSeconds"
-                            min="0"
-                            step="any"
-                            value="120"
-                            required
-                        >
+                        <label for="duration-seconds">Duration (seconds) <span class="required">*</span></label>
+                        <input id="duration-seconds" name="durationSeconds" type="number" min="0" step="any"
+                            value="120" required>
+                        <span class="field-error" data-error-for="duration-seconds"></span>
                     </div>
 
                     <div class="field">
-                        <label for="repetitions">Repetitions</label>
-                        <input
-                            type="number"
-                            id="repetitions"
-                            name="repetitions"
-                            min="1"
-                            step="1"
-                            value="10"
-                            required
-                        >
+                        <label for="repetitions">Repetitions <span class="required">*</span></label>
+                        <input id="repetitions" name="repetitions" type="number" min="1" step="1"
+                            value="10" required>
+                        <span class="field-error" data-error-for="repetitions"></span>
                     </div>
 
                     <div class="field">
-                        <label for="receiver-consumption">Receiver consumption (Mbps)</label>
-                        <input
-                            type="number"
-                            id="receiver-consumption"
-                            name="receiverConsumptionMbps"
-                            min="0"
-                            step="any"
-                            value="80"
-                            required
-                        >
+                        <label for="receiver-consumption">Receiver consumption (Mbps) <span
+                                class="required">*</span></label>
+                        <input id="receiver-consumption" name="receiverConsumptionMbps" type="number"
+                            min="0" step="any" value="80" required>
+                        <span class="field-error" data-error-for="receiver-consumption"></span>
                     </div>
                 </div>
             </section>
 
             <section class="form-section">
                 <div class="section-heading">
-                    <h2>Network paths</h2>
-                    <p>Configure at least one network path.</p>
+                    <div>
+                        <h2>Network paths</h2>
+                        <p class="section-description">Configure at least one network path for the simulation.</p>
+                    </div>
+                    <button class="secondary-button" id="add-path" type="button">+ Add path</button>
                 </div>
 
                 <div id="paths-list" class="parameters-list"></div>
-
-                <p id="paths-error" class="field-error" aria-live="polite"></p>
-
-                <button type="button" id="add-path" class="secondary-button">
-                    + Add path
-                </button>
+                <span class="field-error" id="paths-error"></span>
             </section>
 
-            <div id="form-message" class="form-message" aria-live="polite"></div>
-
             <div class="form-actions">
-                <a href="{{ url_for('scenarios_list') }}" class="cancel-button">Cancel</a>
-                <button type="submit" id="submit-button" class="submit-button">
-                    Create Scenario
-                </button>
+                <a class="cancel-button" href="{{ url_for('scenarios_list') }}">Cancel</a>
+                <button class="submit-button" type="submit">Create scenario</button>
             </div>
         </form>
     </main>
 </body>
+
 </html>
