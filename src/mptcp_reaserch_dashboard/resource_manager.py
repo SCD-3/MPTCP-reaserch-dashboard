@@ -8,7 +8,7 @@ import typing
 JSON_SCHEMA_BASE_PATH = Path(r'json-schemas')
 
 ALGORITHMS_SCHEMA_PATH = Path(r'algorithms.schema.jsonc')
-ENVIROMENTS_SCHEMA_PATH = Path(r'enviroments.schema.jsonc')
+ENVIROMENTS_SCHEMA_PATH = Path(r'environments.schema.jsonc')
 EXPERIMENTS_SCHEMA_PATH = Path(r'experiments.schema.jsonc')
 SCENARIOS_SCHEMA_PATH = Path(r'scenarios.schema.jsonc')
 
