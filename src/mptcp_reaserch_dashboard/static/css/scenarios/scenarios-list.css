@@ -1,6 +1,6 @@
-@import url("common.css");
-@import url(back-button.css);
-@import url("add-button.css");
+@import url("../common.css");
+@import url("../back-button.css");
+@import url("../add-button.css");
 
 * {
     box-sizing: border-box;

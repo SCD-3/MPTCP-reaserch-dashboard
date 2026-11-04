@@ -1,10 +1,11 @@
-@import url("common.css");
-@import url("back-button.css");
-@import url("add-button.css");
+@import url("../common.css");
+@import url("../back-button.css");
+@import url("../add-button.css");
 
 * {
     box-sizing: border-box;
 }
+
 
 body {
     margin: 0;
@@ -55,13 +56,13 @@ h1 {
     white-space: nowrap;
 }
 
-.experiment-list {
+.environment-list {
     display: flex;
     flex-direction: column;
     gap: 12px;
 }
 
-.experiment-card {
+.environment-card {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -71,50 +72,61 @@ h1 {
     border: 1px solid #334155;
     border-radius: 12px;
     color: inherit;
+    text-decoration: none;
     transition: border-color 0.2s, background 0.2s, transform 0.2s;
 }
 
-.experiment-card:hover {
+.environment-card:hover {
     background: #263449;
     border-color: #818cf8;
     transform: translateY(-2px);
 }
 
-.experiment-main {
+.environment-main {
     min-width: 0;
 }
 
-.experiment-main h2 {
-    margin: 0;
-    font-size: 17px;
-    font-weight: 600;
-    overflow-wrap: anywhere;
-}
-
-.experiment-meta {
+.environment-heading {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 12px;
-    color: #94a3b8;
-    font-size: 13px;
+    gap: 12px;
 }
 
-.meta-item strong {
-    color: #cbd5e1;
+.environment-heading h2 {
+    margin: 0;
+    font-size: 17px;
     font-weight: 600;
 }
 
-.separator {
-    color: #475569;
+.environment-type {
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 700;
 }
 
-.secondary-meta {
-    margin-top: 8px;
+.type-ns3 {
+    background: #164e63;
+    color: #67e8f9;
 }
 
-.experiment-right {
+.type-uml {
+    background: #4c1d95;
+    color: #ddd6fe;
+}
+
+.environment-meta {
+    margin-top: 12px;
+}
+
+.version {
+    color: #94a3b8;
+    font-family: monospace;
+    font-size: 13px;
+}
+
+.environment-status {
     display: flex;
     align-items: center;
     gap: 18px;
@@ -122,45 +134,32 @@ h1 {
 }
 
 .status {
-    padding: 5px 9px;
-    border-radius: 5px;
-    font-size: 11px;
-    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
 }
 
-.status-draft {
-    background: #334155;
-    color: #cbd5e1;
+.status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
 }
 
-.status-planned {
-    background: #1e3a8a;
-    color: #93c5fd;
-}
-
-.status-queued {
-    background: #4c1d95;
-    color: #ddd6fe;
-}
-
-.status-running {
-    background: #7c2d12;
-    color: #fdba74;
-}
-
-.status-completed {
-    background: #14532d;
+.active {
     color: #86efac;
 }
 
-.status-failed {
-    background: #7f1d1d;
+.active .status-dot {
+    background: #22c55e;
+}
+
+.inactive {
     color: #fca5a5;
 }
 
-.status-cancelled {
-    background: #374151;
-    color: #9ca3af;
+.inactive .status-dot {
+    background: #ef4444;
 }
 
 .arrow {
@@ -169,7 +168,7 @@ h1 {
     transition: color 0.2s, transform 0.2s;
 }
 
-.experiment-card:hover .arrow {
+.environment-card:hover .arrow {
     color: #a5b4fc;
     transform: translateX(4px);
 }
@@ -203,12 +202,12 @@ h1 {
         flex-direction: column;
     }
 
-    .experiment-card {
+    .environment-card {
         align-items: flex-start;
         flex-direction: column;
     }
 
-    .experiment-right {
+    .environment-status {
         width: 100%;
         justify-content: space-between;
     }
