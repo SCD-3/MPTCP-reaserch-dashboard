@@ -1,0 +1,166 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://mptcp-cc-poc.invalid/schemas/experiment.schema.json",
+    "title": "Experiment (mptcp-experiment/1)",
+    "description": "What to run: scenarios (optionally with parameter sweeps) x environments x algorithms x repetitions. Freezing an experiment expands it into run records (mptcp-run/1); after that it is immutable except for 'status'.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "schema",
+        "id",
+        "version",
+        "name",
+        "scenarios",
+        "environments",
+        "algorithms",
+        "status"
+    ],
+    "properties": {
+        "schema": {
+            "const": "mptcp-experiment/1"
+        },
+        "id": {
+            "$ref": "common.schema.json#/$defs/Id"
+        },
+        "version": {
+            "$ref": "common.schema.json#/$defs/Version"
+        },
+        "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+        },
+        "description": {
+            "type": "string",
+            "maxLength": 4000,
+            "description": "Research question / hypothesis this experiment answers."
+        },
+        "labels": {
+            "$ref": "common.schema.json#/$defs/Labels"
+        },
+        "scenarios": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "id",
+                    "version"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "common.schema.json#/$defs/Id"
+                    },
+                    "version": {
+                        "$ref": "common.schema.json#/$defs/Version",
+                        "description": "A pinned scenario version; later edits of the scenario do not change this experiment."
+                    },
+                    "sweep": {
+                        "type": "object",
+                        "description": "Parameter sweep: key = dotted path into the scenario (array indices as numbers, e.g. paths.1.loss.probability), value = list of values. All combinations (Cartesian product) become scenario variants. Rule X-SWEEP: every path must exist in the scenario and every variant must be a valid scenario.",
+                        "propertyNames": {
+                            "pattern": "^[a-z_]+(\\.([a-z_]+|[0-9]+))*$"
+                        },
+                        "additionalProperties": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 50,
+                            "items": {
+                                "description": "A value for the field at the dotted path: a number/string/boolean/null, or an object/array that replaces the whole sub-tree (e.g. a complete loss spec)."
+                            }
+                        },
+                        "maxProperties": 5
+                    }
+                }
+            }
+        },
+        "environments": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+                "$ref": "common.schema.json#/$defs/Id"
+            },
+            "description": "Environment ids (mptcp-environment/1)."
+        },
+        "algorithms": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "id"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "common.schema.json#/$defs/Id",
+                        "description": "Algorithm id (mptcp-algorithm/1)."
+                    },
+                    "profile": {
+                        "$ref": "common.schema.json#/$defs/Id",
+                        "description": "Profile id; required when the algorithm has profiles (rule X-PROFILE)."
+                    },
+                    "parameter_overrides": {
+                        "type": "object",
+                        "description": "ADVANCED. Per environment type, values replacing profile parameters. Runs with overrides are classified 'exploratory'.",
+                        "additionalProperties": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "description": "Rule X-ALG-DUP: no (id, profile) pair twice."
+        },
+        "repetitions": {
+            "oneOf": [
+                {
+                    "$ref": "common.schema.json#/$defs/Repetitions"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "default": null,
+            "description": "Overrides the scenario default; null = use each scenario's defaults.repetitions."
+        },
+        "seeds": {
+            "oneOf": [
+                {
+                    "$ref": "common.schema.json#/$defs/Seeds"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "default": null,
+            "description": "Overrides the scenario default seeds; null = use each scenario's defaults.seeds."
+        },
+        "status": {
+            "type": "string",
+            "enum": [
+                "draft",
+                "planned",
+                "frozen",
+                "running",
+                "completed",
+                "stopped",
+                "failed"
+            ],
+            "description": "draft (editable) -> planned (validated, run list previewed) -> frozen (run records created, immutable) -> running -> completed | stopped | failed. Only the backend sets frozen and later states."
+        },
+        "frozen_utc": {
+            "$ref": "common.schema.json#/$defs/Timestamp"
+        },
+        "fingerprint": {
+            "$ref": "common.schema.json#/$defs/Sha256",
+            "description": "Set when frozen: hash over all run definitions."
+        },
+        "notes": {
+            "type": "string",
+            "maxLength": 4000
+        }
+    }
+}

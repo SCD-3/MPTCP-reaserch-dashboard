@@ -1,0 +1,902 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://mptcp-cc-poc.invalid/schemas/scenario.schema.json",
+    "title": "Scenario (mptcp-scenario/1)",
+    "description": "Test conditions of one experiment cell: network paths, impairments, timed changes, traffic and receiver behaviour. It does NOT name the algorithm or the environment. Units are SI and are part of the key name (_bps bit/s, _Bps bytes/s, _s seconds, _bytes, _pkts; probabilities are fractions 0..1). Cross-field rules that JSON Schema cannot express are listed in README.md (rule ids S-*).",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "schema",
+        "id",
+        "version",
+        "name",
+        "duration_s",
+        "topology",
+        "paths",
+        "traffic",
+        "defaults"
+    ],
+    "properties": {
+        "schema": {
+            "const": "mptcp-scenario/1"
+        },
+        "id": {
+            "$ref": "common.schema.json#/$defs/Id"
+        },
+        "version": {
+            "$ref": "common.schema.json#/$defs/Version"
+        },
+        "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120,
+            "description": "Short human-readable title."
+        },
+        "description": {
+            "type": "string",
+            "maxLength": 4000,
+            "description": "Purpose of the test and what is expected to happen."
+        },
+        "labels": {
+            "$ref": "common.schema.json#/$defs/Labels"
+        },
+        "duration_s": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 3600,
+            "description": "Duration of the data transfer in one run, from the sender start.",
+            "x-unit": "s",
+            "x-display": {
+                "unit": "s",
+                "factor": 1
+            },
+            "examples": [
+                30,
+                60
+            ]
+        },
+        "statistics_window_s": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+                "type": "number",
+                "minimum": 0
+            },
+            "description": "[from, to] time window used for summary metrics; the part before 'from' is warm-up (slow start). Rule S-WINDOW: 0 <= from < to <= duration_s. Default when omitted: [5, duration_s] (or [0, duration_s] for runs shorter than 10 s).",
+            "x-unit": "s",
+            "examples": [
+                [
+                    5,
+                    30
+                ]
+            ]
+        },
+        "topology": {
+            "$ref": "#/$defs/Topology"
+        },
+        "paths": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": {
+                "$ref": "#/$defs/Path"
+            },
+            "description": "Network paths between client and server, one MPTCP subflow each. The format allows up to 8; every current environment supports exactly 2 (see the environment's capabilities.max_paths). Rule S-PATH-ID: ids unique."
+        },
+        "events": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+                "$ref": "#/$defs/Event"
+            },
+            "description": "Timed changes of path or bottleneck parameters. Rules S-TARGET, S-EVENT-TIME, S-EVENT-DUP."
+        },
+        "generators": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+                "$ref": "#/$defs/Generator"
+            },
+            "description": "Randomised series of changes. They are expanded into concrete events per seed when the experiment is frozen, so every algorithm sees the same series. Rules S-TARGET, S-GEN."
+        },
+        "traffic": {
+            "$ref": "#/$defs/Traffic"
+        },
+        "sender": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "sndbuf_bytes": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 268435456,
+                    "default": 0,
+                    "description": "Fixed send buffer (SO_SNDBUF). 0 = the platform's autotuning.",
+                    "x-unit": "B",
+                    "x-display": {
+                        "unit": "KiB",
+                        "factor": 0.0009765625
+                    }
+                }
+            }
+        },
+        "receiver": {
+            "$ref": "#/$defs/Receiver"
+        },
+        "defaults": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "repetitions",
+                "seeds"
+            ],
+            "description": "Default repetition plan. An experiment may override both values.",
+            "properties": {
+                "repetitions": {
+                    "$ref": "common.schema.json#/$defs/Repetitions"
+                },
+                "seeds": {
+                    "$ref": "common.schema.json#/$defs/Seeds"
+                }
+            }
+        },
+        "backend_overrides": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "ADVANCED. Raw fragments merged into the compiled input of one environment type (engine YAML keys for uml/dce, program option names for ns3). Anything here makes the scenario environment-specific; the UI should show it as such and hide it by default.",
+            "properties": {
+                "uml": {
+                    "type": "object"
+                },
+                "dce": {
+                    "type": "object"
+                },
+                "ns3": {
+                    "type": "object"
+                },
+                "rpi4": {
+                    "type": "object"
+                },
+                "model": {
+                    "type": "object"
+                }
+            }
+        }
+    },
+    "$defs": {
+        "PathId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,32}$",
+            "description": "Path identifier, used by events, generators and in the metrics (path_id). 'bottleneck' is reserved."
+        },
+        "Bandwidth": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 100000000000,
+            "description": "Link rate in bit/s (20 Mbit/s = 20000000).",
+            "x-unit": "bit/s",
+            "x-display": {
+                "unit": "Mbit/s",
+                "factor": 0.000001
+            }
+        },
+        "Delay": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 10,
+            "description": "ONE-WAY delay added on the link, in seconds (20 ms = 0.02). The round-trip time is about twice the sum over the path, plus queueing.",
+            "x-unit": "s",
+            "x-display": {
+                "unit": "ms",
+                "factor": 1000
+            }
+        },
+        "Queue": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100000,
+            "description": "Length of the bottleneck queue (drop-tail) in packets. Strongly affects delay and loss; a typical value is 100.",
+            "x-unit": "packets"
+        },
+        "Probability": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Probability as a fraction (0.01 = 1 %).",
+            "x-unit": "1",
+            "x-display": {
+                "unit": "%",
+                "factor": 100
+            }
+        },
+        "AppliesTo": {
+            "type": "string",
+            "enum": [
+                "data",
+                "all"
+            ],
+            "default": "data",
+            "description": "data = only data packets in the sender->receiver direction are dropped; all = every packet in both directions (ACKs too). Use 'all' with probability 1 for a silent path failure."
+        },
+        "Loss": {
+            "description": "Artificial packet loss on a path. Decisions are deterministic per (seed, path, packet index), identical for every algorithm.",
+            "oneOf": [
+                {
+                    "title": "No loss",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "model"
+                    ],
+                    "properties": {
+                        "model": {
+                            "const": "none"
+                        },
+                        "applies_to": {
+                            "$ref": "#/$defs/AppliesTo"
+                        }
+                    }
+                },
+                {
+                    "title": "Random (Bernoulli)",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "model",
+                        "probability"
+                    ],
+                    "description": "Each eligible packet is dropped independently with the given probability.",
+                    "properties": {
+                        "model": {
+                            "const": "bernoulli"
+                        },
+                        "probability": {
+                            "$ref": "#/$defs/Probability"
+                        },
+                        "applies_to": {
+                            "$ref": "#/$defs/AppliesTo"
+                        }
+                    }
+                },
+                {
+                    "title": "Bursts (Gilbert-Elliott)",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "model",
+                        "p_gb",
+                        "p_bg",
+                        "loss_good",
+                        "loss_bad"
+                    ],
+                    "description": "Two-state Markov chain evaluated per packet. Mean burst length = 1/p_bg packets; share of time in the bad state = p_gb/(p_gb+p_bg); mean loss = (p_bg*loss_good + p_gb*loss_bad)/(p_gb+p_bg).",
+                    "properties": {
+                        "model": {
+                            "const": "gilbert-elliott"
+                        },
+                        "p_gb": {
+                            "$ref": "#/$defs/Probability",
+                            "description": "Per-packet probability good -> bad."
+                        },
+                        "p_bg": {
+                            "$ref": "#/$defs/Probability",
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "description": "Per-packet probability bad -> good (> 0)."
+                        },
+                        "loss_good": {
+                            "$ref": "#/$defs/Probability",
+                            "description": "Loss probability in the good state (usually 0)."
+                        },
+                        "loss_bad": {
+                            "$ref": "#/$defs/Probability",
+                            "description": "Loss probability in the bad state (usually 1)."
+                        },
+                        "applies_to": {
+                            "$ref": "#/$defs/AppliesTo"
+                        }
+                    }
+                },
+                {
+                    "title": "Explicit packet list",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "model",
+                        "indices"
+                    ],
+                    "description": "ADVANCED. Drop exactly the eligible packets with these 0-based indices (single-loss tests). UML only.",
+                    "properties": {
+                        "model": {
+                            "const": "list"
+                        },
+                        "indices": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 10000,
+                            "uniqueItems": true,
+                            "items": {
+                                "type": "integer",
+                                "minimum": 0
+                            }
+                        },
+                        "applies_to": {
+                            "$ref": "#/$defs/AppliesTo"
+                        }
+                    }
+                }
+            ]
+        },
+        "Path": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "id",
+                "bandwidth_bps",
+                "delay_s",
+                "queue_pkts"
+            ],
+            "properties": {
+                "id": {
+                    "$ref": "#/$defs/PathId"
+                },
+                "label": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "description": "Display name, e.g. 'Wi-Fi' or 'LTE'."
+                },
+                "bandwidth_bps": {
+                    "$ref": "#/$defs/Bandwidth"
+                },
+                "delay_s": {
+                    "$ref": "#/$defs/Delay"
+                },
+                "queue_pkts": {
+                    "$ref": "#/$defs/Queue"
+                },
+                "loss": {
+                    "$ref": "#/$defs/Loss",
+                    "default": {
+                        "model": "none"
+                    }
+                }
+            }
+        },
+        "Topology": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "mode"
+            ],
+            "properties": {
+                "mode": {
+                    "type": "string",
+                    "enum": [
+                        "disjoint",
+                        "shared"
+                    ],
+                    "default": "disjoint",
+                    "description": "disjoint = each path has its own bottleneck (independent links); shared = both paths meet in one common bottleneck after their access links (tests fairness to other traffic)."
+                },
+                "bottleneck": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "bandwidth_bps",
+                        "queue_pkts"
+                    ],
+                    "description": "The common bottleneck (shared mode only).",
+                    "properties": {
+                        "bandwidth_bps": {
+                            "$ref": "#/$defs/Bandwidth"
+                        },
+                        "delay_s": {
+                            "$ref": "#/$defs/Delay",
+                            "default": 0
+                        },
+                        "queue_pkts": {
+                            "$ref": "#/$defs/Queue"
+                        }
+                    }
+                },
+                "cross_traffic": {
+                    "$ref": "#/$defs/CrossTraffic"
+                }
+            },
+            "if": {
+                "properties": {
+                    "mode": {
+                        "const": "shared"
+                    }
+                }
+            },
+            "then": {
+                "required": [
+                    "bottleneck"
+                ]
+            },
+            "else": {
+                "properties": {
+                    "bottleneck": false,
+                    "cross_traffic": false
+                },
+                "description": "bottleneck and cross_traffic are only allowed in shared mode."
+            }
+        },
+        "CrossTraffic": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "cc",
+                "delay_s"
+            ],
+            "description": "Competing single-path TCP flows through the shared bottleneck. Either a fixed schedule or a random on/off generator (or both).",
+            "properties": {
+                "cc": {
+                    "type": "string",
+                    "enum": [
+                        "cubic",
+                        "reno"
+                    ],
+                    "default": "cubic",
+                    "description": "Congestion control of the competing flows."
+                },
+                "delay_s": {
+                    "$ref": "#/$defs/Delay",
+                    "description": "One-way delay of the cross-traffic access link."
+                },
+                "schedule": {
+                    "type": "array",
+                    "maxItems": 100,
+                    "description": "Rule S-CROSS: start_s < stop_s <= duration_s.",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "start_s",
+                            "stop_s",
+                            "flows"
+                        ],
+                        "properties": {
+                            "start_s": {
+                                "type": "number",
+                                "minimum": 0,
+                                "x-unit": "s"
+                            },
+                            "stop_s": {
+                                "type": "number",
+                                "exclusiveMinimum": 0,
+                                "x-unit": "s"
+                            },
+                            "flows": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 32,
+                                "description": "Number of parallel TCP flows in this interval."
+                            }
+                        }
+                    }
+                },
+                "generator": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "type",
+                        "flows",
+                        "mean_on_s",
+                        "mean_off_s"
+                    ],
+                    "description": "Random on/off periods (exponentially distributed), drawn from the seed.",
+                    "properties": {
+                        "type": {
+                            "const": "onoff"
+                        },
+                        "flows": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 32
+                        },
+                        "mean_on_s": {
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "x-unit": "s"
+                        },
+                        "mean_off_s": {
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "x-unit": "s"
+                        },
+                        "start_s": {
+                            "type": "number",
+                            "minimum": 0,
+                            "default": 0,
+                            "x-unit": "s"
+                        }
+                    }
+                }
+            },
+            "anyOf": [
+                {
+                    "required": [
+                        "schedule"
+                    ]
+                },
+                {
+                    "required": [
+                        "generator"
+                    ]
+                }
+            ]
+        },
+        "Target": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,32}$",
+            "description": "Id of a path from 'paths', or 'bottleneck' (shared mode; not for set-loss). Rule S-TARGET."
+        },
+        "AtS": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Time of the change, seconds after the sender start. Rule S-EVENT-TIME: at_s <= duration_s.",
+            "x-unit": "s"
+        },
+        "Event": {
+            "description": "One timed change. The new value holds until the next change of the same parameter on the same target.",
+            "oneOf": [
+                {
+                    "title": "Change loss",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "at_s",
+                        "target",
+                        "action",
+                        "loss"
+                    ],
+                    "properties": {
+                        "at_s": {
+                            "$ref": "#/$defs/AtS"
+                        },
+                        "target": {
+                            "$ref": "#/$defs/Target"
+                        },
+                        "action": {
+                            "const": "set-loss"
+                        },
+                        "loss": {
+                            "$ref": "#/$defs/Loss"
+                        }
+                    }
+                },
+                {
+                    "title": "Change bandwidth",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "at_s",
+                        "target",
+                        "action",
+                        "bandwidth_bps"
+                    ],
+                    "properties": {
+                        "at_s": {
+                            "$ref": "#/$defs/AtS"
+                        },
+                        "target": {
+                            "$ref": "#/$defs/Target"
+                        },
+                        "action": {
+                            "const": "set-bandwidth"
+                        },
+                        "bandwidth_bps": {
+                            "$ref": "#/$defs/Bandwidth"
+                        }
+                    }
+                },
+                {
+                    "title": "Change delay",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "at_s",
+                        "target",
+                        "action",
+                        "delay_s"
+                    ],
+                    "description": "Lowering the delay lets later packets overtake earlier ones (reordering), as on a route change.",
+                    "properties": {
+                        "at_s": {
+                            "$ref": "#/$defs/AtS"
+                        },
+                        "target": {
+                            "$ref": "#/$defs/Target"
+                        },
+                        "action": {
+                            "const": "set-delay"
+                        },
+                        "delay_s": {
+                            "$ref": "#/$defs/Delay"
+                        }
+                    }
+                },
+                {
+                    "title": "Change queue length",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "at_s",
+                        "target",
+                        "action",
+                        "queue_pkts"
+                    ],
+                    "properties": {
+                        "at_s": {
+                            "$ref": "#/$defs/AtS"
+                        },
+                        "target": {
+                            "$ref": "#/$defs/Target"
+                        },
+                        "action": {
+                            "const": "set-queue"
+                        },
+                        "queue_pkts": {
+                            "$ref": "#/$defs/Queue"
+                        }
+                    }
+                }
+            ]
+        },
+        "Generator": {
+            "oneOf": [
+                {
+                    "title": "Random delay",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "type",
+                        "target",
+                        "every_s",
+                        "min_delay_s",
+                        "max_delay_s"
+                    ],
+                    "description": "Every every_s seconds the one-way delay of the path is re-drawn uniformly from [min_delay_s, max_delay_s]. This is how delay variability ('jitter') is modelled; per-packet jitter is not supported.",
+                    "properties": {
+                        "type": {
+                            "const": "random-delay"
+                        },
+                        "target": {
+                            "$ref": "#/$defs/Target"
+                        },
+                        "start_s": {
+                            "type": "number",
+                            "minimum": 0,
+                            "default": 0,
+                            "x-unit": "s"
+                        },
+                        "every_s": {
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "x-unit": "s"
+                        },
+                        "min_delay_s": {
+                            "$ref": "#/$defs/Delay"
+                        },
+                        "max_delay_s": {
+                            "$ref": "#/$defs/Delay"
+                        }
+                    }
+                },
+                {
+                    "title": "Random outages",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "type",
+                        "target",
+                        "mean_interval_s",
+                        "duration_s"
+                    ],
+                    "description": "Silent failures of the path (all packets lost, both directions) of length duration_s, separated by exponentially distributed gaps with mean mean_interval_s.",
+                    "properties": {
+                        "type": {
+                            "const": "outages"
+                        },
+                        "target": {
+                            "$ref": "#/$defs/Target"
+                        },
+                        "start_s": {
+                            "type": "number",
+                            "minimum": 0,
+                            "default": 0,
+                            "x-unit": "s"
+                        },
+                        "mean_interval_s": {
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "x-unit": "s"
+                        },
+                        "duration_s": {
+                            "type": "number",
+                            "exclusiveMinimum": 0,
+                            "x-unit": "s"
+                        }
+                    }
+                }
+            ]
+        },
+        "Traffic": {
+            "description": "What the sender sends.",
+            "oneOf": [
+                {
+                    "title": "Bulk transfer",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "type"
+                    ],
+                    "description": "The sender always has data (limited only by the network, the algorithm and the receiver).",
+                    "properties": {
+                        "type": {
+                            "const": "bulk"
+                        }
+                    }
+                },
+                {
+                    "title": "Media stream",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "type",
+                        "media"
+                    ],
+                    "properties": {
+                        "type": {
+                            "const": "media"
+                        },
+                        "media": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                                "mode",
+                                "source",
+                                "rate_Bps"
+                            ],
+                            "properties": {
+                                "mode": {
+                                    "type": "string",
+                                    "enum": [
+                                        "cbr",
+                                        "vbr"
+                                    ],
+                                    "description": "cbr = constant frame size; vbr = variable frame size (drawn from the seed)."
+                                },
+                                "source": {
+                                    "type": "string",
+                                    "enum": [
+                                        "live",
+                                        "stored"
+                                    ],
+                                    "description": "live = frames are produced in real time; stored = the whole file is available, sending is limited by the network."
+                                },
+                                "rate_Bps": {
+                                    "type": "number",
+                                    "exclusiveMinimum": 0,
+                                    "description": "Mean stream rate in BYTES per second (1 MB/s = 1000000).",
+                                    "x-unit": "B/s",
+                                    "x-display": {
+                                        "unit": "Mbit/s",
+                                        "factor": 0.000008
+                                    }
+                                },
+                                "fps": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 240,
+                                    "default": 30,
+                                    "description": "Frames per second."
+                                },
+                                "close": {
+                                    "type": "string",
+                                    "enum": [
+                                        "hold",
+                                        "fin"
+                                    ],
+                                    "default": "hold",
+                                    "description": "hold = keep the connection open after the stream; fin = close it."
+                                },
+                                "start_delay_s": {
+                                    "type": "number",
+                                    "minimum": 0,
+                                    "default": 0,
+                                    "description": "Delay of the stream start after the connection is accepted.",
+                                    "x-unit": "s"
+                                },
+                                "pause_s": {
+                                    "type": "array",
+                                    "minItems": 2,
+                                    "maxItems": 2,
+                                    "items": {
+                                        "type": "number",
+                                        "minimum": 0
+                                    },
+                                    "description": "[from, to]: the viewer pauses (stops reading) in this interval, seconds after accept. Rule S-PAUSE: from < to <= duration_s.",
+                                    "x-unit": "s"
+                                },
+                                "reverse": {
+                                    "type": "boolean",
+                                    "default": false,
+                                    "description": "Add a second, independent stream in the opposite direction (conference)."
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "Receiver": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Behaviour of the receiving application and its buffers.",
+            "properties": {
+                "rcvbuf_bytes": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 268435456,
+                    "default": 0,
+                    "description": "Fixed receive buffer (SO_RCVBUF); disables autotuning. 0 = autotuning.",
+                    "x-unit": "B",
+                    "x-display": {
+                        "unit": "KiB",
+                        "factor": 0.0009765625
+                    }
+                },
+                "rcvbuf_autotune_max_bytes": {
+                    "type": "integer",
+                    "minimum": 4096,
+                    "maximum": 268435456,
+                    "description": "Upper limit of receive-buffer autotuning (Linux tcp_rmem max). Omit to use the platform default (16 MiB). Ignored when rcvbuf_bytes > 0.",
+                    "x-unit": "B",
+                    "x-display": {
+                        "unit": "KiB",
+                        "factor": 0.0009765625
+                    }
+                },
+                "read_schedule": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 100,
+                    "description": "How fast the receiving application reads, as a piecewise-constant schedule. Each entry holds from from_s until the next entry. Rule S-READ: the first from_s is 0 and from_s strictly increases. Omitted = always unlimited. (This is the 'receiver consumption' of the old dashboard draft.)",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "from_s",
+                            "rate_Bps"
+                        ],
+                        "properties": {
+                            "from_s": {
+                                "type": "number",
+                                "minimum": 0,
+                                "description": "Seconds after the connection is accepted.",
+                                "x-unit": "s"
+                            },
+                            "rate_Bps": {
+                                "type": [
+                                    "number",
+                                    "null"
+                                ],
+                                "minimum": 0,
+                                "description": "Read rate in BYTES per second; null = unlimited (read as fast as data arrives); 0 = stop reading.",
+                                "x-unit": "B/s",
+                                "x-display": {
+                                    "unit": "kB/s",
+                                    "factor": 0.001
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

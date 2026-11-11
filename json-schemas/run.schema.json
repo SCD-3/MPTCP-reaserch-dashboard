@@ -1,0 +1,231 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://mptcp-cc-poc.invalid/schemas/run.schema.json",
+    "title": "Run record (mptcp-run/1)",
+    "description": "One execution: one scenario variant, one environment, one algorithm (+profile), one repetition. Created by the backend when an experiment is frozen; the dashboard only reads it. The snapshot is the full, resolved configuration, so later catalogue edits never change history.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "schema",
+        "run_id",
+        "experiment_id",
+        "scenario",
+        "environment_id",
+        "algorithm",
+        "repetition",
+        "seed",
+        "scope",
+        "snapshot",
+        "status"
+    ],
+    "properties": {
+        "schema": {
+            "const": "mptcp-run/1"
+        },
+        "run_id": {
+            "type": "string",
+            "maxLength": 400,
+            "pattern": "^[A-Za-z0-9_.:@+/-]+$",
+            "description": "<experiment>/<scenario variant>/<environment>/<algorithm>[:<profile>]/rep-NN"
+        },
+        "experiment_id": {
+            "$ref": "common.schema.json#/$defs/Id"
+        },
+        "scenario": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "id",
+                "version",
+                "variant_id"
+            ],
+            "properties": {
+                "id": {
+                    "$ref": "common.schema.json#/$defs/Id"
+                },
+                "version": {
+                    "$ref": "common.schema.json#/$defs/Version"
+                },
+                "variant_id": {
+                    "type": "string",
+                    "maxLength": 120,
+                    "description": "<id>@v<version> or <id>@v<version>+<hash8> for a sweep variant."
+                },
+                "sweep_values": {
+                    "type": "object",
+                    "description": "The sweep values of this variant (dotted path -> value)."
+                }
+            }
+        },
+        "environment_id": {
+            "$ref": "common.schema.json#/$defs/Id"
+        },
+        "algorithm": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "$ref": "common.schema.json#/$defs/Id"
+                },
+                "profile": {
+                    "$ref": "common.schema.json#/$defs/Id"
+                },
+                "version": {
+                    "type": "string"
+                },
+                "implementation_hash": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            }
+        },
+        "repetition": {
+            "type": "integer",
+            "minimum": 1
+        },
+        "seed": {
+            "$ref": "common.schema.json#/$defs/Seed"
+        },
+        "scope": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "class",
+                "reasons"
+            ],
+            "description": "Compatibility class (README.md 'Compatibility'). unsupported runs are never created; exploratory runs are labelled in every result view.",
+            "properties": {
+                "class": {
+                    "enum": [
+                        "supported",
+                        "exploratory"
+                    ]
+                },
+                "reasons": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "snapshot": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "scenario",
+                "algorithm",
+                "environment"
+            ],
+            "properties": {
+                "scenario": {
+                    "$ref": "scenario.schema.json",
+                    "description": "The resolved scenario variant (sweep applied, defaults filled in)."
+                },
+                "expanded_events": {
+                    "type": "array",
+                    "description": "Events after expanding the generators for this seed (what was actually applied)."
+                },
+                "algorithm": {
+                    "type": "object",
+                    "description": "Profile parameters for this environment type + implementation hash."
+                },
+                "environment": {
+                    "type": "object",
+                    "description": "Environment document incl. fingerprint at freeze time."
+                }
+            }
+        },
+        "condition_hash": {
+            "$ref": "common.schema.json#/$defs/Sha256",
+            "description": "Hash of the conditions of this repetition. Equal for all algorithms of the same (variant, environment, repetition): runs with equal condition_hash form a valid paired comparison."
+        },
+        "status": {
+            "type": "string",
+            "enum": [
+                "pending",
+                "running",
+                "completed",
+                "failed",
+                "interrupted",
+                "invalidated"
+            ],
+            "description": "pending -> running -> completed | failed | interrupted. invalidated = a completed run found faulty and set aside (kept, with a reason)."
+        },
+        "status_reason": {
+            "type": "string",
+            "maxLength": 2000
+        },
+        "attempts": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "started_utc"
+                ],
+                "properties": {
+                    "started_utc": {
+                        "$ref": "common.schema.json#/$defs/Timestamp"
+                    },
+                    "finished_utc": {
+                        "$ref": "common.schema.json#/$defs/Timestamp"
+                    },
+                    "outcome": {
+                        "enum": [
+                            "completed",
+                            "failed",
+                            "interrupted"
+                        ]
+                    },
+                    "exit_code": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "wall_s": {
+                        "type": "number",
+                        "minimum": 0
+                    }
+                }
+            }
+        },
+        "results": {
+            "oneOf": [
+                {
+                    "type": "null"
+                },
+                {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "format",
+                        "path"
+                    ],
+                    "properties": {
+                        "format": {
+                            "const": "mptcp-metrics/1",
+                            "description": "See docs/metrics-format.md."
+                        },
+                        "path": {
+                            "type": "string",
+                            "description": "Location of the metrics document of this run."
+                        },
+                        "outputs_sha256": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

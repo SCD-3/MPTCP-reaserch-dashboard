@@ -1,0 +1,175 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://mptcp-cc-poc.invalid/schemas/algorithm.schema.json",
+    "title": "Algorithm catalogue entry (mptcp-algorithm/1)",
+    "description": "A congestion-control algorithm, its frozen parameter profiles and its implementations per environment type. Read-only for the dashboard: the backend generates it from algorithms/registry.yaml and algorithms/profiles/.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "schema",
+        "id",
+        "name",
+        "short_name",
+        "type",
+        "is_active",
+        "implementations"
+    ],
+    "properties": {
+        "schema": {
+            "const": "mptcp-algorithm/1"
+        },
+        "id": {
+            "$ref": "common.schema.json#/$defs/Id",
+            "description": "Algorithm id as used by the backend (lia, olia, balia, wvegas, onoff, ...)."
+        },
+        "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+        },
+        "short_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 24
+        },
+        "type": {
+            "type": "string",
+            "enum": [
+                "reference",
+                "custom"
+            ],
+            "description": "reference = published algorithm, unmodified implementation (baseline); custom = algorithm developed in this research."
+        },
+        "description": {
+            "type": "string",
+            "maxLength": 4000
+        },
+        "is_active": {
+            "type": "boolean",
+            "description": "Selectable for new experiments."
+        },
+        "profiles": {
+            "type": "array",
+            "description": "Frozen parameter sets. An experiment selects a profile, never loose parameter values. Reference algorithms have no profiles. A change of behaviour gets a new profile id.",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "id",
+                    "status",
+                    "parameters"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "common.schema.json#/$defs/Id"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "draft",
+                            "frozen",
+                            "retired"
+                        ],
+                        "description": "Only frozen profiles may be used in experiments whose results are reported."
+                    },
+                    "label": {
+                        "type": "string",
+                        "maxLength": 64,
+                        "description": "E.g. PAPER, EXPERIMENTAL."
+                    },
+                    "description": {
+                        "type": "string",
+                        "maxLength": 4000
+                    },
+                    "parameters": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "description": "Parameter values per environment type. Names and units differ between implementations, so they are kept separate.",
+                        "properties": {
+                            "uml": {
+                                "type": "object"
+                            },
+                            "dce": {
+                                "type": "object"
+                            },
+                            "ns3": {
+                                "type": "object"
+                            },
+                            "rpi4": {
+                                "type": "object"
+                            },
+                            "model": {
+                                "type": "object"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "parameters_schema": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Optional JSON Schema per environment type describing the tunable parameters (for an override form). Overrides make a run exploratory.",
+            "properties": {
+                "uml": {
+                    "type": "object"
+                },
+                "dce": {
+                    "type": "object"
+                },
+                "ns3": {
+                    "type": "object"
+                },
+                "rpi4": {
+                    "type": "object"
+                },
+                "model": {
+                    "type": "object"
+                }
+            }
+        },
+        "implementations": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "env_type",
+                    "status"
+                ],
+                "properties": {
+                    "env_type": {
+                        "$ref": "common.schema.json#/$defs/EnvType"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "available",
+                            "planned",
+                            "unsupported"
+                        ],
+                        "description": "available = can be run; planned = not implemented yet; unsupported = exists but its results are not accepted on this platform."
+                    },
+                    "version": {
+                        "type": "string",
+                        "maxLength": 64,
+                        "description": "Human version label, e.g. mptcp-v0.96."
+                    },
+                    "implementation_hash": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "pattern": "^[0-9a-f]{8,64}$",
+                        "description": "SHA-256 (or its prefix) of the implementation sources; part of every run's identity. null until known."
+                    },
+                    "note": {
+                        "type": "string",
+                        "maxLength": 1000
+                    }
+                }
+            }
+        }
+    }
+}

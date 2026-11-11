@@ -1,0 +1,175 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://mptcp-cc-poc.invalid/schemas/environment.schema.json",
+    "title": "Environment (mptcp-environment/1)",
+    "description": "One concrete execution environment (an instance of an environment type) and what scenario features it can execute. The dashboard uses 'capabilities' to grey out or reject scenario options (rules E-* in README.md).",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "schema",
+        "id",
+        "type",
+        "name",
+        "is_active",
+        "capabilities"
+    ],
+    "properties": {
+        "schema": {
+            "const": "mptcp-environment/1"
+        },
+        "id": {
+            "$ref": "common.schema.json#/$defs/Id"
+        },
+        "type": {
+            "$ref": "common.schema.json#/$defs/EnvType"
+        },
+        "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+        },
+        "description": {
+            "type": "string",
+            "maxLength": 4000
+        },
+        "host": {
+            "type": "string",
+            "maxLength": 120,
+            "description": "Where it runs (machine name). Two instances of one type differ here."
+        },
+        "platform_profile": {
+            "type": "string",
+            "maxLength": 64,
+            "description": "Transport-stack profile (algorithms/profiles/platform/): MSS, initial window, SACK, ACK policy, minimum RTO. Example: uml-reference, ns3-linux-comparable."
+        },
+        "fingerprint": {
+            "type": "object",
+            "description": "Hashes of the kernel/binaries/harness. Runs are comparable only with the same fingerprint.",
+            "additionalProperties": {
+                "type": "string"
+            }
+        },
+        "is_active": {
+            "type": "boolean"
+        },
+        "capabilities": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "max_paths",
+                "topology_modes",
+                "traffic_types",
+                "event_actions",
+                "generator_types",
+                "loss_models"
+            ],
+            "properties": {
+                "max_paths": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 8,
+                    "description": "Exact number of paths supported is min_paths..max_paths."
+                },
+                "min_paths": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 8,
+                    "default": 1
+                },
+                "topology_modes": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "minItems": 1,
+                    "items": {
+                        "enum": [
+                            "disjoint",
+                            "shared"
+                        ]
+                    }
+                },
+                "cross_traffic": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "traffic_types": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "minItems": 1,
+                    "items": {
+                        "enum": [
+                            "bulk",
+                            "media"
+                        ]
+                    }
+                },
+                "event_actions": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "enum": [
+                            "set-loss",
+                            "set-bandwidth",
+                            "set-delay",
+                            "set-queue"
+                        ]
+                    }
+                },
+                "generator_types": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "enum": [
+                            "random-delay",
+                            "outages"
+                        ]
+                    }
+                },
+                "loss_models": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "minItems": 1,
+                    "items": {
+                        "enum": [
+                            "none",
+                            "bernoulli",
+                            "gilbert-elliott",
+                            "list"
+                        ]
+                    }
+                },
+                "loss_applies_to": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "enum": [
+                            "data",
+                            "all"
+                        ]
+                    },
+                    "default": [
+                        "data",
+                        "all"
+                    ]
+                },
+                "read_schedule": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Supports receiver.read_schedule."
+                },
+                "supported_queue_pkts_max": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Queues above this are allowed but the run is classified 'exploratory' (outside the validated range)."
+                }
+            }
+        },
+        "scope_notes": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "maxLength": 500
+            },
+            "description": "Known limitations shown to the user (free text)."
+        }
+    }
+}
