@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://mptcp-cc-poc.invalid/schemas/common.schema.json",
+    "$id": "https://mptcp-cc-poc/schemas/common.schema.json",
     "title": "Common definitions",
     "description": "Building blocks shared by the mptcp-* document schemas. Not a document type of its own.",
     "$defs": {

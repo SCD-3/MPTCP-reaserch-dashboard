@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://mptcp-cc-poc.invalid/schemas/experiment.schema.json",
+    "$id": "https://mptcp-cc-poc/schemas/experiment.schema.json",
     "title": "Experiment (mptcp-experiment/1)",
     "description": "What to run: scenarios (optionally with parameter sweeps) x environments x algorithms x repetitions. Freezing an experiment expands it into run records (mptcp-run/1); after that it is immutable except for 'status'.",
     "type": "object",

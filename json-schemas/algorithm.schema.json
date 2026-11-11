@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://mptcp-cc-poc.invalid/schemas/algorithm.schema.json",
+    "$id": "https://mptcp-cc-poc/schemas/algorithm.schema.json",
     "title": "Algorithm catalogue entry (mptcp-algorithm/1)",
     "description": "A congestion-control algorithm, its frozen parameter profiles and its implementations per environment type. Read-only for the dashboard: the backend generates it from algorithms/registry.yaml and algorithms/profiles/.",
     "type": "object",

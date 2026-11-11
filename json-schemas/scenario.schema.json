@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://mptcp-cc-poc.invalid/schemas/scenario.schema.json",
+    "$id": "https://mptcp-cc-poc/schemas/scenario.schema.json",
     "title": "Scenario (mptcp-scenario/1)",
     "description": "Test conditions of one experiment cell: network paths, impairments, timed changes, traffic and receiver behaviour. It does NOT name the algorithm or the environment. Units are SI and are part of the key name (_bps bit/s, _Bps bytes/s, _s seconds, _bytes, _pkts; probabilities are fractions 0..1). Cross-field rules that JSON Schema cannot express are listed in README.md (rule ids S-*).",
     "type": "object",

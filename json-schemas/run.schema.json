@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://mptcp-cc-poc.invalid/schemas/run.schema.json",
+    "$id": "https://mptcp-cc-poc/schemas/run.schema.json",
     "title": "Run record (mptcp-run/1)",
     "description": "One execution: one scenario variant, one environment, one algorithm (+profile), one repetition. Created by the backend when an experiment is frozen; the dashboard only reads it. The snapshot is the full, resolved configuration, so later catalogue edits never change history.",
     "type": "object",

@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://mptcp-cc-poc.invalid/schemas/environment.schema.json",
+    "$id": "https://mptcp-cc-poc/schemas/environment.schema.json",
     "title": "Environment (mptcp-environment/1)",
     "description": "One concrete execution environment (an instance of an environment type) and what scenario features it can execute. The dashboard uses 'capabilities' to grey out or reject scenario options (rules E-* in README.md).",
     "type": "object",

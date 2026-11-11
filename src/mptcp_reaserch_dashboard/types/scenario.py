@@ -1,4 +1,4 @@
-from typing import Literal, TypedDict, Any
+from typing import Literal, TypedDict, Any, Optional
 from mptcp_reaserch_dashboard.types.common import *
 
 # scenario.schema.json
@@ -71,20 +71,20 @@ class BackendOverrides(TypedDict):
     
     model: dict[str, Any]
 
-class PathId(str):
-    """Path identifier, used by events, generators and in the metrics (path_id). 'bottleneck' is reserved."""
+type PathId = str
+"""Path identifier, used by events, generators and in the metrics (path_id). 'bottleneck' is reserved."""
 
-class Bandwidth(float):
-    """Link rate in bit/s (20 Mbit/s = 20000000)."""
+type Bandwidth = float
+"""Link rate in bit/s (20 Mbit/s = 20000000)."""
 
-class Delay(float):
-    """ONE-WAY delay added on the link, in seconds (20 ms = 0.02). The round-trip time is about twice the sum over the path, plus queueing."""
+type Delay = float
+"""ONE-WAY delay added on the link, in seconds (20 ms = 0.02). The round-trip time is about twice the sum over the path, plus queueing."""
 
-class Queue(int):
-    """Length of the bottleneck queue (drop-tail) in packets. Strongly affects delay and loss; a typical value is 100."""
+type Queue = int
+"""Length of the bottleneck queue (drop-tail) in packets. Strongly affects delay and loss; a typical value is 100."""
 
-class Probability(float):
-    """Probability as a fraction (0.01 = 1 %)."""
+type Probability = float
+"""Probability as a fraction (0.01 = 1 %)."""
 
 type AppliesTo = Literal["data", "all"]
 """data = only data packets in the sender->receiver direction are dropped; all = every packet in both directions (ACKs too). Use 'all' with probability 1 for a silent path failure."""
@@ -95,7 +95,7 @@ class NoLoss(TypedDict):
     
     model: Literal["none"]
     
-    applies_to: AppliesTo
+    applies_to: Optional[AppliesTo]
 
 class Random(TypedDict):
     """Each eligible packet is dropped independently with the given probability."""
@@ -104,7 +104,7 @@ class Random(TypedDict):
     
     probability: Probability
     
-    applies_to: AppliesTo
+    applies_to: Optional[AppliesTo]
 
 class Burst(TypedDict):
     """Two-state Markov chain evaluated per packet. Mean burst length = 1/p_bg packets; share of time in the bad state = p_gb/(p_gb+p_bg); mean loss = (p_bg*loss_good + p_gb*loss_bad)/(p_gb+p_bg)."""
@@ -123,7 +123,7 @@ class Burst(TypedDict):
     lostt_bad: Probability
     """Loss probability in the bad state (usually 1)."""
     
-    applies_to: AppliesTo
+    applies_to: Optional[AppliesTo]
 
 class LossExplicit(TypedDict):
     """ADVANCED. Drop exactly the eligible packets with these 0-based indices (single-loss tests). UML only."""
@@ -154,9 +154,9 @@ class Topology(TypedDict):
     mode: Literal["disjoint", "shared"]
     """disjoint = each path has its own bottleneck (independent links); shared = both paths meet in one common bottleneck after their access links (tests fairness to other traffic)."""
     
-    bottleneck: Bottleneck
+    bottleneck: Optional[Bottleneck]
     
-    cross_traffic: CrossTraffic
+    cross_traffic: Optional[CrossTraffic]
 
 class Bottleneck(TypedDict):
     """The common bottleneck (shared mode only)."""
@@ -203,11 +203,11 @@ class CrossTrafficGenerator(TypedDict):
     
     start_s: float
 
-class Target(str):
-    """Id of a path from 'paths', or 'bottleneck' (shared mode; not for set-loss). Rule S-TARGET."""
+type Target = str
+"""Id of a path from 'paths', or 'bottleneck' (shared mode; not for set-loss). Rule S-TARGET."""
 
-class AtS(float):
-    """Time of the change, seconds after the sender start. Rule S-EVENT-TIME: at_s <= duration_s."""
+type AtS = float
+"""Time of the change, seconds after the sender start. Rule S-EVENT-TIME: at_s <= duration_s."""
 
 type Event = EventLoss|EventBandwidth|EventDelay|EventQueueLen
 
