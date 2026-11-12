@@ -2,19 +2,30 @@ lazy import pymongo
 lazy import jsonschema
 lazy import referencing
 lazy import json
-lazy import re as regex
+lazy import enum
 lazy import itertools
 lazy from pathlib import Path
 
 lazy import typing
+lazy import pymongo.collection
 
-lazy import mptcp_reaserch_dashboard.types.scenario as mptcp_types
+lazy import mptcp_reaserch_dashboard.types as mptcp_types
 lazy import mptcp_reaserch_dashboard.errors as err
 
-client: pymongo.MongoClient[mptcp_types.Scenario] = pymongo.MongoClient("mongodb://localhost:27017/")
+type collection[T: mptcp_types.Resource] = pymongo.collection.Collection[T]
+
+client: pymongo.MongoClient[mptcp_types.Resource] = pymongo.MongoClient("mongodb://localhost:27017/")
 db = client["mptcp-database"]
 
-scenarios    = db['scenarios']
+collection_scenarios: collection[mptcp_types.Scenario] = db['scenarios'] #type: ignore
+
+
+class ResourceType(enum.Enum):
+    Algorithm = enum.auto()
+    Environment = enum.auto()
+    Experiment = enum.auto()
+    Run = enum.auto()
+    Scenario = enum.auto()
 
 
 schema_dir = Path("json-schemas")
@@ -140,8 +151,8 @@ def scenario_find_errors(data: mptcp_types.Scenario) -> list[err.ValidErrors]:
             add_error('S-PAUSE')
     
     # S-SEEDS
-    deafults = data['defaults']
-    if len(deafults['seeds']) != deafults['repetitions']:
+    defaults = data['defaults']
+    if len(defaults['seeds']) != defaults['repetitions']:
         add_error('S-SEEDS')
     
     # W-WARMUP
@@ -176,8 +187,15 @@ def is_scenario_valid(data: mptcp_types.Scenario) -> bool:
     errors = [i for i in scenario_find_errors(data) if err.errors[i][0] == err.ErrorLevel.Error]
     return len(errors) == 0
 
-def add_scenario(data: mptcp_types.Scenario):
-    scenarios.insert_one(data)
+
+def scenario_insert(data: mptcp_types.Scenario):
+    if not is_scenario_valid(data):
+        raise ValueError("Scenario is invalid")
+    
+    same_id = list(collection_scenarios.find({ 'id': data['id'] }))
+    data['version'] = len(same_id) + 1
+    
+    collection_scenarios.insert_one(data)
 
 def scenario_get(id: str):
-    return scenarios.find_one({ 'id': id })
+    return collection_scenarios.find_one({ 'id': id })
