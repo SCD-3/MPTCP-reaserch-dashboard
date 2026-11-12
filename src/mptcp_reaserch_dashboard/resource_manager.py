@@ -157,8 +157,8 @@ def scenario_find_errors(data: mptcp_types.Scenario) -> list[err.ValidErrors]:
     
     return errors
 
+def add_scenario(data: mptcp_types.Scenario):
+    scenarios.insert_one(data)
+
 def scenario_get(id: str):
-    if regex.match(r'^[a-z0-9][a-z0-9_.-]{0,63}$', id) is None:
-        return None
-    
     return scenarios.find_one({ 'id': id })
