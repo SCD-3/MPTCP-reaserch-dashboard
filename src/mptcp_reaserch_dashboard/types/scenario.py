@@ -62,7 +62,7 @@ class Scenario(TypedDict):
     
     defaults: Defaults
     
-    backend_overrides: Optional[BackendOverrides]
+    backend_overrides: Optional[Parameter]
 
 class Sender(TypedDict):
     """Fixed send buffer (SO_SNDBUF).0 = the platform's autotuning.
@@ -78,24 +78,6 @@ class Defaults(TypedDict):
     repetitions: Repetitions
     
     seeds: Seeds
-
-class BackendOverrides(TypedDict):
-    """ADVANCED.
-    Raw fragments merged into the compiled input of one environment type (engine YAML keys for uml/dce, program option names for ns3).
-    Anything here makes the scenario environment-specific
-
-    the UI should show it as such and hide it by default.
-    """
-    
-    uml: dict[str, Any]
-    
-    dce: dict[str, Any]
-    
-    ms3: dict[str, Any]
-    
-    rpi4: dict[str, Any]
-    
-    model: dict[str, Any]
 
 type PathId = str
 """Path identifier, used by events, generators and in the metrics (path_id).

@@ -1,4 +1,4 @@
-from typing import Literal, TypedDict
+from typing import Literal, TypedDict, Optional, Any
 
 # common.schema.json
 
@@ -70,3 +70,5 @@ type Sha256 = str
 type Timestamp = str
 """UTC time, RFC 3339 (e.g. 2026-11-09T12:00:00Z).
 """
+
+type Parameter = dict[EnvType, dict[str, Any]]
