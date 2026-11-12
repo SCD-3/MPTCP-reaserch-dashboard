@@ -75,44 +75,53 @@ def scenario_find_errors(data: mptcp_types.Scenario) -> list[err.ValidErrors]:
         add_error('S-PATH-ID')
 
     # S-TARGET
-    for i in itertools.chain(data['events'], data['generators']):
-        if i['target'] not in all_unique_paths:
-            add_error('S-TARGET')
+    if data['events'] is not None and data['generators'] is not None:
+        for i in itertools.chain(data['events'], data['generators']):
+            if i['target'] not in all_unique_paths:
+                add_error('S-TARGET')
     
     # S-EVENT-TIME
-    for event in data['events']:
-        if not event['at_s'] <= data['duration_s']:
-            add_error('S-EVENT-TIME')
+    if data['events'] is not None:
+        for event in data['events']:
+            if not event['at_s'] <= data['duration_s']:
+                add_error('S-EVENT-TIME')
     
     # S-EVENT-DUP
-    for event1 in data['events']:
-        event1 = (event1['at_s'], event1['target'], event1['action'])
-        for event2 in data['events']: # O(n^2) goes brr
-            event2 = (event2['at_s'], event2['target'], event2['action'])
-            
-            if event1 == event2:
-                add_error('S-EVENT-DUP')
+    if data['events'] is not None:
+        for event1 in data['events']:
+            event1 = (event1['at_s'], event1['target'], event1['action'])
+            for event2 in data['events']: # O(n^2) goes brr
+                event2 = (event2['at_s'], event2['target'], event2['action'])
+                
+                if event1 == event2:
+                    add_error('S-EVENT-DUP')
     
     # S-WINDOW
-    start, end = data['statistics_window_s']
-    if not (0 <= start < end < data['duration_s']):
-        add_error('S-WINDOW')
+    if data['statistics_window_s'] is not None:
+        start, end = data['statistics_window_s']
+        if not (0 <= start < end < data['duration_s']):
+            add_error('S-WINDOW')
 
     # S-GEN
-    generators = data['generators']
-    for gen in generators:
-        if gen['type'] == 'random-delay':
-            if not (gen['start_s'] < data['duration_s'] and gen['min_delay_s'] <= gen['max_delay_s']):
-                add_error('S-GEN')
-                
-        elif gen['type'] == 'outages':
-            if not (gen['duration_s'] < data['duration_s']):
-                add_error('S-GEN')
+    generators = data.get('generators')
+    if generators is not None:
+        for gen in generators:
+            if gen['type'] == 'random-delay':
+                if not (gen['start_s'] < data['duration_s'] and gen['min_delay_s'] <= gen['max_delay_s']):
+                    add_error('S-GEN')
+                    
+            elif gen['type'] == 'outages':
+                if not (gen['duration_s'] < data['duration_s']):
+                    add_error('S-GEN')
     
     # S-READ
-    scheldues = [i['from_s'] for i in data['receiver']['read_scheldue']]
-    if scheldues[0] != 0 or scheldues != sorted(scheldues):
-        add_error('S-READ')
+    receiver = data.get('receiver')
+    if receiver is not None:
+        read_scheldue = receiver.get('read_scheldue')
+        if read_scheldue is not None:
+            scheldues = [i['from_s'] for i in read_scheldue]
+            if scheldues[0] != 0 or scheldues != sorted(scheldues):
+                add_error('S-READ')
 
     # S-CROSS
     cross = data['topology'].get('cross_traffic')
@@ -136,7 +145,8 @@ def scenario_find_errors(data: mptcp_types.Scenario) -> list[err.ValidErrors]:
         add_error('S-SEEDS')
     
     # W-WARMUP
-    if data['traffic']['type'] == 'bulk' and data['statistics_window_s'][0] == 0:
+    statistics_window = data.get('statistics_window_s')
+    if statistics_window is not None and data['traffic']['type'] == 'bulk' and statistics_window[0] == 0:
         add_error('W-WARMUP')
     
     # W-DELAY-TWICE
@@ -156,6 +166,15 @@ def scenario_find_errors(data: mptcp_types.Scenario) -> list[err.ValidErrors]:
             add_error('W-QUEUE')
     
     return errors
+
+def is_scenario_valid(data: mptcp_types.Scenario) -> bool:
+    try:
+        scenario_validator.validate(data)
+    except jsonschema.ValidationError:
+        return False
+
+    errors = [i for i in scenario_find_errors(data) if err.errors[i][0] == err.ErrorLevel.Error]
+    return len(errors) == 0
 
 def add_scenario(data: mptcp_types.Scenario):
     scenarios.insert_one(data)

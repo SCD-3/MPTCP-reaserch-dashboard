@@ -15,17 +15,17 @@ class Scenario(TypedDict):
     """Short human-readable title.
     """
     
-    description: str
+    description: Optional[str]
     """Purpose of the test and what is expected to happen.
     """
     
-    labels: Labels
+    labels: Optional[Labels]
     
     duration_s: int
     """Duration of the data transfer in one run, from the sender start.
     """
     
-    statistics_window_s: tuple[int, int]
+    statistics_window_s: Optional[tuple[int, int]]
     """[from, to] time window used for summary metrics
 
     the part before 'from' is warm-up (slow start).
@@ -43,12 +43,12 @@ class Scenario(TypedDict):
     Rule S-PATH-ID: ids unique.
     """
     
-    events: list[Event]
+    events: Optional[list[Event]]
     """Timed changes of path or bottleneck parameters.
     Rules S-TARGET, S-EVENT-TIME, S-EVENT-DUP.
     """
     
-    generators: list[Generator]
+    generators: Optional[list[Generator]]
     """Randomised series of changes.
     They are expanded into concrete events per seed when the experiment is frozen, so every algorithm sees the same series.
     Rules S-TARGET, S-GEN.
@@ -56,19 +56,19 @@ class Scenario(TypedDict):
     
     traffic: Traffic
     
-    sender: Sender
+    sender: Optional[Sender]
     
-    receiver: Receiver
+    receiver: Optional[Receiver]
     
     defaults: Defaults
     
-    backend_overrides: BackendOverrides
+    backend_overrides: Optional[BackendOverrides]
 
 class Sender(TypedDict):
     """Fixed send buffer (SO_SNDBUF).0 = the platform's autotuning.
     """
     
-    sndbuf_bytes: int # ???
+    sndbuf_bytes: Optional[int] # ???
 
 class Defaults(TypedDict):
     """Default repetition plan.
@@ -401,20 +401,20 @@ class Receiver(TypedDict):
     """Behaviour of the receiving application and its buffers.
     """
     
-    rcvbuf_bytes: int
+    rcvbuf_bytes: Optional[int]
     """Fixed receive buffer (SO_RCVBUF)
 
     disables autotuning.
     0 = autotuning.
     """
     
-    rcvbuf_autotune_max_bytes: int
+    rcvbuf_autotune_max_bytes: Optional[int]
     """Upper limit of receive-buffer autotuning (Linux tcp_rmem max).
     Omit to use the platform default (16 MiB).
     Ignored when rcvbuf_bytes > 0.
     """
     
-    read_scheldue: list[ReadScheldueItem]
+    read_scheldue: Optional[list[ReadScheldueItem]]
     """How fast the receiving application reads, as a piecewise-constant schedule.
     Each entry holds from from_s until the next entry.
     Rule S-READ: the first from_s is 0 and from_s strictly increases.
