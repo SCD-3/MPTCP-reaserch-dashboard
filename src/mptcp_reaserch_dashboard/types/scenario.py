@@ -269,7 +269,7 @@ class GeneratorDelay(TypedDict):
     
     max_delay_s: Delay
 
-class GeneratorOutages:
+class GeneratorOutages(TypedDict):
     """Silent failures of the path (all packets lost, both directions) of length duration_s, separated by exponentially distributed gaps with mean mean_interval_s."""
     
     type: Literal["outages"]
@@ -324,8 +324,9 @@ class Receiver(TypedDict):
     rcvbuf_autotune_max_bytes: int
     """Upper limit of receive-buffer autotuning (Linux tcp_rmem max). Omit to use the platform default (16 MiB). Ignored when rcvbuf_bytes > 0."""
     
-
-type read_scheldue = list[ReadScheldueItem]
+    read_scheldue: list[ReadScheldueItem]
+    """How fast the receiving application reads, as a piecewise-constant schedule. Each entry holds from from_s until the next entry. Rule S-READ: the first from_s is 0 and from_s strictly increases. Omitted = always unlimited. (This is the 'receiver consumption' of the old dashboard draft.)"""
+    
 
 class ReadScheldueItem(TypedDict):
     """How fast the receiving application reads, as a piecewise-constant schedule. Each entry holds from from_s until the next entry. Rule S-READ: the first from_s is 0 and from_s strictly increases. Omitted = always unlimited. (This is the 'receiver consumption' of the old dashboard draft.)"""
