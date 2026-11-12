@@ -99,7 +99,15 @@ def scenario_find_errors(data: mptcp_types.Scenario) -> list[err.ValidErrors]:
         add_error('S-WINDOW')
 
     # S-GEN
-    #TODO yea, i have no idea what they mean
+    generators = data['generators']
+    for gen in generators:
+        if gen['type'] == 'random-delay':
+            if not (gen['start_s'] < data['duration_s'] and gen['min_delay_s'] <= gen['max_delay_s']):
+                add_error('S-GEN')
+                
+        elif gen['type'] == 'outages':
+            if not (gen['duration_s'] < data['duration_s']):
+                add_error('S-GEN')
     
     # S-READ
     scheldues = [i['from_s'] for i in data['receiver']['read_scheldue']]
