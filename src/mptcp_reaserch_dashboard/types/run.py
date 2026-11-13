@@ -73,7 +73,7 @@ class Snapshot(TypedDict):
     
     scenario: Scenario # okay, bit weird
     
-    expanded_events: list[Any]
+    expanded_events: Optional[list[Any]]
     
     algorithm: dict[str, Any]
     
