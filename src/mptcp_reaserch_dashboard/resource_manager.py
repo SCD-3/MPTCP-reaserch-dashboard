@@ -1,10 +1,9 @@
-lazy import pymongo
-lazy import jsonschema
-lazy import referencing
-lazy import json
-lazy import enum
-lazy import itertools
-lazy from pathlib import Path
+import pymongo
+import jsonschema
+import referencing
+import json
+import enum
+from pathlib import Path
 
 lazy import typing
 lazy import pymongo.collection
@@ -14,10 +13,15 @@ lazy import mptcp_reaserch_dashboard.errors as err
 
 type collection[T: mptcp_types.Resource] = pymongo.collection.Collection[T]
 
-client: pymongo.MongoClient[mptcp_types.Resource] = pymongo.MongoClient("mongodb://localhost:27017/")
+client: pymongo.MongoClient[typing.Any] = pymongo.MongoClient("mongodb://localhost:27017/")
 db = client["mptcp-database"]
 
-collection_scenarios: collection[mptcp_types.Scenario] = db['scenarios'] #type: ignore
+
+algorithms: collection[mptcp_types.Algorithm]     = db['algorithms']
+environments: collection[mptcp_types.Environment] = db['environments']
+experiments: collection[mptcp_types.Experiment]   = db['experiments']
+runs: collection[mptcp_types.Run]                 = db['runs']
+scenarios: collection[mptcp_types.Scenario]       = db['scenarios']
 
 
 class ResourceType(enum.Enum):
@@ -72,130 +76,18 @@ scenario_validator = jsonschema.Draft202012Validator(
     registry=common_registry # type: ignore
 )
 
-def scenario_find_errors(data: mptcp_types.Scenario) -> list[err.ValidErrors]:
-    
-    errors: list[err.ValidErrors] = []
-    
-    def add_error(error: err.ValidErrors):
-        if error not in errors:
-            errors.append(error)
-    
-    # S-PATH-ID
-    all_unique_paths = {i['id'] for i in data['paths'] if i['id'] != 'bottleneck'}
-    if len(all_unique_paths) != len(data['paths']):
-        add_error('S-PATH-ID')
 
-    # S-TARGET
-    if data['events'] is not None and data['generators'] is not None:
-        for i in itertools.chain(data['events'], data['generators']):
-            if i['target'] not in all_unique_paths:
-                add_error('S-TARGET')
-    
-    # S-EVENT-TIME
-    if data['events'] is not None:
-        for event in data['events']:
-            if not event['at_s'] <= data['duration_s']:
-                add_error('S-EVENT-TIME')
-    
-    # S-EVENT-DUP
-    if data['events'] is not None:
-        for event1 in data['events']:
-            event1 = (event1['at_s'], event1['target'], event1['action'])
-            for event2 in data['events']: # O(n^2) goes brr
-                event2 = (event2['at_s'], event2['target'], event2['action'])
-                
-                if event1 == event2:
-                    add_error('S-EVENT-DUP')
-    
-    # S-WINDOW
-    if data['statistics_window_s'] is not None:
-        start, end = data['statistics_window_s']
-        if not (0 <= start < end < data['duration_s']):
-            add_error('S-WINDOW')
-
-    # S-GEN
-    generators = data.get('generators')
-    if generators is not None:
-        for gen in generators:
-            if gen['type'] == 'random-delay':
-                if not (gen['start_s'] < data['duration_s'] and gen['min_delay_s'] <= gen['max_delay_s']):
-                    add_error('S-GEN')
-                    
-            elif gen['type'] == 'outages':
-                if not (gen['duration_s'] < data['duration_s']):
-                    add_error('S-GEN')
-    
-    # S-READ
-    receiver = data.get('receiver')
-    if receiver is not None:
-        read_scheldue = receiver.get('read_scheldue')
-        if read_scheldue is not None:
-            scheldues = [i['from_s'] for i in read_scheldue]
-            if scheldues[0] != 0 or scheldues != sorted(scheldues):
-                add_error('S-READ')
-
-    # S-CROSS
-    cross = data['topology'].get('cross_traffic')
-    if cross is not None:
-        for i in cross['schedule']:
-            if not (i['start_s'] < i['stop_s'] <= data['duration_s']):
-                add_error('S-CROSS')
-    
-    # S-PAUSE
-    traffic = data['traffic']
-    if traffic['type'] == 'media':
-        media = traffic['media']
-        start, stop = media['pause_s']
-        
-        if not (start < stop <= data['duration_s']):
-            add_error('S-PAUSE')
-    
-    # S-SEEDS
-    defaults = data['defaults']
-    if len(defaults['seeds']) != defaults['repetitions']:
-        add_error('S-SEEDS')
-    
-    # W-WARMUP
-    statistics_window = data.get('statistics_window_s')
-    if statistics_window is not None and data['traffic']['type'] == 'bulk' and statistics_window[0] == 0:
-        add_error('W-WARMUP')
-    
-    # W-DELAY-TWICE
-    #TODO again, no idea what they mean. paths have no events nor gens
-    
-    # W-BOTTLENECK
-    topology = data['topology']
-    bottleneck = topology.get('bottleneck')
-    if topology['mode'] == 'shared' and bottleneck is not None:
-        paths_bandwidth = sum(path['bandwidth_bps'] for path in data['paths'])
-        if bottleneck['bandwidth_bps'] >= paths_bandwidth:
-            add_error('W-BOTTLENECK')
-    
-    # W-QUEUE
-    for path in data['paths']:
-        if path['queue_pkts'] < 10:
-            add_error('W-QUEUE')
-    
-    return errors
-
-def is_scenario_valid(data: mptcp_types.Scenario) -> bool:
-    try:
-        scenario_validator.validate(data)
-    except jsonschema.ValidationError:
-        return False
-
-    errors = [i for i in scenario_find_errors(data) if err.errors[i][0] == err.ErrorLevel.Error]
-    return len(errors) == 0
-
+def is_scenario_valid(data: mptcp_types.Scenario) -> tuple[bool, list[err.ValidErrors]]:
+    ... #todo
 
 def scenario_insert(data: mptcp_types.Scenario):
     if not is_scenario_valid(data):
         raise ValueError("Scenario is invalid")
     
-    same_id = list(collection_scenarios.find({ 'id': data['id'] }))
+    same_id = list(scenarios.find({ 'id': data['id'] }))
     data['version'] = len(same_id) + 1
     
-    collection_scenarios.insert_one(data)
+    scenarios.insert_one(data)
 
 def scenario_get(id: str):
-    return collection_scenarios.find_one({ 'id': id })
+    return scenarios.find_one({ 'id': id })

@@ -172,7 +172,7 @@ class LossExplicit(TypedDict):
 
 class Path(TypedDict):
     
-    id: Id
+    id: Id | Literal['bottleneck']
     
     label: str
     """Display name, e.g.
