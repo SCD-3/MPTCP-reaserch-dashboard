@@ -23,6 +23,47 @@ def favicon():
     
     return flask.send_from_directory(app.static_folder, "favicon.ico", mimetype="image/vnd.microsoft.icon")
 
+
+@app.post('/algorithm_new')
+def algorithm_new():
+    data = flask.request.json
+    
+    try:
+        mptcp_resource.algorithm_insert(data)
+    except ValueError:
+        return 'bad data', 400
+    return 'ok', 200
+
+@app.post('/environment_new')
+def environment_new():
+    data = flask.request.json
+    
+    try:
+        mptcp_resource.environment_insert(data)
+    except ValueError:
+        return 'bad data', 400
+    return 'ok', 200
+
+@app.post('/experiment_new')
+def experiment_new():
+    data = flask.request.json
+    
+    try:
+        mptcp_resource.experiment_insert(data)
+    except ValueError:
+        return 'bad data', 400
+    return 'ok', 200
+
+@app.post('/run_new')
+def run_new():
+    data = flask.request.json
+    
+    try:
+        mptcp_resource.run_insert(data)
+    except ValueError:
+        return 'bad data', 400
+    return 'ok', 200
+
 @app.post('/scenario_new')
 def scenario_new():
     data = flask.request.json

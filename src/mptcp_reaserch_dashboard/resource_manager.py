@@ -55,7 +55,7 @@ common_registry = referencing.Registry().with_resource( # type: ignore
     referencing.Resource.from_contents(common_schema)
 )
 
-scenario_validator = jsonschema.Draft202012Validator(
+algorithm_validator = jsonschema.Draft202012Validator(
     algorithm_schema,
     registry=common_registry # type: ignore
 )
@@ -77,8 +77,110 @@ scenario_validator = jsonschema.Draft202012Validator(
 )
 
 
-def is_scenario_valid(data: mptcp_types.Scenario) -> tuple[bool, list[err.ValidErrors]]:
-    ... #todo
+
+def is_algorithm_valid(data: mptcp_types.Algorithm) -> bool:
+    try:
+        algorithm_validator.validate(data)
+    except jsonschema.ValidationError:
+        return False
+    
+    return True
+
+def is_environment_valid(data: mptcp_types.Environment) -> bool:
+    try:
+        environment_validator.validate(data)
+    except jsonschema.ValidationError:
+        return False
+    
+    return True
+
+def is_experiment_valid(data: mptcp_types.Experiment) -> bool:
+    
+    def lazy_check_errors():
+        yield err.x_ref(data, db)
+        yield err.x_profile(data, db)
+        yield err.x_alg_dup(data)
+        yield err.x_sweep(data)
+        yield err.w_profile(data, db)
+    
+    try:
+        experiment_validator.validate(data)
+    except jsonschema.ValidationError:
+        return False
+    
+    return not any(lazy_check_errors())
+
+def is_run_valid(data: mptcp_types.Run) -> bool:
+    try:
+        run_validator.validate(data)
+    except jsonschema.ValidationError:
+        return False
+    
+    return True
+
+
+def is_scenario_valid(data: mptcp_types.Scenario) -> bool:
+    
+    def lazy_check_errors():
+        yield err.s_path_id(data)
+        yield err.s_target(data)
+        yield err.s_event_time(data)
+        yield err.s_event_dup(data)
+        yield err.s_window(data)
+        yield err.s_gen(data)
+        yield err.s_read(data)
+        yield err.s_cross(data)
+        yield err.s_pause(data)
+        yield err.s_seeds(data)
+    
+    try:
+        scenario_validator.validate(data)
+    except jsonschema.ValidationError:
+        return False
+    
+    return not any(lazy_check_errors())
+
+
+
+def algorithm_insert(data: mptcp_types.Algorithm):
+    if not is_algorithm_valid(data):
+        raise ValueError("Algorithm is invalid")
+    algorithms.insert_one(data)
+    
+def algorithm_get(id: str):
+    return algorithms.find_one({ 'id': id })
+
+
+def environment_insert(data: mptcp_types.Environment):
+    if not is_environment_valid(data):
+        raise ValueError("Environment is invalid")
+    environments.insert_one(data)
+
+def environment_get(id: str):
+    return environments.find_one({ 'id': id })
+
+
+def experiment_insert(data: mptcp_types.Experiment):
+    if not is_experiment_valid(data):
+        raise ValueError("Experiment is invalid")
+    
+    same_id = list(experiments.find({ 'id': data['id'] }))
+    data['version'] = len(same_id) + 1
+    
+    experiments.insert_one(data)
+
+def experiment_get(id: str):
+    return experiments.find_one({ 'id': id })
+
+
+def run_insert(data: mptcp_types.Run):
+    if not is_run_valid(data):
+        raise ValueError("Run is invalid")
+    
+    runs.insert_one(data)
+
+def run_get(id: str):
+    return runs.find_one({ 'id': id })
 
 def scenario_insert(data: mptcp_types.Scenario):
     if not is_scenario_valid(data):
