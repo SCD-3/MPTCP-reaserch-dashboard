@@ -42,7 +42,12 @@ ValidErrors = typing.Literal[
     'E-GENERATOR',
     'E-LOSS',
     'E-READ',
-    'E-QUEUE',
+    
+    'X-REF',
+    'X-PROFILE',
+    'X-ALG-DUP',
+    'X-SWEEP',
+    'W-PROFILE',
 ]
 
 errors: dict[ValidErrors, tuple[ErrorLevel, str]] = {
@@ -71,7 +76,12 @@ errors: dict[ValidErrors, tuple[ErrorLevel, str]] = {
     'E-GENERATOR':    (ErrorLevel.Error,   'every generator `type` in `generator_types`'),
     'E-LOSS':         (ErrorLevel.Error,   'every loss model used (paths and `set-loss` events) in `loss_models`; its `applies_to` in `loss_applies_to`'),
     'E-READ':         (ErrorLevel.Error,   'a limited `read_schedule` only if `read_schedule: true`'),
-    'E-QUEUE':        (ErrorLevel.Warning, 'a queue above `supported_queue_pkts_max`: allowed, but the run is labelled exploratory'),
+    
+    'X-REF':          (ErrorLevel.Error,   'scenario (id+version), environment and algorithm ids exist in the catalogue'),
+    'X-PROFILE':      (ErrorLevel.Error,   'an algorithm with profiles needs an existing profile; one without profiles takes none'),
+    'X-ALG-DUP':      (ErrorLevel.Error,   'the same (algorithm, profile) at most once'),
+    'X-SWEEP':        (ErrorLevel.Error,   'every sweep path exists; every variant passes the schema and the S-rules'),
+    'W-PROFILE':      (ErrorLevel.Warning, 'the chosen profile is not frozen'),
 }
 
 
