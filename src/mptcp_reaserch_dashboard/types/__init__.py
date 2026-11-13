@@ -1,12 +1,16 @@
-lazy import mptcp_reaserch_dashboard.types.scenario as mptcp_scenario
-lazy import typing
+lazy import mptcp_reaserch_dashboard.types.algorithm
+lazy import mptcp_reaserch_dashboard.types.environment
+lazy import mptcp_reaserch_dashboard.types.experiment
+lazy import mptcp_reaserch_dashboard.types.run
+lazy import mptcp_reaserch_dashboard.types.scenario
 
 
-type Algorithm = typing.Mapping[str, typing.Any] #TODO
-type Environment = typing.Mapping[str, typing.Any] #TODO
-type Experiment = typing.Mapping[str, typing.Any] #TODO
-type Run = typing.Mapping[str, typing.Any] #TODO
-type Scenario = mptcp_scenario.Scenario
+
+type Algorithm   = mptcp_reaserch_dashboard.types.  algorithm.Algorithm
+type Environment = mptcp_reaserch_dashboard.types.environment.Environment
+type Experiment  = mptcp_reaserch_dashboard.types. experiment.Experiment
+type Run         = mptcp_reaserch_dashboard.types.        run.Run
+type Scenario    = mptcp_reaserch_dashboard.types.   scenario.Scenario
 
 
 type Resource = Algorithm | Environment | Experiment | Run | Scenario
