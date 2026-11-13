@@ -7,6 +7,11 @@ lazy import pymongo.database
 lazy import pymongo.collection
 lazy import mptcp_reaserch_dashboard.types as mptcp_types
 
+
+class InvalidResourceError(Exception):
+    ...
+
+
 class ErrorLevel(Enum):
     
     Error = auto()
@@ -259,6 +264,6 @@ def w_profile(data: mptcp_types.Experiment, db: pymongo.database.Database[typing
             if alg_found is not None and alg_found['profiles'] is not None:
                 
                 for profile in alg_found['profiles']:
-                    if algo['profile'] == profile['id'] and profile['status'] == 'frozen':
+                    if algo['profile'] == profile['id'] and profile['status'] != 'frozen':
                         return True
     return False

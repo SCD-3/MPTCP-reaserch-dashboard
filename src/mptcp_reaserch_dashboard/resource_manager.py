@@ -144,7 +144,7 @@ def is_scenario_valid(data: mptcp_types.Scenario) -> bool:
 
 def algorithm_insert(data: mptcp_types.Algorithm):
     if not is_algorithm_valid(data):
-        raise ValueError("Algorithm is invalid")
+        raise err.InvalidResourceError("Algorithm is invalid")
     algorithms.insert_one(data)
     
 def algorithm_get(id: str):
@@ -153,7 +153,7 @@ def algorithm_get(id: str):
 
 def environment_insert(data: mptcp_types.Environment):
     if not is_environment_valid(data):
-        raise ValueError("Environment is invalid")
+        raise err.InvalidResourceError("Environment is invalid")
     environments.insert_one(data)
 
 def environment_get(id: str):
@@ -162,7 +162,7 @@ def environment_get(id: str):
 
 def experiment_insert(data: mptcp_types.Experiment):
     if not is_experiment_valid(data):
-        raise ValueError("Experiment is invalid")
+        raise err.InvalidResourceError("Experiment is invalid")
     
     same_id = list(experiments.find({ 'id': data['id'] }))
     data['version'] = len(same_id) + 1
@@ -175,7 +175,7 @@ def experiment_get(id: str):
 
 def run_insert(data: mptcp_types.Run):
     if not is_run_valid(data):
-        raise ValueError("Run is invalid")
+        raise err.InvalidResourceError("Run is invalid")
     
     runs.insert_one(data)
 
@@ -184,7 +184,7 @@ def run_get(id: str):
 
 def scenario_insert(data: mptcp_types.Scenario):
     if not is_scenario_valid(data):
-        raise ValueError("Scenario is invalid")
+        raise err.InvalidResourceError("Scenario is invalid")
     
     same_id = list(scenarios.find({ 'id': data['id'] }))
     data['version'] = len(same_id) + 1

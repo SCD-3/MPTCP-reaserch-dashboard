@@ -1,11 +1,10 @@
 import flask
-import json
-import jsonschema.exceptions
 from werkzeug import http
 
 from typing import Literal
 
 import mptcp_reaserch_dashboard.resource_manager as mptcp_resource
+import mptcp_reaserch_dashboard.errors as err
 
 
 app = flask.Flask(__name__)
@@ -30,7 +29,7 @@ def algorithm_new():
     
     try:
         mptcp_resource.algorithm_insert(data)
-    except ValueError:
+    except err.InvalidResourceError:
         return 'bad data', 400
     return 'ok', 200
 
@@ -40,7 +39,7 @@ def environment_new():
     
     try:
         mptcp_resource.environment_insert(data)
-    except ValueError:
+    except err.InvalidResourceError:
         return 'bad data', 400
     return 'ok', 200
 
@@ -50,7 +49,7 @@ def experiment_new():
     
     try:
         mptcp_resource.experiment_insert(data)
-    except ValueError:
+    except err.InvalidResourceError:
         return 'bad data', 400
     return 'ok', 200
 
@@ -60,7 +59,7 @@ def run_new():
     
     try:
         mptcp_resource.run_insert(data)
-    except ValueError:
+    except err.InvalidResourceError:
         return 'bad data', 400
     return 'ok', 200
 
@@ -70,7 +69,7 @@ def scenario_new():
     
     try:
         mptcp_resource.scenario_insert(data)
-    except ValueError:
+    except err.InvalidResourceError:
         return 'bad data', 400
     return 'ok', 200
 
