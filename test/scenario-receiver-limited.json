@@ -1,0 +1,81 @@
+{
+  "schema": "mptcp-scenario/1",
+  "id": "receiver-limited",
+  "version": 1,
+  "name": "Slow and stalling receiver",
+  "description": "Equivalent of experiments/scenarios/e-receiver-limited.yaml: the receiver reads at full speed (0-8 s), 200 kB/s (8-16 s), not at all (16-22 s), full speed again (22-30 s); autotuning limited to 1 MiB; 0.2 % random loss on path 2 so that repetitions differ.",
+  "labels": {
+    "family": "receiver",
+    "source": "experiments/scenarios/e-receiver-limited.yaml"
+  },
+  "duration_s": 30,
+  "statistics_window_s": [
+    5,
+    30
+  ],
+  "topology": {
+    "mode": "disjoint"
+  },
+  "paths": [
+    {
+      "id": "path1",
+      "label": "Wi-Fi",
+      "bandwidth_bps": 20000000,
+      "delay_s": 0.02,
+      "queue_pkts": 100,
+      "loss": {
+        "model": "none"
+      }
+    },
+    {
+      "id": "path2",
+      "label": "LTE",
+      "bandwidth_bps": 10000000,
+      "delay_s": 0.06,
+      "queue_pkts": 100,
+      "loss": {
+        "model": "bernoulli",
+        "probability": 0.002,
+        "applies_to": "data"
+      }
+    }
+  ],
+  "events": [],
+  "generators": [],
+  "traffic": {
+    "type": "bulk"
+  },
+  "sender": {
+    "sndbuf_bytes": 0
+  },
+  "receiver": {
+    "rcvbuf_bytes": 0,
+    "rcvbuf_autotune_max_bytes": 1048576,
+    "read_schedule": [
+      {
+        "from_s": 0,
+        "rate_Bps": null
+      },
+      {
+        "from_s": 8,
+        "rate_Bps": 200000
+      },
+      {
+        "from_s": 16,
+        "rate_Bps": 0
+      },
+      {
+        "from_s": 22,
+        "rate_Bps": null
+      }
+    ]
+  },
+  "defaults": {
+    "repetitions": 15,
+    "seeds": {
+      "strategy": "sequence",
+      "start": 5001,
+      "step": 1
+    }
+  }
+}

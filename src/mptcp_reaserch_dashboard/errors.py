@@ -120,9 +120,9 @@ def s_event_time(data: mptcp_types.Scenario) -> bool:
 
 def s_event_dup(data: mptcp_types.Scenario) -> bool:
     if data['events'] is not None:
-        for event1 in data['events']:
+        for iid, event1 in enumerate(data['events']):
             event1 = (event1['at_s'], event1['target'], event1['action'])
-            for event2 in data['events']: # O(n^2) goes brr
+            for event2 in data['events'][iid + 1:]: # O(n^2) goes brr
                 event2 = (event2['at_s'], event2['target'], event2['action'])
                 
                 if event1 == event2:
@@ -133,7 +133,7 @@ def s_event_dup(data: mptcp_types.Scenario) -> bool:
 def s_window(data: mptcp_types.Scenario) -> bool:
     if data['statistics_window_s'] is not None:
         start, end = data['statistics_window_s']
-        if not (0 <= start < end < data['duration_s']):
+        if not (0 <= start < end <= data['duration_s']):
             return True
     return False
 
@@ -153,10 +153,16 @@ def s_gen(data: mptcp_types.Scenario) -> bool:
 
 
 def s_read(data: mptcp_types.Scenario) -> bool:
-    if data['receiver'] is not None and data['receiver']['read_scheldue'] is not None:
-        scheldues = [i['from_s'] for i in data['receiver']['read_scheldue']]
-        if scheldues[0] != 0 or scheldues != sorted(scheldues):
-            return True
+    receiver = data.get('receiver')
+    if receiver is None:
+        return False
+    read_schedule = receiver.get('read_schedule')
+    if read_schedule is None:
+        return False
+    
+    scheldues = [i['from_s'] for i in read_schedule]
+    if scheldues[0] != 0 or scheldues != sorted(scheldues):
+        return True
     return False
 
 

@@ -1,0 +1,43 @@
+{
+  "schema": "mptcp-environment/1",
+  "id": "dce-libos41",
+  "type": "dce",
+  "name": "ns-3 DCE, Linux 4.1 MPTCP",
+  "description": "Linux 4.1 MPTCP kernel (LibOS) inside ns-3 DCE; same loss streams and generated events as UML for the same seed.",
+  "is_active": true,
+  "capabilities": {
+    "min_paths": 2,
+    "max_paths": 2,
+    "topology_modes": [
+      "disjoint",
+      "shared"
+    ],
+    "cross_traffic": true,
+    "traffic_types": [
+      "bulk"
+    ],
+    "event_actions": [
+      "set-loss",
+      "set-bandwidth",
+      "set-delay"
+    ],
+    "generator_types": [
+      "random-delay",
+      "outages"
+    ],
+    "loss_models": [
+      "none",
+      "bernoulli",
+      "gilbert-elliott"
+    ],
+    "loss_applies_to": [
+      "data",
+      "all"
+    ],
+    "read_schedule": true
+  },
+  "scope_notes": [
+    "No media traffic, no set-queue events.",
+    "Kernel randomness comes from ns-3's RNG, not from the UML guest seed."
+  ]
+}

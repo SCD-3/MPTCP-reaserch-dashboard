@@ -1,0 +1,69 @@
+{
+  "schema": "mptcp-scenario/1",
+  "id": "two-path-baseline",
+  "version": 1,
+  "name": "Two asymmetric paths, no impairments",
+  "description": "Reference conditions: 20 Mbit/s / 20 ms and 10 Mbit/s / 60 ms one-way, 100-packet queues, no loss, bulk transfer. Repetitions differ only by the kernel randomness (ISNs, ports).",
+  "labels": {
+    "family": "baseline"
+  },
+  "duration_s": 30,
+  "statistics_window_s": [
+    5,
+    30
+  ],
+  "topology": {
+    "mode": "disjoint",
+    "bottleneck": {
+      "bandwidth_bps": 10000000.0,
+      "queue_pkts": 50
+    }
+  },
+  "paths": [
+    {
+      "id": "path1",
+      "label": "Wi-Fi",
+      "bandwidth_bps": 20000000,
+      "delay_s": 0.02,
+      "queue_pkts": 100,
+      "loss": {
+        "model": "none"
+      }
+    },
+    {
+      "id": "path2",
+      "label": "LTE",
+      "bandwidth_bps": 10000000,
+      "delay_s": 0.06,
+      "queue_pkts": 100,
+      "loss": {
+        "model": "none"
+      }
+    }
+  ],
+  "events": [],
+  "generators": [],
+  "traffic": {
+    "type": "bulk"
+  },
+  "sender": {
+    "sndbuf_bytes": 0
+  },
+  "receiver": {
+    "rcvbuf_bytes": 0,
+    "read_schedule": [
+      {
+        "from_s": 0,
+        "rate_Bps": null
+      }
+    ]
+  },
+  "defaults": {
+    "repetitions": 15,
+    "seeds": {
+      "strategy": "sequence",
+      "start": 1001,
+      "step": 1
+    }
+  }
+}

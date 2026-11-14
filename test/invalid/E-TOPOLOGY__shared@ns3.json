@@ -1,0 +1,71 @@
+{
+  "schema": "mptcp-scenario/1",
+  "id": "shared-bottleneck",
+  "version": 1,
+  "name": "Shared bottleneck with competing TCP",
+  "description": "Equivalent of experiments/scenarios/f-congested-bottleneck.yaml: both subflows and 2 competing cubic flows (on/off, mean on 8 s, off 4 s) share a 15 Mbit/s bottleneck with a 60-packet queue; all drops are congestion drops.",
+  "labels": {
+    "family": "fairness",
+    "source": "experiments/scenarios/f-congested-bottleneck.yaml"
+  },
+  "duration_s": 30,
+  "statistics_window_s": [
+    5,
+    30
+  ],
+  "topology": {
+    "mode": "shared",
+    "bottleneck": {
+      "bandwidth_bps": 15000000,
+      "delay_s": 0.005,
+      "queue_pkts": 60
+    }
+  },
+  "paths": [
+    {
+      "id": "path1",
+      "label": "Wi-Fi",
+      "bandwidth_bps": 50000000,
+      "delay_s": 0.01,
+      "queue_pkts": 100,
+      "loss": {
+        "model": "none"
+      }
+    },
+    {
+      "id": "path2",
+      "label": "LTE",
+      "bandwidth_bps": 50000000,
+      "delay_s": 0.03,
+      "queue_pkts": 100,
+      "loss": {
+        "model": "none"
+      }
+    }
+  ],
+  "events": [],
+  "generators": [],
+  "traffic": {
+    "type": "bulk"
+  },
+  "sender": {
+    "sndbuf_bytes": 0
+  },
+  "receiver": {
+    "rcvbuf_bytes": 0,
+    "read_schedule": [
+      {
+        "from_s": 0,
+        "rate_Bps": null
+      }
+    ]
+  },
+  "defaults": {
+    "repetitions": 15,
+    "seeds": {
+      "strategy": "sequence",
+      "start": 6001,
+      "step": 1
+    }
+  }
+}

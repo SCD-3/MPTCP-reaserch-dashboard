@@ -1,0 +1,44 @@
+{
+  "schema": "mptcp-environment/1",
+  "id": "ns3-native",
+  "type": "ns3",
+  "name": "Native ns-3 MPTCP model",
+  "description": "ns-3 MPTCP model with the project's patches; programs ns3/scratch/mptcp-2path.cc (bulk) and mptcp-media.cc (media).",
+  "platform_profile": "ns3-linux-comparable",
+  "is_active": true,
+  "capabilities": {
+    "min_paths": 2,
+    "max_paths": 2,
+    "topology_modes": [
+      "disjoint"
+    ],
+    "cross_traffic": false,
+    "traffic_types": [
+      "bulk",
+      "media"
+    ],
+    "event_actions": [
+      "set-loss",
+      "set-bandwidth",
+      "set-delay"
+    ],
+    "generator_types": [
+      "random-delay"
+    ],
+    "loss_models": [
+      "none",
+      "bernoulli"
+    ],
+    "loss_applies_to": [
+      "data",
+      "all"
+    ],
+    "read_schedule": true,
+    "supported_queue_pkts_max": 100
+  },
+  "scope_notes": [
+    "wVegas results are not accepted.",
+    "Queues above 100 packets and burst/random loss are exploratory (outside the D16 validation).",
+    "Timed events are available in the media program only; to be confirmed when the scenario compiler is written."
+  ]
+}

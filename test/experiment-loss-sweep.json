@@ -1,0 +1,48 @@
+{
+  "schema": "mptcp-experiment/1",
+  "id": "loss-sweep-2026-11",
+  "version": 1,
+  "name": "References vs On-Off under random loss on the slow path",
+  "description": "How does goodput degrade with random loss on path 2? 3 loss levels x 2 environments x 3 algorithms x 10 repetitions.",
+  "scenarios": [
+    {
+      "id": "two-path-baseline",
+      "version": 1,
+      "sweep": {
+        "paths.1.loss": [
+          {
+            "model": "bernoulli",
+            "probability": 0.001
+          },
+          {
+            "model": "bernoulli",
+            "probability": 0.01
+          },
+          {
+            "model": "bernoulli",
+            "probability": 0.05
+          }
+        ]
+      }
+    }
+  ],
+  "environments": [
+    "uml-v0-ref",
+    "ns3-native"
+  ],
+  "algorithms": [
+    {
+      "id": "lia"
+    },
+    {
+      "id": "olia"
+    },
+    {
+      "id": "onoff",
+      "profile": "onoff-paper"
+    }
+  ],
+  "repetitions": 10,
+  "seeds": null,
+  "status": "draft"
+}

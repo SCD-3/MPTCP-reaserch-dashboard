@@ -1,0 +1,108 @@
+{
+  "schema": "mptcp-scenario/1",
+  "id": "time-varying",
+  "version": 1,
+  "name": "Loss burst, rate dip and delay variation",
+  "description": "Equivalent of experiments/scenarios/d-time-varying.yaml: Gilbert-Elliott loss bursts on path 2 from 10 to 15 s, path 1 rate 20 -> 5 -> 20 Mbit/s at 18/24 s, path 2 one-way delay re-drawn every 2 s in [40, 80] ms.",
+  "labels": {
+    "family": "time-varying",
+    "source": "experiments/scenarios/d-time-varying.yaml"
+  },
+  "duration_s": 30,
+  "statistics_window_s": [
+    5,
+    30
+  ],
+  "topology": {
+    "mode": "disjoint"
+  },
+  "paths": [
+    {
+      "id": "path1",
+      "label": "Wi-Fi",
+      "bandwidth_bps": 20000000,
+      "delay_s": 0.02,
+      "queue_pkts": 100,
+      "loss": {
+        "model": "none"
+      }
+    },
+    {
+      "id": "path2",
+      "label": "LTE",
+      "bandwidth_bps": 10000000,
+      "delay_s": 0.06,
+      "queue_pkts": 100,
+      "loss": {
+        "model": "none"
+      }
+    }
+  ],
+  "events": [
+    {
+      "at_s": 10,
+      "target": "path2",
+      "action": "set-loss",
+      "loss": {
+        "model": "gilbert-elliott",
+        "p_gb": 0.01,
+        "p_bg": 0.25,
+        "loss_good": 0.0,
+        "loss_bad": 1.0
+      }
+    },
+    {
+      "at_s": 15,
+      "target": "path2",
+      "action": "set-loss",
+      "loss": {
+        "model": "none"
+      }
+    },
+    {
+      "at_s": 18,
+      "target": "path1",
+      "action": "set-bandwidth",
+      "bandwidth_bps": 5000000
+    },
+    {
+      "at_s": 24,
+      "target": "path1",
+      "action": "set-bandwidth",
+      "bandwidth_bps": 20000000
+    }
+  ],
+  "generators": [
+    {
+      "type": "random-delay",
+      "target": "path2",
+      "start_s": 2,
+      "every_s": 2,
+      "min_delay_s": 0.04,
+      "max_delay_s": 0.08
+    }
+  ],
+  "traffic": {
+    "type": "bulk"
+  },
+  "sender": {
+    "sndbuf_bytes": 0
+  },
+  "receiver": {
+    "rcvbuf_bytes": 0,
+    "read_schedule": [
+      {
+        "from_s": 0,
+        "rate_Bps": null
+      }
+    ]
+  },
+  "defaults": {
+    "repetitions": 15,
+    "seeds": {
+      "strategy": "sequence",
+      "start": 4001,
+      "step": 1
+    }
+  }
+}

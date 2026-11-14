@@ -1,0 +1,30 @@
+{
+  "schema": "mptcp-algorithm/1",
+  "id": "wvegas",
+  "name": "Weighted Vegas",
+  "short_name": "wVegas",
+  "type": "reference",
+  "description": "Delay-based coupled congestion control.",
+  "is_active": true,
+  "implementations": [
+    {
+      "env_type": "uml",
+      "status": "available",
+      "version": "mptcp-v0.96",
+      "implementation_hash": null
+    },
+    {
+      "env_type": "dce",
+      "status": "available",
+      "version": "linux-4.1-mptcp",
+      "implementation_hash": null
+    },
+    {
+      "env_type": "ns3",
+      "status": "unsupported",
+      "version": "ns3-mptcp-model",
+      "implementation_hash": null,
+      "note": "Behaviour of the ns-3 implementation not accepted (stage 4H scope)."
+    }
+  ]
+}

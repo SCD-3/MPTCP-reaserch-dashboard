@@ -161,11 +161,13 @@ def environment_get(id: str):
 
 
 def experiment_insert(data: mptcp_types.Experiment):
-    if not is_experiment_valid(data):
-        raise err.InvalidResourceError("Experiment is invalid")
     
     same_id = list(experiments.find({ 'id': data['id'] }))
     data['version'] = len(same_id) + 1
+    
+    if not is_experiment_valid(data):
+        raise err.InvalidResourceError("Experiment is invalid")
+    
     
     experiments.insert_one(data)
 
@@ -183,11 +185,13 @@ def run_get(id: str):
     return runs.find_one({ 'id': id })
 
 def scenario_insert(data: mptcp_types.Scenario):
-    if not is_scenario_valid(data):
-        raise err.InvalidResourceError("Scenario is invalid")
     
     same_id = list(scenarios.find({ 'id': data['id'] }))
     data['version'] = len(same_id) + 1
+    
+    if not is_scenario_valid(data):
+        raise err.InvalidResourceError("Scenario is invalid")
+    
     
     scenarios.insert_one(data)
 

@@ -1,0 +1,141 @@
+{
+  "schema": "mptcp-run/1",
+  "run_id": "loss-sweep-2026-11/two-path-baseline@v1+0a1b2c3d/uml-v0-ref/onoff:onoff-paper/rep-03",
+  "experiment_id": "loss-sweep-2026-11",
+  "scenario": {
+    "id": "two-path-baseline",
+    "version": 1,
+    "variant_id": "two-path-baseline@v1+0a1b2c3d",
+    "sweep_values": {
+      "paths.1.loss": {
+        "model": "bernoulli",
+        "probability": 0.01
+      }
+    }
+  },
+  "environment_id": "uml-v0-ref",
+  "algorithm": {
+    "id": "onoff",
+    "profile": "onoff-paper",
+    "version": "v1",
+    "implementation_hash": null
+  },
+  "repetition": 3,
+  "seed": 1003,
+  "scope": {
+    "class": "supported",
+    "reasons": []
+  },
+  "snapshot": {
+    "scenario": {
+      "schema": "mptcp-scenario/1",
+      "id": "two-path-baseline",
+      "version": 1,
+      "name": "Two asymmetric paths, no impairments",
+      "description": "Reference conditions: 20 Mbit/s / 20 ms and 10 Mbit/s / 60 ms one-way, 100-packet queues, no loss, bulk transfer. Repetitions differ only by the kernel randomness (ISNs, ports).",
+      "labels": {
+        "family": "baseline"
+      },
+      "duration_s": 30,
+      "statistics_window_s": [
+        5,
+        30
+      ],
+      "topology": {
+        "mode": "disjoint"
+      },
+      "paths": [
+        {
+          "id": "path1",
+          "label": "Wi-Fi",
+          "bandwidth_bps": 20000000,
+          "delay_s": 0.02,
+          "queue_pkts": 100,
+          "loss": {
+            "model": "none"
+          }
+        },
+        {
+          "id": "path2",
+          "label": "LTE",
+          "bandwidth_bps": 10000000,
+          "delay_s": 0.06,
+          "queue_pkts": 100,
+          "loss": {
+            "model": "bernoulli",
+            "probability": 0.01,
+            "applies_to": "data"
+          }
+        }
+      ],
+      "events": [],
+      "generators": [],
+      "traffic": {
+        "type": "bulk"
+      },
+      "sender": {
+        "sndbuf_bytes": 0
+      },
+      "receiver": {
+        "rcvbuf_bytes": 0,
+        "read_schedule": [
+          {
+            "from_s": 0,
+            "rate_Bps": null
+          }
+        ]
+      },
+      "defaults": {
+        "repetitions": 15,
+        "seeds": {
+          "strategy": "sequence",
+          "start": 1001,
+          "step": 1
+        }
+      }
+    },
+    "expanded_events": [],
+    "algorithm": {
+      "uml": {
+        "enable": 1,
+        "mode": 1,
+        "budget_policy": 3,
+        "off_probe": 0,
+        "off_probe_ns": 40000000,
+        "s_b": 6000,
+        "b_ref_b": 252000,
+        "period_ns": 5000000,
+        "kappa_num": 2,
+        "kappa_den": 1,
+        "wref_policy": 1,
+        "wref_fixed_b": 0,
+        "warmup_hold_ns": 500000000,
+        "stale_policy": 1,
+        "stale_after_ns": 0,
+        "start_policy": 1,
+        "round_policy": 2
+      }
+    },
+    "environment": {
+      "id": "uml-v0-ref",
+      "fingerprint": {
+        "uml_kernel_sha256": "b2f7882c0e8b0e9474fa1f4797d39683fc1bc689df6e8ba11cbc83a170c6e033"
+      }
+    }
+  },
+  "condition_hash": "771c253669199c0ce24e40fa1f3bc1848106e824bdbcde634a238f5d5eacab2c",
+  "status": "completed",
+  "attempts": [
+    {
+      "started_utc": "2026-11-09T10:00:00Z",
+      "finished_utc": "2026-11-09T10:06:10Z",
+      "outcome": "completed",
+      "exit_code": 0,
+      "wall_s": 370
+    }
+  ],
+  "results": {
+    "format": "mptcp-metrics/1",
+    "path": "results/experiments/loss-sweep-2026-11/runs/.../derived/metrics.json"
+  }
+}

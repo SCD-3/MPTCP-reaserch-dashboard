@@ -23,7 +23,7 @@ def favicon():
     return flask.send_from_directory(app.static_folder, "favicon.ico", mimetype="image/vnd.microsoft.icon")
 
 
-@app.post('/algorithm')
+@app.post('/api/algorithm')
 def algorithm_new():
     data = flask.request.json
     
@@ -33,7 +33,7 @@ def algorithm_new():
         return 'bad data', 400
     return 'ok', 200
 
-@app.post('/environment')
+@app.post('/api/environment')
 def environment_new():
     data = flask.request.json
     
@@ -43,7 +43,7 @@ def environment_new():
         return 'bad data', 400
     return 'ok', 200
 
-@app.post('/experiment')
+@app.post('/api/experiment')
 def experiment_new():
     data = flask.request.json
     
@@ -53,7 +53,7 @@ def experiment_new():
         return 'bad data', 400
     return 'ok', 200
 
-@app.post('/run')
+@app.post('/api/run')
 def run_new():
     data = flask.request.json
     
@@ -63,7 +63,7 @@ def run_new():
         return 'bad data', 400
     return 'ok', 200
 
-@app.post('/scenario')
+@app.post('/api/scenario')
 def scenario_new():
     data = flask.request.json
     

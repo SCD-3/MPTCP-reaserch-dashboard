@@ -1,0 +1,29 @@
+{
+  "schema": "mptcp-algorithm/1",
+  "id": "lia",
+  "name": "Linked Increases Algorithm",
+  "short_name": "LIA",
+  "type": "reference",
+  "description": "Coupled congestion control for MPTCP (RFC 6356).",
+  "is_active": true,
+  "implementations": [
+    {
+      "env_type": "uml",
+      "status": "available",
+      "version": "mptcp-v0.96",
+      "implementation_hash": null
+    },
+    {
+      "env_type": "dce",
+      "status": "available",
+      "version": "linux-4.1-mptcp",
+      "implementation_hash": null
+    },
+    {
+      "env_type": "ns3",
+      "status": "available",
+      "version": "ns3-mptcp-model",
+      "implementation_hash": null
+    }
+  ]
+}

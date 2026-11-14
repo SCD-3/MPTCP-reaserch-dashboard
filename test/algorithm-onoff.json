@@ -1,0 +1,95 @@
+{
+  "schema": "mptcp-algorithm/1",
+  "id": "onoff",
+  "name": "On-Off",
+  "short_name": "On-Off",
+  "type": "custom",
+  "description": "Own MPTCP sending controller (stage 4). Parameters are fixed by frozen profiles, see docs/design/onoff-profiles.md.",
+  "is_active": true,
+  "profiles": [
+    {
+      "id": "onoff-paper",
+      "status": "frozen",
+      "label": "PAPER",
+      "description": "The published ON/OFF as far as it can be implemented; no new data in OFF.",
+      "parameters": {
+        "uml": {
+          "enable": 1,
+          "mode": 1,
+          "budget_policy": 3,
+          "off_probe": 0,
+          "off_probe_ns": 40000000,
+          "s_b": 6000,
+          "b_ref_b": 252000,
+          "period_ns": 5000000,
+          "kappa_num": 2,
+          "kappa_den": 1,
+          "wref_policy": 1,
+          "wref_fixed_b": 0,
+          "warmup_hold_ns": 500000000,
+          "stale_policy": 1,
+          "stale_after_ns": 0,
+          "start_policy": 1,
+          "round_policy": 2
+        },
+        "ns3": {
+          "base": "ns3/onoff/configs/n4d-base.json",
+          "overrides": {
+            "off_probe": "none",
+            "budget_policy": "meta-exact",
+            "profile": "onoff-paper"
+          }
+        }
+      }
+    },
+    {
+      "id": "onoff-probe",
+      "status": "frozen",
+      "label": "EXPERIMENTAL",
+      "description": "One MSS per T_probe outside the budget while OFF with nothing in flight and a stale observation.",
+      "parameters": {
+        "uml": {
+          "enable": 1,
+          "mode": 1,
+          "budget_policy": 3,
+          "off_probe": 2,
+          "off_probe_ns": 40000000,
+          "s_b": 6000,
+          "b_ref_b": 252000,
+          "period_ns": 5000000,
+          "kappa_num": 2,
+          "kappa_den": 1,
+          "wref_policy": 1,
+          "wref_fixed_b": 0,
+          "warmup_hold_ns": 500000000,
+          "stale_policy": 2,
+          "stale_after_ns": 240000000,
+          "start_policy": 1,
+          "round_policy": 2
+        },
+        "ns3": {
+          "base": "ns3/onoff/configs/n4d-base.json",
+          "overrides": {}
+        }
+      }
+    }
+  ],
+  "implementations": [
+    {
+      "env_type": "uml",
+      "status": "available",
+      "version": "v1",
+      "implementation_hash": null
+    },
+    {
+      "env_type": "ns3",
+      "status": "available",
+      "version": "n4d",
+      "implementation_hash": null
+    },
+    {
+      "env_type": "dce",
+      "status": "planned"
+    }
+  ]
+}

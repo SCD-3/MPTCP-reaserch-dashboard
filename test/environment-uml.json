@@ -1,0 +1,50 @@
+{
+  "schema": "mptcp-environment/1",
+  "id": "uml-v0-ref",
+  "type": "uml",
+  "name": "UML, Linux MPTCP v0.96 (reference kernel)",
+  "description": "User-Mode Linux guests (client, router, server) with the MPTCP v0.96 kernel, deterministic loss agent, time-travel clock.",
+  "platform_profile": "uml-reference",
+  "fingerprint": {
+    "uml_kernel_sha256": "b2f7882c0e8b0e9474fa1f4797d39683fc1bc689df6e8ba11cbc83a170c6e033"
+  },
+  "is_active": true,
+  "capabilities": {
+    "min_paths": 2,
+    "max_paths": 2,
+    "topology_modes": [
+      "disjoint",
+      "shared"
+    ],
+    "cross_traffic": true,
+    "traffic_types": [
+      "bulk",
+      "media"
+    ],
+    "event_actions": [
+      "set-loss",
+      "set-bandwidth",
+      "set-delay",
+      "set-queue"
+    ],
+    "generator_types": [
+      "random-delay",
+      "outages"
+    ],
+    "loss_models": [
+      "none",
+      "bernoulli",
+      "gilbert-elliott",
+      "list"
+    ],
+    "loss_applies_to": [
+      "data",
+      "all"
+    ],
+    "read_schedule": true
+  },
+  "scope_notes": [
+    "Exactly 2 paths (MPTCP v0 emulation topology).",
+    "Address removal / new subflow / handover are not modelled."
+  ]
+}
