@@ -369,15 +369,15 @@ class Media(TypedDict):
 
     rate_Bps: float
 
-    fps: int
+    fps: Optional[int]
 
-    close: Literal["hold", "fin"]
+    close: Optional[Literal["hold", "fin"]]
 
-    start_delay_s: float
+    start_delay_s: Optional[float]
 
-    pause_s: tuple[float, float]
+    pause_s: Optional[tuple[float, float]]
 
-    reverse: bool
+    reverse: Optional[bool]
 
 class Receiver(TypedDict):
     """Behaviour of the receiving application and its buffers.

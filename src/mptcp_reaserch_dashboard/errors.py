@@ -178,9 +178,13 @@ def s_cross(data: mptcp_types.Scenario) -> bool:
 def s_pause(data: mptcp_types.Scenario) -> bool:
     traffic = data['traffic']
     if traffic['type'] == 'media':
-        media = traffic['media']
-        start, stop = media['pause_s']
         
+        pause_s = traffic['media'].get('pause_s')
+        if pause_s is None:
+            return False
+        
+        start, stop = pause_s
+
         if not (start < stop <= data['duration_s']):
             return True
     return False
@@ -188,8 +192,9 @@ def s_pause(data: mptcp_types.Scenario) -> bool:
 
 def s_seeds(data: mptcp_types.Scenario) -> bool:
     defaults = data['defaults']
-    if len(defaults['seeds']) != defaults['repetitions']:
-        return True
+    if defaults['seeds']['strategy'] == 'explicit':
+        if len(defaults['seeds']['values']) != defaults['repetitions']:
+            return True
     return False
 
 
