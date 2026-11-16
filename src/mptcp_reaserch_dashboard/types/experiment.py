@@ -7,7 +7,7 @@ class Experiment(TypedDict):
     
     id: Id
     
-    version: Optional[Version]
+    version: Version
     
     name: str
     

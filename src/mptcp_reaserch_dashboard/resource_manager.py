@@ -171,8 +171,15 @@ def experiment_insert(data: mptcp_types.Experiment):
     
     experiments.insert_one(data)
 
-def experiment_get(id: str):
-    return experiments.find_one({ 'id': id })
+def experiment_get(id: str, version: typing.Optional[int] = None):
+    if version is None:
+        all_experiments = list(experiments.find({ 'id': id }))
+        
+        for experiment in all_experiments:
+            if experiment['version'] == len(all_experiments):
+                return experiment
+            
+    return experiments.find_one({ 'id': id, 'version': version })
 
 
 def run_insert(data: mptcp_types.Run):
@@ -195,5 +202,12 @@ def scenario_insert(data: mptcp_types.Scenario):
     
     scenarios.insert_one(data)
 
-def scenario_get(id: str):
-    return scenarios.find_one({ 'id': id })
+def scenario_get(id: str, version: typing.Optional[int] = None):
+    if version is None:
+        all_scenarios = list(scenarios.find({ 'id': id }))
+        
+        for scenario in all_scenarios:
+            if scenario['version'] == len(all_scenarios):
+                return scenario
+            
+    return scenarios.find_one({ 'id': id, 'version': version })

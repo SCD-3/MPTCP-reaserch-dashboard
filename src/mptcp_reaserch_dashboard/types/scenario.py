@@ -9,7 +9,7 @@ class Scenario(TypedDict):
     
     id: Id
     
-    version: Optional[Version]
+    version: Version
     
     name: str
     """Short human-readable title.

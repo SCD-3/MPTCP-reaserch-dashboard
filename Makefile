@@ -2,7 +2,7 @@ build:
 	npx tsc
 
 run:
-	npx tsc
+	make build
 	flask --app src/mptcp_reaserch_dashboard/__init__ run --debug
 
 db:
