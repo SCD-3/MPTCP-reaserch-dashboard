@@ -178,8 +178,8 @@ def experiment_get(id: str, version: typing.Optional[int] = None):
         for experiment in all_experiments:
             if experiment['version'] == len(all_experiments):
                 return experiment
-            
-    return experiments.find_one({ 'id': id, 'version': version })
+    else:
+        return experiments.find_one({ 'id': id, 'version': version })
 
 
 def run_insert(data: mptcp_types.Run):
@@ -209,5 +209,5 @@ def scenario_get(id: str, version: typing.Optional[int] = None):
         for scenario in all_scenarios:
             if scenario['version'] == len(all_scenarios):
                 return scenario
-            
-    return scenarios.find_one({ 'id': id, 'version': version })
+    else:
+        return scenarios.find_one({ 'id': id, 'version': version })
