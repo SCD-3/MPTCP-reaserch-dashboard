@@ -24,7 +24,7 @@ def favicon():
 
 
 @app.post('/api/algorithm')
-def algorithm_new():
+def api_algorithm_new():
     data = flask.request.json
     
     try:
@@ -34,7 +34,7 @@ def algorithm_new():
     return 'ok', 200
 
 @app.get('/api/algorithm/<id>')
-def algorithm_get(id: str):
+def api_algorithm_get(id: str):
     algorithm = mptcp_resource.algorithm_get(id)
     
     if algorithm is None:
@@ -43,7 +43,7 @@ def algorithm_get(id: str):
     return flask.jsonify(algorithm), 200
 
 @app.get('/api/algorithm')
-def algorithm_get_all():
+def api_algorithm_get_all():
     filter = flask.request.get_json(silent=True)
     algorithms = mptcp_resource.algorithm_get_all(filter)
     
@@ -51,7 +51,7 @@ def algorithm_get_all():
 
 
 @app.post('/api/environment')
-def environment_new():
+def api_environment_new():
     data = flask.request.json
     
     try:
@@ -61,7 +61,7 @@ def environment_new():
     return 'ok', 200
 
 @app.get('/api/environment/<id>')
-def environment_get(id: str):
+def api_environment_get(id: str):
     environment = mptcp_resource.environment_get(id)
     
     if environment is None:
@@ -70,7 +70,7 @@ def environment_get(id: str):
     return flask.jsonify(environment), 200
 
 @app.get('/api/environment')
-def environment_get_all():
+def api_environment_get_all():
     filter = flask.request.get_json(silent=True)
     environments = mptcp_resource.environment_get_all(filter)
     
@@ -78,7 +78,7 @@ def environment_get_all():
 
 
 @app.post('/api/experiment')
-def experiment_new():
+def api_experiment_new():
     data = flask.request.json
     
     try:
@@ -88,7 +88,7 @@ def experiment_new():
     return 'ok', 200
 
 @app.get('/api/experiment/<id>')
-def experiment_get(id: str):
+def api_experiment_get(id: str):
     experiment = mptcp_resource.experiment_get(id)
     
     if experiment is None:
@@ -97,7 +97,7 @@ def experiment_get(id: str):
     return flask.jsonify(experiment), 200
 
 @app.get('/api/experiment')
-def experiment_get_all():
+def api_experiment_get_all():
     filter = flask.request.get_json(silent=True)
     experiments = mptcp_resource.experiment_get_all(filter)
     
@@ -105,7 +105,7 @@ def experiment_get_all():
 
 
 @app.post('/api/run')
-def run_new():
+def api_run_new():
     data = flask.request.json
     
     try:
@@ -115,7 +115,7 @@ def run_new():
     return 'ok', 200
 
 @app.get('/api/run/<id>')
-def run_get(id: str):
+def api_run_get(id: str):
     run = mptcp_resource.run_get(id)
     
     if run is None:
@@ -124,7 +124,7 @@ def run_get(id: str):
     return flask.jsonify(run), 200
 
 @app.get('/api/run')
-def run_get_all():
+def api_run_get_all():
     filter = flask.request.get_json(silent=True)
     runs = mptcp_resource.run_get_all(filter)
     
@@ -132,7 +132,7 @@ def run_get_all():
 
 
 @app.post('/api/scenario')
-def scenario_new():
+def api_scenario_new():
     data = flask.request.json
     
     try:
@@ -142,7 +142,7 @@ def scenario_new():
     return 'ok', 200
 
 @app.get('/api/scenario/<id>')
-def scenario_get(id: str):
+def api_scenario_get(id: str):
     scenario = mptcp_resource.scenario_get(id)
     
     if scenario is None:
@@ -151,7 +151,7 @@ def scenario_get(id: str):
     return flask.jsonify(scenario), 200
 
 @app.get('/api/scenario')
-def scenario_get_all():
+def api_scenario_get_all():
     filter = flask.request.get_json(silent=True)
     scenarios = mptcp_resource.scenario_get_all(filter)
     
@@ -162,7 +162,7 @@ def scenario_get_all():
 
 @app.get('/scenario/<id>')
 def scenario_view(id: str):
-    response = scenario_get(id)
+    response = api_scenario_get(id)
     
     if response[1] != 200:
         return 'not found', 404
@@ -171,13 +171,13 @@ def scenario_view(id: str):
 
 @app.get('/scenario')
 def scenarios_list():
-    scenarios = scenario_get_all()
+    scenarios = api_scenario_get_all()
     
     return flask.render_template('scenarios/scenario-list.html', scenarios=scenarios[0].json)
 
 @app.get('/scenario/<id>/edit')
 def scenario_edit(id: str):
-    response = scenario_get(id)
+    response = api_scenario_get(id)
     
     if response[1] != 200:
         return 'not found', 404
