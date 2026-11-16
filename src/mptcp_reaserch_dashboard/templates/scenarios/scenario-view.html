@@ -1,103 +1,399 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ name }} - Scenario Details</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Scenario · {{ scenario.name }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/scenarios/scenario-view.css') }}">
 </head>
 
 <body>
-    <main class="container">
-
-        <a class="back-button" href="{{ url_for('scenarios_list') }}">
-            <span>←</span>
-            Back
-        </a>
-
-        <header class="page-header">
-            <div>
-                <span class="eyebrow">SCENARIO DETAILS</span>
-                <h1>{{ name }}</h1>
-                <p class="subtitle">{{ description }}</p>
+    <main class="page">
+        <header class="topbar">
+            <a class="back-link" href="{{ url_for('scenarios_list') }}">← <span>Scenarios</span></a>
+            <div class="top-actions">
+                <span class="version">Version {{ scenario.version }}</span>
+                <a class="button button-secondary" href="{{ url_for('scenario_edit', id=scenario.id) }}">Edit
+                    scenario</a>
             </div>
-            <span class="tag">{{ paths | length }} paths</span>
         </header>
 
-        <section class="card">
-            <h2>General information</h2>
-
-            <div class="details-grid">
-                <div class="detail">
-                    <span class="label">Scenario ID</span>
-                    <span class="value">{{ scenarioId }}</span>
-                </div>
-
-                <div class="detail">
-                    <span class="label">Duration</span>
-                    <span class="value">{{ durationSeconds }} seconds</span>
-                </div>
-
-                <div class="detail">
-                    <span class="label">Repetitions</span>
-                    <span class="value">{{ repetitions }}</span>
-                </div>
-
-                <div class="detail">
-                    <span class="label">Receiver consumption</span>
-                    <span class="value">{{ receiverConsumptionMbps }} Mbps</span>
-                </div>
-            </div>
-        </section>
-
-        <section class="card">
-            <div class="section-header">
+        <section class="hero">
+            <div class="eyebrow"><span class="status-dot"></span> Scenario</div>
+            <div class="hero-main">
                 <div>
-                    <h2>Network paths</h2>
-                    <p>Network configuration for each simulation path</p>
-                </div>
-                <span class="tag">{{ paths | length }} paths</span>
-            </div>
-
-            <div class="paths-list">
-                {% for path in paths %}
-                    <div class="path-card">
-                        <div class="path-header">
-                            <h3>{{ path.name }}</h3>
-                            <span class="path-index">PATH {{ loop.index }}</span>
-                        </div>
-
-                        <div class="details-grid">
-                            <div class="detail">
-                                <span class="label">Bandwidth</span>
-                                <span class="value">{{ path.bandwidthMbps }} Mbps</span>
-                            </div>
-
-                            <div class="detail">
-                                <span class="label">Delay</span>
-                                <span class="value">{{ path.delayMs }} ms</span>
-                            </div>
-
-                            <div class="detail">
-                                <span class="label">Jitter</span>
-                                <span class="value">{{ path.jitterMs }} ms</span>
-                            </div>
-
-                            <div class="detail">
-                                <span class="label">Packet loss</span>
-                                <span class="value">{{ round(path.packetLossPercent * 100, 2) }}%</span>
-                            </div>
-                        </div>
+                    <h1>{{ scenario.name }}</h1>
+                    {% if scenario.description %}
+                    <p class="subtitle">{{ scenario.description }}</p>
+                    {% endif %}
+                    <div class="identity">
+                        <span class="mono">{{ scenario.id }}</span>
+                        <button class="copy" type="button" data-copy="{{ scenario.id }}">Copy ID</button>
                     </div>
-                {% else %}
-                    <p class="empty-state">No network paths configured.</p>
+                </div>
+                <div class="hero-stats">
+                    <div><strong>{{ scenario.duration_s|int if scenario.duration_s == scenario.duration_s|int else
+                            scenario.duration_s }} <small>s</small></strong><span>Duration</span></div>
+                    <div><strong>{{ scenario.defaults.repetitions }}</strong><span>Repetitions</span></div>
+                    <div><strong>{{ scenario.paths|length }}</strong><span>Paths</span></div>
+                </div>
+            </div>
+            <div class="chips">
+                <span class="chip chip-blue">{{ scenario.topology.mode }} topology</span>
+                <span class="chip">{{ scenario.traffic.type|replace('-', ' ') }}</span>
+                {% for key, value in (scenario.labels or {}).items() %}
+                <span class="chip">{{ key }} · {{ value }}</span>
                 {% endfor %}
             </div>
         </section>
 
-        <footer>
-            MPTCP Research Dashboard
+        <nav class="section-nav" aria-label="Page sections">
+            <a href="#overview" class="active">Overview</a>
+            <a href="#paths">Network paths</a>
+            <a href="#dynamics">Timed changes</a>
+            <a href="#traffic">Traffic & endpoints</a>
+            <a href="#execution">Execution</a>
+        </nav>
+
+        <section class="content-grid" id="overview">
+            <div class="main-column">
+                <section class="panel">
+                    <div class="panel-heading">
+                        <div><span class="section-kicker">01 / Overview</span>
+                            <h2>Scenario configuration</h2>
+                        </div>
+                        <span class="quiet">Test conditions</span>
+                    </div>
+                    {% if scenario.description %}
+                    <p class="description">{{ scenario.description }}</p>
+                    {% endif %}
+                    <div class="detail-grid">
+                        <div class="detail"><span>Duration</span><strong>{{ scenario.duration_s }} s</strong><small>From
+                                sender start</small></div>
+                        <div class="detail">
+                            <span>Statistics window</span>
+                            {% if scenario.statistics_window_s %}
+                            <strong>{{ scenario.statistics_window_s[0] }}–{{ scenario.statistics_window_s[1] }}
+                                s</strong>
+                            <small>Warm-up before {{ scenario.statistics_window_s[0] }} s</small>
+                            {% else %}
+                            <strong>{% if scenario.duration_s < 10 %}0–{{ scenario.duration_s }}{% else %}5–{{
+                                    scenario.duration_s }}{% endif %} s</strong>
+                                    <small>Default statistics window</small>
+                                    {% endif %}
+                        </div>
+                        <div class="detail"><span>Topology mode</span><strong>{{ scenario.topology.mode|capitalize
+                                }}</strong><small>{% if scenario.topology.mode == 'shared' %}Common bottleneck{% else
+                                %}Independent bottlenecks{% endif %}</small></div>
+                        <div class="detail"><span>Traffic type</span><strong>{{ scenario.traffic.type|capitalize
+                                }}</strong><small>{% if scenario.traffic.type == 'bulk' %}Sender always has data{% else
+                                %}Media stream{% endif %}</small></div>
+                    </div>
+                </section>
+
+                <section class="panel" id="paths">
+                    <div class="panel-heading">
+                        <div><span class="section-kicker">02 / Network</span>
+                            <h2>Network paths</h2>
+                        </div>
+                        <span class="quiet">{{ scenario.paths|length }} configured</span>
+                    </div>
+                    <div class="path-list">
+                        {% for path in scenario.paths %}
+                        <article class="path-card">
+                            <div class="path-top">
+                                <div class="path-name">
+                                    <span class="path-mark {% if loop.first %}mark-a{% else %}mark-b{% endif %}">{{
+                                        loop.index }}</span>
+                                    <div>
+                                        <h3>{{ path.label or path.id }}</h3><span class="mono muted">{{ path.id
+                                            }}</span>
+                                    </div>
+                                </div>
+                                {% set loss = path.loss or {'model': 'none'} %}
+                                {% if loss.model == 'none' %}
+                                <span class="chip chip-green">No loss</span>
+                                {% else %}
+                                <span class="chip">{{ loss.model|replace('-', ' ')|title }} loss</span>
+                                {% endif %}
+                            </div>
+                            <div class="metrics">
+                                <div>
+                                    <span>Bandwidth</span>
+                                    <strong>{{ '%.2f'|format(path.bandwidth_bps / 1000000) }}
+                                        <small>Mbit/s</small></strong>
+                                    <div class="meter"><i
+                                            style="width: {{ [100, (path.bandwidth_bps / (scenario.paths|map(attribute='bandwidth_bps')|max) * 100)]|min }}%"></i>
+                                            <!-- dunno whast the problem, i aint touching it -->
+                                    </div>
+                                </div>
+                                <div><span>One-way delay</span><strong>{{ '%.2f'|format(path.delay_s * 1000) }}
+                                        <small>ms</small></strong></div>
+                                <div><span>Queue length</span><strong>{{ path.queue_pkts }}
+                                        <small>packets</small></strong></div>
+                            </div>
+                            <div class="path-foot">
+                                <span>Loss model</span><strong>{{ loss.model|replace('-', ' ')|title }}</strong>
+                                {% if loss.model == 'bernoulli' %}
+                                <span>Probability</span><strong>{{ (loss.probability * 100)|round(2) }}%</strong>
+                                {% elif loss.model == 'gilbert-elliott' %}
+                                <span>Good / bad loss</span><strong>{{ (loss.loss_good * 100)|round(2) }}% / {{
+                                    (loss.loss_bad * 100)|round(2) }}%</strong>
+                                {% elif loss.model == 'list' %}
+                                <span>Dropped packets</span><strong>{{ loss.indices|length }}</strong>
+                                {% endif %}
+                                {% if loss.applies_to %}<span>Applies to</span><strong>{{ loss.applies_to }}</strong>{%
+                                endif %}
+                            </div>
+                        </article>
+                        {% endfor %}
+                    </div>
+
+                    {% if scenario.topology.mode == 'shared' and scenario.topology.bottleneck %}
+                    <div class="subpanel" style="margin-top: 14px">
+                        <div class="subpanel-title"><span class="mini-icon">⇄</span>
+                            <h3>Shared bottleneck</h3>
+                        </div>
+                        <div class="kv"><span>Bandwidth</span><strong>{{
+                                '%.2f'|format(scenario.topology.bottleneck.bandwidth_bps / 1000000) }} Mbit/s</strong>
+                        </div>
+                        <div class="kv"><span>Delay</span><strong>{{ (scenario.topology.bottleneck.get('delay_s', 0) *
+                                1000)|round(2) }} ms</strong></div>
+                        <div class="kv"><span>Queue</span><strong>{{ scenario.topology.bottleneck.queue_pkts }}
+                                packets</strong></div>
+                    </div>
+                    {% endif %}
+                    {% if scenario.topology.cross_traffic %}
+                    <div class="subpanel" style="margin-top: 12px">
+                        <div class="subpanel-title"><span class="mini-icon">⇢</span>
+                            <h3>Cross traffic</h3>
+                        </div>
+                        <div class="kv"><span>Congestion control</span><strong>{{
+                                scenario.topology.cross_traffic.cc|upper }}</strong></div>
+                        <div class="kv"><span>Access-link delay</span><strong>{{
+                                (scenario.topology.cross_traffic.delay_s * 1000)|round(2) }} ms</strong></div>
+                        {% if scenario.topology.cross_traffic.schedule %}
+                        <p class="help">Scheduled flows:</p>
+                        {% for interval in scenario.topology.cross_traffic.schedule %}
+                        <div class="kv"><span>{{ interval.start_s }}–{{ interval.stop_s }} s</span><strong>{{
+                                interval.flows }} flows</strong></div>
+                        {% endfor %}
+                        {% endif %}
+                        {% if scenario.topology.cross_traffic.generator %}
+                        <div class="kv"><span>Generator</span><strong>On/off · {{
+                                scenario.topology.cross_traffic.generator.flows }} flows</strong></div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </section>
+
+                <section class="panel" id="dynamics">
+                    <div class="panel-heading">
+                        <div><span class="section-kicker">03 / Dynamics</span>
+                            <h2>Timed changes & generators</h2>
+                        </div>
+                        <span class="quiet">{{ (scenario.events or [])|length }} events · {{ (scenario.generators or
+                            [])|length }} generators</span>
+                    </div>
+                    {% if scenario.events %}
+                    <h3 class="subheading">Timed events</h3>
+                    <div class="table-wrap">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Target</th>
+                                    <th>Action</th>
+                                    <th>New value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for event in scenario.events|sort(attribute='at_s') %}
+                                <tr>
+                                    <td>{{ event.at_s }} s</td>
+                                    <td class="mono">{{ event.target }}</td>
+                                    <td>{{ event.action|replace('set-', '')|replace('-', ' ')|title }}</td>
+                                    <td>
+                                        {% if event.action == 'set-bandwidth' %}{{ (event.bandwidth_bps /
+                                        1000000)|round(2) }} Mbit/s
+                                        {% elif event.action == 'set-delay' %}{{ (event.delay_s * 1000)|round(2) }} ms
+                                        {% elif event.action == 'set-queue' %}{{ event.queue_pkts }} packets
+                                        {% elif event.action == 'set-loss' %}{{ event.loss.model|replace('-', ' ')|title
+                                        }}{% if event.loss.probability is defined %} · {{ (event.loss.probability *
+                                        100)|round(2) }}%{% endif %}
+                                        {% else %}—
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
+                    {% if scenario.generators %}
+                    <h3 class="subheading">Random generators</h3>
+                    <div class="generator-list">
+                        {% for generator in scenario.generators %}
+                        <div class="generator-item">
+                            <strong>{{ generator.type|replace('-', ' ')|title }}</strong>
+                            <span class="mono">{{ generator.target }}</span>
+                            {% if generator.type == 'random-delay' %}
+                            <span>Every {{ generator.every_s }} s · {{ (generator.min_delay_s * 1000)|round(2) }}–{{
+                                (generator.max_delay_s * 1000)|round(2) }} ms</span>
+                            {% elif generator.type == 'outages' %}
+                            <span>Mean interval {{ generator.mean_interval_s }} s · outage duration {{
+                                generator.duration_s }} s</span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    {% if not scenario.events and not scenario.generators %}
+                    <div class="empty-state">
+                        <span class="empty-icon">⌁</span>
+                        <div><strong>Static network conditions</strong>
+                            <p>No timed events or random generators are defined for this scenario.</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </section>
+
+                <section class="panel" id="traffic">
+                    <div class="panel-heading">
+                        <div><span class="section-kicker">04 / Endpoints</span>
+                            <h2>Traffic & endpoints</h2>
+                        </div>
+                    </div>
+                    <div class="split-details">
+                        <div class="subpanel">
+                            <div class="subpanel-title"><span class="mini-icon">↑</span>
+                                <h3>Sender</h3>
+                            </div>
+                            <div class="kv"><span>Send buffer</span><strong>{% if scenario.get('sender',
+                                    {}).get('sndbuf_bytes', 0) == 0 %}Autotuning{% else %}{{
+                                    (scenario.sender.sndbuf_bytes / 1024)|round(1) }} KiB{% endif %}</strong></div>
+                            <p class="help">A value of 0 uses the platform's automatic buffer tuning.</p>
+                        </div>
+                        <div class="subpanel">
+                            <div class="subpanel-title"><span class="mini-icon">↓</span>
+                                <h3>Receiver</h3>
+                            </div>
+                            <div class="kv"><span>Receive buffer</span><strong>{% if scenario.get('receiver',
+                                    {}).get('rcvbuf_bytes', 0) == 0 %}Autotuning{% else %}{{
+                                    (scenario.receiver.rcvbuf_bytes / 1024)|round(1) }} KiB{% endif %}</strong></div>
+                            {% if scenario.get('receiver', {}).get('rcvbuf_autotune_max_bytes') %}
+                            <div class="kv"><span>Autotune maximum</span><strong>{{
+                                    (scenario.receiver.rcvbuf_autotune_max_bytes / 1024)|round(1) }} KiB</strong></div>
+                            {% endif %}
+                            <div class="kv"><span>Read schedule</span><strong>{% if scenario.get('receiver',
+                                    {}).get('read_schedule') %}{{ scenario.receiver.read_schedule|length }} intervals{%
+                                    else %}Unlimited{% endif %}</strong></div>
+                            {% if scenario.get('receiver', {}).get('read_schedule') %}
+                            {% for item in scenario.receiver.read_schedule %}
+                            <div class="kv"><span>From {{ item.from_s }} s</span><strong>{% if item.rate_Bps is none
+                                    %}Unlimited{% elif item.rate_Bps == 0 %}Paused{% else %}{{ (item.rate_Bps /
+                                    1000)|round(2) }} kB/s{% endif %}</strong></div>
+                            {% endfor %}
+                            {% else %}
+                            <p class="help">No read schedule is configured, so the receiver reads as fast as data
+                                arrives.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="traffic-summary">
+                        <div><span class="traffic-icon">⇢</span>
+                            <div>
+                                <strong>{{ scenario.traffic.type|capitalize }}{% if scenario.traffic.type == 'media' %}
+                                    stream{% else %} transfer{% endif %}</strong>
+                                {% if scenario.traffic.type == 'bulk' %}
+                                <p>Continuous data transfer, limited by the network, algorithm and receiver.</p>
+                                {% else %}
+                                <p>{{ scenario.traffic.media.mode|upper }} · {{ scenario.traffic.media.source }} · {{
+                                    (scenario.traffic.media.rate_Bps * 8 / 1000000)|round(3) }} Mbit/s{% if
+                                    scenario.traffic.media.get('fps') %} · {{ scenario.traffic.media.fps }} fps{% endif
+                                    %}</p>
+                                {% if scenario.traffic.media.get('pause_s') %}<p>Viewer pause: {{
+                                    scenario.traffic.media.pause_s[0] }}–{{ scenario.traffic.media.pause_s[1] }} s</p>{%
+                                endif %}
+                                {% if scenario.traffic.media.get('reverse') %}<p>Includes a reverse-direction stream.
+                                </p>{% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <aside class="side-column">
+                <section class="panel side-panel" id="execution">
+                    <span class="section-kicker">05 / Execution</span>
+                    <h2>Default run plan</h2>
+                    <div class="run-number"><strong>{{ scenario.defaults.repetitions }}</strong><span>repetitions per
+                            algorithm and environment</span></div>
+                    <div class="divider"></div>
+                    <div class="kv"><span>Seed strategy</span><strong>{{ scenario.defaults.seeds.strategy|capitalize
+                            }}</strong></div>
+                    {% if scenario.defaults.seeds.strategy == 'sequence' %}
+                    <div class="kv"><span>Starting seed</span><strong class="mono">{{ scenario.defaults.seeds.start
+                            }}</strong></div>
+                    <div class="kv"><span>Step</span><strong>{{ scenario.defaults.seeds.step }}</strong></div>
+                    <p class="help">Repetition n uses start + (n − 1) × step. The same seed gives the same conditions
+                        for every algorithm.</p>
+                    {% elif scenario.defaults.seeds.strategy == 'explicit' %}
+                    <div class="kv"><span>Explicit seeds</span><strong>{{ scenario.defaults.seeds.values()|length
+                            }}</strong></div>
+                    <div class="seed-list">
+                        {% for seed in scenario.defaults.seeds.values() %}
+                        <span class="mono">{{ seed }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </section>
+
+                {% if scenario.labels %}
+                <section class="panel side-panel">
+                    <span class="section-kicker">Metadata</span>
+                    <h2>Labels</h2>
+                    {% for key, value in scenario.labels.items() %}
+                    <div class="label-row"><span>{{ key }}</span><strong>{{ value }}</strong></div>
+                    {% endfor %}
+                </section>
+                {% endif %}
+
+                {% if scenario.backend_overrides %}
+                <section class="panel side-panel advanced">
+                    <div class="advanced-heading">
+                        <div><span class="section-kicker">Advanced</span>
+                            <h2>Backend overrides</h2>
+                        </div><span class="chip">Environment-specific</span>
+                    </div>
+                    {% for environment, overrides in scenario.backend_overrides.items() %}
+                    {% if overrides %}
+                    <div class="kv"><span>{{ environment|upper }}</span><strong>Configured</strong></div>
+                    <pre class="json-preview">{{ overrides|tojson(indent=2) }}</pre>
+                    {% endif %}
+                    {% endfor %}
+                </section>
+                {% endif %}
+            </aside>
+        </section>
+
+        <footer class="footer">
+            <span>Scenario viewer</span>
+            <span>Schema <span class="mono">{{ scenario.schema }}</span></span>
         </footer>
     </main>
+    <script>
+        document.querySelectorAll('[data-copy]').forEach((button) => {
+            button.addEventListener('click', async () => {
+                await navigator.clipboard.writeText(button.dataset.copy);
+                const original = button.textContent;
+                button.textContent = 'Copied';
+                window.setTimeout(() => { button.textContent = original; }, 1200);
+            });
+        });
+    </script>
 </body>
+
 </html>

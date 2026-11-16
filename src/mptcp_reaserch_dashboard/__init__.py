@@ -157,5 +157,32 @@ def scenario_get_all():
     
     return flask.jsonify(scenarios), 200
 
+
+
+@app.get('/scenario/<id>')
+def scenario_view(id: str):
+    scenario = mptcp_resource.scenario_get(id)
+    
+    if scenario is None:
+        return 'not found', 404
+    
+    return flask.render_template('scenarios/scenario-view.html', scenario=scenario)
+
+@app.get('/scenario')
+def scenarios_list():
+    scenarios = mptcp_resource.scenario_get_all()
+    
+    return flask.render_template('scenarios/scenario-list.html', scenarios=scenarios)
+
+@app.get('/scenario/<id>/edit')
+def scenario_edit(id: str):
+    scenario = mptcp_resource.scenario_get(id)
+    
+    if scenario is None:
+        return 'not found', 404
+    
+    return flask.render_template('scenarios/scenario-edit.html', scenario=scenario)
+
+
 if __name__ == '__main__':
     app.run()
