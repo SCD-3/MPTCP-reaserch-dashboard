@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Algorithm · {{ algorithm["name"] }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/algorithms/algorithm-view.css') }}">
+</head>
+
+<body>
+    <main class="page">
+        <header class="topbar">
+            <a class="back-link" href="{{ url_for('algorithms_list') }}">← <span>Algorithms</span></a>
+            <div class="top-actions">
+                <span class="version">{{ algorithm["schema"] }}</span>
+            </div>
+        </header>
+
+        <section class="hero">
+            <div class="eyebrow"><span class="status-dot"></span> Algorithm catalogue</div>
+            <div class="hero-main">
+                <div>
+                    <h1>{{ algorithm["name"] }}</h1>
+                    {% if algorithm.get("description") %}
+                    <p class="subtitle">{{ algorithm["description"] }}</p>
+                    {% endif %}
+                    <div class="identity">
+                        <span class="mono">{{ algorithm["id"] }}</span>
+                        <button class="copy" type="button" data-copy="{{ algorithm['id'] }}">Copy ID</button>
+                        <span class="identity-separator">·</span>
+                        <span class="short-name">{{ algorithm["short_name"] }}</span>
+                    </div>
+                </div>
+                <div class="hero-stats">
+                    <div>
+                        <strong>{{ algorithm["implementations"]|length }}</strong>
+                        <span>Implementations</span>
+                    </div>
+                    <div>
+                        <strong>{{ algorithm.get("profiles", [])|length }}</strong>
+                        <span>Profiles</span>
+                    </div>
+                    <div>
+                        <strong>{{ algorithm["implementations"]|selectattr("status", "equalto", "available")|list|length }}</strong>
+                        <span>Available</span>
+                    </div>
+                </div>
+            </div>
+            <div class="chips">
+                <span class="chip chip-blue">{{ algorithm["type"]|capitalize }} algorithm</span>
+                <span class="chip {{ 'chip-green' if algorithm['is_active'] else 'chip-muted' }}">
+                    {{ "Active" if algorithm["is_active"] else "Inactive" }}
+                </span>
+                {% for implementation in algorithm["implementations"] %}
+                <span class="chip">{{ implementation["env_type"]|upper }}</span>
+                {% endfor %}
+            </div>
+        </section>
+
+        <nav class="section-nav" aria-label="Page sections">
+            <a href="#overview" class="active">Overview</a>
+            <a href="#implementations">Implementations</a>
+            <a href="#profiles">Parameter profiles</a>
+            {% if algorithm.get("parameters_schema") %}
+            <a href="#parameter-schemas">Parameter schemas</a>
+            {% endif %}
+        </nav>
+
+        <section class="content-grid" id="overview">
+            <div class="main-column">
+                <section class="panel">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="section-kicker">01 / Overview</span>
+                            <h2>Algorithm configuration</h2>
+                        </div>
+                        <span class="quiet">Catalogue entry</span>
+                    </div>
+                    {% if algorithm.get("description") %}
+                    <p class="description">{{ algorithm["description"] }}</p>
+                    {% endif %}
+                    <div class="detail-grid">
+                        <div class="detail">
+                            <span>Algorithm ID</span>
+                            <strong class="mono">{{ algorithm["id"] }}</strong>
+                            <small>Backend identifier</small>
+                        </div>
+                        <div class="detail">
+                            <span>Short name</span>
+                            <strong>{{ algorithm["short_name"] }}</strong>
+                            <small>Display abbreviation</small>
+                        </div>
+                        <div class="detail">
+                            <span>Algorithm type</span>
+                            <strong>{{ algorithm["type"]|capitalize }}</strong>
+                            <small>{% if algorithm["type"] == "reference" %}Published baseline{% else %}Research-developed algorithm{% endif %}</small>
+                        </div>
+                        <div class="detail">
+                            <span>Selectable</span>
+                            <strong>{{ "Yes" if algorithm["is_active"] else "No" }}</strong>
+                            <small>For new experiments</small>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel" id="implementations">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="section-kicker">02 / Execution</span>
+                            <h2>Implementations</h2>
+                        </div>
+                        <span class="quiet">{{ algorithm["implementations"]|length }} configured</span>
+                    </div>
+
+                    {% if algorithm["implementations"] %}
+                    <div class="implementation-list">
+                        {% for implementation in algorithm["implementations"] %}
+                        <article class="implementation-card">
+                            <div class="implementation-top">
+                                <div class="implementation-name">
+                                    <span class="path-mark {% if loop.first %}mark-a{% else %}mark-b{% endif %}">{{ loop.index }}</span>
+                                    <div>
+                                        <h3>{{ implementation["env_type"]|upper }}</h3>
+                                        <span class="mono muted">Environment implementation</span>
+                                    </div>
+                                </div>
+                                <span class="chip
+                                    {% if implementation['status'] == 'available' %}chip-green
+                                    {% elif implementation['status'] == 'planned' %}chip-blue
+                                    {% else %}chip-muted{% endif %}">
+                                    {{ implementation["status"]|capitalize }}
+                                </span>
+                            </div>
+
+                            <div class="implementation-metrics">
+                                <div>
+                                    <span>Version</span>
+                                    <strong>{{ implementation.get("version") or "—" }}</strong>
+                                </div>
+                                <div>
+                                    <span>Implementation hash</span>
+                                    {% if implementation.get("implementation_hash") %}
+                                    <strong class="mono hash">{{ implementation["implementation_hash"] }}</strong>
+                                    {% else %}
+                                    <strong class="muted">Not known</strong>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            {% if implementation.get("note") %}
+                            <p class="implementation-note">{{ implementation["note"] }}</p>
+                            {% endif %}
+                        </article>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <span class="empty-icon">⌁</span>
+                        <div>
+                            <strong>No implementations registered</strong>
+                            <p>This algorithm has no environment implementations in the catalogue.</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </section>
+
+                <section class="panel" id="profiles">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="section-kicker">03 / Configuration</span>
+                            <h2>Parameter profiles</h2>
+                        </div>
+                        <span class="quiet">{{ algorithm.get("profiles", [])|length }} profiles</span>
+                    </div>
+
+                    {% if algorithm.get("profiles") %}
+                    <div class="profile-list">
+                        {% for profile in algorithm["profiles"] %}
+                        <article class="profile-card">
+                            <div class="profile-top">
+                                <div>
+                                    <h3>{{ profile["id"] }}</h3>
+                                    {% if profile.get("label") %}
+                                    <span class="profile-label">{{ profile["label"] }}</span>
+                                    {% endif %}
+                                </div>
+                                <span class="chip
+                                    {% if profile['status'] == 'frozen' %}chip-green
+                                    {% elif profile['status'] == 'draft' %}chip-blue
+                                    {% else %}chip-muted{% endif %}">
+                                    {{ profile["status"]|capitalize }}
+                                </span>
+                            </div>
+
+                            {% if profile.get("description") %}
+                            <p class="profile-description">{{ profile["description"] }}</p>
+                            {% endif %}
+
+                            {% set profile_parameters = profile.get("parameters", {}) %}
+                            {% if profile_parameters %}
+                            <div class="environment-list">
+                                {% for env_type, parameters in profile_parameters.items() %}
+                                <div class="subpanel environment-block">
+                                    <div class="subpanel-title">
+                                        <span class="mini-icon">⌘</span>
+                                        <h4>{{ env_type|upper }}</h4>
+                                    </div>
+                                    {% if parameters %}
+                                    <div class="parameter-list">
+                                        {% for parameter_name, parameter_value in parameters.items() %}
+                                        <div class="kv">
+                                            <span>{{ parameter_name }}</span>
+                                            <strong>
+                                                {% if parameter_value is mapping or (parameter_value is sequence and parameter_value is not string) %}
+                                                <code>{{ parameter_value|tojson }}</code>
+                                                {% elif parameter_value is none %}
+                                                <span class="muted">null</span>
+                                                {% elif parameter_value is sameas true %}
+                                                true
+                                                {% elif parameter_value is sameas false %}
+                                                false
+                                                {% else %}
+                                                {{ parameter_value }}
+                                                {% endif %}
+                                            </strong>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% else %}
+                                    <p class="help">No parameters defined for this environment.</p>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="empty-state compact-empty">
+                                <span class="empty-icon">⌁</span>
+                                <div>
+                                    <strong>No parameter values</strong>
+                                    <p>This profile does not define environment-specific parameters.</p>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </article>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <span class="empty-icon">⌁</span>
+                        <div>
+                            <strong>No parameter profiles</strong>
+                            <p>This algorithm does not define frozen parameter profiles.</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </section>
+
+                {% if algorithm.get("parameters_schema") %}
+                <section class="panel" id="parameter-schemas">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="section-kicker">04 / Overrides</span>
+                            <h2>Parameter schemas</h2>
+                        </div>
+                        <span class="quiet">Per environment</span>
+                    </div>
+                    <p class="description">
+                        JSON Schema definitions for tunable parameters. Overrides make a run exploratory.
+                    </p>
+                    <div class="schema-list">
+                        {% for env_type, schema in algorithm["parameters_schema"].items() %}
+                        <details class="schema-item">
+                            <summary>
+                                <span>{{ env_type|upper }}</span>
+                                <span class="schema-toggle">Show schema</span>
+                            </summary>
+                            <pre><code>{{ schema|tojson(indent=2) }}</code></pre>
+                        </details>
+                        {% endfor %}
+                    </div>
+                </section>
+                {% endif %}
+            </div>
+
+            <aside class="side-column">
+                <section class="panel side-panel">
+                    <span class="section-kicker">Catalogue status</span>
+                    <h2>Availability</h2>
+                    <div class="availability-status">
+                        <span class="availability-dot {{ 'is-active' if algorithm['is_active'] else 'is-inactive' }}"></span>
+                        <div>
+                            <strong>{{ "Active" if algorithm["is_active"] else "Inactive" }}</strong>
+                            <p>{{ "Selectable for new experiments." if algorithm["is_active"] else "Not selectable for new experiments." }}</p>
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="kv">
+                        <span>Type</span>
+                        <strong>{{ algorithm["type"]|capitalize }}</strong>
+                    </div>
+                    <div class="kv">
+                        <span>Available implementations</span>
+                        <strong>{{ algorithm["implementations"]|selectattr("status", "equalto", "available")|list|length }}</strong>
+                    </div>
+                    <div class="kv">
+                        <span>Planned implementations</span>
+                        <strong>{{ algorithm["implementations"]|selectattr("status", "equalto", "planned")|list|length }}</strong>
+                    </div>
+                    <div class="kv">
+                        <span>Unsupported implementations</span>
+                        <strong>{{ algorithm["implementations"]|selectattr("status", "equalto", "unsupported")|list|length }}</strong>
+                    </div>
+                </section>
+
+                {% if algorithm.get("profiles") %}
+                <section class="panel side-panel">
+                    <span class="section-kicker">Profile summary</span>
+                    <h2>Profile statuses</h2>
+                    <div class="kv">
+                        <span>Frozen</span>
+                        <strong>{{ algorithm["profiles"]|selectattr("status", "equalto", "frozen")|list|length }}</strong>
+                    </div>
+                    <div class="kv">
+                        <span>Draft</span>
+                        <strong>{{ algorithm["profiles"]|selectattr("status", "equalto", "draft")|list|length }}</strong>
+                    </div>
+                    <div class="kv">
+                        <span>Retired</span>
+                        <strong>{{ algorithm["profiles"]|selectattr("status", "equalto", "retired")|list|length }}</strong>
+                    </div>
+                    <p class="help">Only frozen profiles may be used in experiments whose results are reported.</p>
+                </section>
+                {% endif %}
+
+                <section class="panel side-panel">
+                    <span class="section-kicker">Identity</span>
+                    <h2>Catalogue metadata</h2>
+                    <div class="kv">
+                        <span>Schema</span>
+                        <strong class="mono">{{ algorithm["schema"] }}</strong>
+                    </div>
+                    <div class="kv">
+                        <span>Algorithm ID</span>
+                        <strong class="mono">{{ algorithm["id"] }}</strong>
+                    </div>
+                    <div class="kv">
+                        <span>Short name</span>
+                        <strong>{{ algorithm["short_name"] }}</strong>
+                    </div>
+                </section>
+            </aside>
+        </section>
+
+        <footer class="footer">
+            <span>Algorithm viewer</span>
+            <span>Schema <span class="mono">{{ algorithm["schema"] }}</span></span>
+        </footer>
+    </main>
+
+    <script>
+        document.querySelectorAll('[data-copy]').forEach((button) => {
+            button.addEventListener('click', async () => {
+                await navigator.clipboard.writeText(button.dataset.copy);
+                const original = button.textContent;
+                button.textContent = 'Copied';
+                window.setTimeout(() => { button.textContent = original; }, 1200);
+            });
+        });
+    </script>
+</body>
+
+</html>

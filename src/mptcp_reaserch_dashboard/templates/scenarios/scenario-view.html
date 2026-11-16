@@ -341,7 +341,7 @@
                     <p class="help">Repetition n uses start + (n − 1) × step. The same seed gives the same conditions
                         for every algorithm.</p>
                     {% elif scenario.defaults.seeds.strategy == 'explicit' %}
-                    <div class="kv"><span>Explicit seeds</span><strong>{{ scenario.defaults.seeds.values()|length
+                    <div class="kv"><span>Explicit seeds</span><strong>{{ scenario.defaults.seeds["values"]|length
                             }}</strong></div>
                     <div class="seed-list">
                         {% for seed in scenario.defaults.seeds.values() %}

@@ -160,6 +160,33 @@ def api_scenario_get_all():
 
 
 
+
+@app.get('/algorithm/<id>')
+def algorithm_view(id: str):
+    response = api_algorithm_get(id)
+    
+    if response[1] != 200:
+        return 'not found', 404
+    
+    return flask.render_template('algorithms/algorithm-view.html', algorithm=response[0].json)
+
+@app.get('/algorithm')
+def algorithms_list():
+    response = api_algorithm_get_all()
+    
+    return flask.render_template('algorithms/algorithm-list.html', algorithms=response[0].json)
+
+@app.get('/algorithm/<id>/edit')
+def algorithm_edit(id: str):
+    response = api_algorithm_get(id)
+    
+    if response[1] != 200:
+        return 'not found', 404
+    
+    return flask.render_template('algorithms/algorithm-edit.html', algorithm=response[0].json)
+
+
+
 @app.get('/scenario/<id>')
 def scenario_view(id: str):
     response = api_scenario_get(id)
