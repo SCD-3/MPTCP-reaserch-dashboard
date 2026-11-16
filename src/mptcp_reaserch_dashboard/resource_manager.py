@@ -146,9 +146,21 @@ def algorithm_insert(data: mptcp_types.Algorithm):
     if not is_algorithm_valid(data):
         raise err.InvalidResourceError("Algorithm is invalid")
     algorithms.insert_one(data)
-    
+
 def algorithm_get(id: str):
-    return algorithms.find_one({ 'id': id })
+    res = algorithms.find_one({ 'id': id })
+    if res is not None:
+        del res['_id'] #type: ignore
+    return res
+
+def algorithm_get_all(filter: typing.Optional[dict[str, typing.Any]] = None):
+    out: list[mptcp_types.Algorithm] = []
+    
+    for algorithm in algorithms.find(filter):
+        del algorithm['_id'] #type: ignore
+        out.append(algorithm)
+    
+    return out
 
 
 def environment_insert(data: mptcp_types.Environment):
@@ -157,7 +169,19 @@ def environment_insert(data: mptcp_types.Environment):
     environments.insert_one(data)
 
 def environment_get(id: str):
-    return environments.find_one({ 'id': id })
+    res = environments.find_one({ 'id': id })
+    if res is not None:
+        del res['_id'] #type: ignore
+    return res
+
+def environment_get_all(filter: typing.Optional[dict[str, typing.Any]] = None):
+    out: list[mptcp_types.Environment] = []
+    
+    for environment in environments.find(filter):
+        del environment['_id'] #type: ignore
+        out.append(environment)
+    
+    return out
 
 
 def experiment_insert(data: mptcp_types.Experiment):
@@ -177,9 +201,23 @@ def experiment_get(id: str, version: typing.Optional[int] = None):
         
         for experiment in all_experiments:
             if experiment['version'] == len(all_experiments):
-                return experiment
+                res = experiment
+                del res['_id'] #type: ignore
+                return res
     else:
-        return experiments.find_one({ 'id': id, 'version': version })
+        res = experiments.find_one({ 'id': id, 'version': version })
+        if res is not None:
+            del res['_id'] #type: ignore
+        return res
+
+def experiment_get_all(filter: typing.Optional[dict[str, typing.Any]] = None):
+    out: list[mptcp_types.Experiment] = []
+    
+    for experiment in experiments.find(filter):
+        del experiment['_id'] #type: ignore
+        out.append(experiment)
+    
+    return out
 
 
 def run_insert(data: mptcp_types.Run):
@@ -189,7 +227,20 @@ def run_insert(data: mptcp_types.Run):
     runs.insert_one(data)
 
 def run_get(id: str):
-    return runs.find_one({ 'id': id })
+    res = runs.find_one({ 'id': id })
+    if res is not None:
+        del res['_id'] #type: ignore
+    return res
+
+def run_get_all(filter: typing.Optional[dict[str, typing.Any]] = None):
+    out: list[mptcp_types.Run] = []
+    
+    for run in runs.find(filter):
+        del run['_id'] #type: ignore
+        out.append(run)
+    
+    return out
+
 
 def scenario_insert(data: mptcp_types.Scenario):
     
@@ -208,6 +259,19 @@ def scenario_get(id: str, version: typing.Optional[int] = None):
         
         for scenario in all_scenarios:
             if scenario['version'] == len(all_scenarios):
-                return scenario
+                res = scenario
+                del res['_id'] #type: ignore
+                return res
     else:
-        return scenarios.find_one({ 'id': id, 'version': version })
+        res = scenarios.find_one({ 'id': id, 'version': version })
+        del res['_id'] #type: ignore
+        return res
+
+def scenario_get_all(filter: typing.Optional[dict[str, typing.Any]] = None):
+    out: list[mptcp_types.Scenario] = []
+    
+    for scenario in scenarios.find(filter):
+        del scenario['_id'] #type: ignore
+        out.append(scenario)
+    
+    return out

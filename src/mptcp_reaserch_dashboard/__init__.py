@@ -42,6 +42,13 @@ def algorithm_get(id: str):
     
     return flask.jsonify(algorithm), 200
 
+@app.get('/api/algorithm')
+def algorithm_get_all():
+    filter = flask.request.get_json(silent=True)
+    algorithms = mptcp_resource.algorithm_get_all(filter)
+    
+    return flask.jsonify(algorithms), 200
+
 
 @app.post('/api/environment')
 def environment_new():
@@ -61,6 +68,13 @@ def environment_get(id: str):
         return 'not found', 404
     
     return flask.jsonify(environment), 200
+
+@app.get('/api/environment')
+def environment_get_all():
+    filter = flask.request.get_json(silent=True)
+    environments = mptcp_resource.environment_get_all(filter)
+    
+    return flask.jsonify(environments), 200
 
 
 @app.post('/api/experiment')
@@ -82,6 +96,13 @@ def experiment_get(id: str):
     
     return flask.jsonify(experiment), 200
 
+@app.get('/api/experiment')
+def experiment_get_all():
+    filter = flask.request.get_json(silent=True)
+    experiments = mptcp_resource.experiment_get_all(filter)
+    
+    return flask.jsonify(experiments), 200
+
 
 @app.post('/api/run')
 def run_new():
@@ -101,6 +122,13 @@ def run_get(id: str):
         return 'not found', 404
     
     return flask.jsonify(run), 200
+
+@app.get('/api/run')
+def run_get_all():
+    filter = flask.request.get_json(silent=True)
+    runs = mptcp_resource.run_get_all(filter)
+    
+    return flask.jsonify(runs), 200
 
 
 @app.post('/api/scenario')
@@ -122,6 +150,12 @@ def scenario_get(id: str):
     
     return flask.jsonify(scenario), 200
 
+@app.get('/api/scenario')
+def scenario_get_all():
+    filter = flask.request.get_json(silent=True)
+    scenarios = mptcp_resource.scenario_get_all(filter)
+    
+    return flask.jsonify(scenarios), 200
 
 if __name__ == '__main__':
     app.run()
