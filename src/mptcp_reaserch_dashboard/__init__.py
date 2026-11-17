@@ -187,6 +187,84 @@ def algorithm_edit(id: str):
 
 
 
+@app.get('/environment/<id>')
+def environment_view(id: str):
+    response = api_environment_get(id)
+    
+    if response[1] != 200:
+        return 'not found', 404
+    
+    return flask.render_template('environments/environment-view.html', environment=response[0].json)
+
+@app.get('/environment')
+def environments_list():
+    response = api_environment_get_all()
+    
+    return flask.render_template('environments/environment-list.html', environments=response[0].json)
+
+@app.get('/environment/<id>/edit')
+def environment_edit(id: str):
+    response = api_environment_get(id)
+    
+    if response[1] != 200:
+        return 'not found', 404
+    
+    return flask.render_template('environments/environment-edit.html', environment=response[0].json)
+
+
+
+@app.get('/experiment/<id>')
+def experiment_view(id: str):
+    response = api_experiment_get(id)
+    
+    if response[1] != 200:
+        return 'not found', 404
+    
+    return flask.render_template('experiments/experiment-view.html', experiment=response[0].json)
+
+@app.get('/experiment')
+def experiments_list():
+    response = api_experiment_get_all()
+    
+    return flask.render_template('experiments/experiment-list.html', experiments=response[0].json)
+
+@app.get('/experiment/<id>/edit')
+def experiment_edit(id: str):
+    response = api_experiment_get(id)
+    
+    if response[1] != 200:
+        return 'not found', 404
+    
+    return flask.render_template('experiments/experiment-edit.html', experiment=response[0].json)
+
+
+
+@app.get('/run/<id>')
+def run_view(id: str):
+    response = api_run_get(id)
+    
+    if response[1] != 200:
+        return 'not found', 404
+    
+    return flask.render_template('runs/run-view.html', run=response[0].json)
+
+@app.get('/run')
+def runs_list():
+    response = api_run_get_all()
+    
+    return flask.render_template('runs/run-list.html', runs=response[0].json)
+
+@app.get('/run/<id>/edit')
+def run_edit(id: str):
+    response = api_run_get(id)
+    
+    if response[1] != 200:
+        return 'not found', 404
+    
+    return flask.render_template('runs/run-edit.html', run=response[0].json)
+
+
+
 @app.get('/scenario/<id>')
 def scenario_view(id: str):
     response = api_scenario_get(id)
