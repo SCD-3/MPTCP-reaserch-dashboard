@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Experiment · {{ experiment.name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/experiments/experiment-view.css') }}">
+</head>
+
+<body>
+    <main class="page">
+        <header class="topbar">
+            <a class="back-link" href="{{ url_for('experiments_list') }}">← <span>Experiments</span></a>
+
+            <div class="top-actions">
+                <span class="version">Version {{ experiment.version }}</span>
+                {% if experiment.status == 'draft' %}
+                <a class="button button-secondary"
+                    href="{{ url_for('experiment_edit', id=experiment.id) }}">Edit experiment</a>
+                {% endif %}
+            </div>
+        </header>
+
+        <!-- Hero -->
+        <section class="hero">
+            <div class="eyebrow">
+                <span class="status-dot status-{{ experiment.status }}"></span>
+                Experiment
+                <span class="chip status-chip status-{{ experiment.status }}">
+                    {{ experiment.status|capitalize }}
+                </span>
+            </div>
+
+            <div class="hero-main">
+                <div>
+                    <h1>{{ experiment.name }}</h1>
+
+                    {% if experiment.description %}
+                    <p class="subtitle">{{ experiment.description }}</p>
+                    {% endif %}
+
+                    <div class="identity">
+                        <span class="mono">{{ experiment.id }}</span>
+                        <button class="copy" type="button" data-copy="{{ experiment.id }}">Copy ID</button>
+                    </div>
+                </div>
+
+                <div class="hero-stats">
+                    <div>
+                        <strong>{{ experiment.scenarios|length }}</strong>
+                        <span>Scenarios</span>
+                    </div>
+                    <div>
+                        <strong>{{ experiment.environments|length }}</strong>
+                        <span>Environments</span>
+                    </div>
+                    <div>
+                        <strong>{{ experiment.algorithms|length }}</strong>
+                        <span>Algorithms</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chips">
+                {% for key, value in (experiment.labels or {}).items() %}
+                <span class="chip">{{ key }} · {{ value }}</span>
+                {% endfor %}
+
+                {% if experiment.status == 'frozen' or experiment.status in ['running', 'completed', 'stopped', 'failed'] %}
+                <span class="chip chip-green">Configuration frozen</span>
+                {% else %}
+                <span class="chip chip-blue">Configuration editable</span>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Navigation -->
+        <nav class="section-nav" aria-label="Page sections">
+            <a href="#overview" class="active">Overview</a>
+            <a href="#scenarios">Scenarios</a>
+            <a href="#environments">Environments</a>
+            <a href="#algorithms">Algorithms</a>
+            <a href="#execution">Execution</a>
+            {% if experiment.fingerprint %}
+            <a href="#fingerprint">Fingerprint</a>
+            {% endif %}
+        </nav>
+
+        <section class="content-grid" id="overview">
+            <div class="main-column">
+
+                <!-- Overview -->
+                <section class="panel">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="section-kicker">01 / Overview</span>
+                            <h2>Experiment configuration</h2>
+                        </div>
+                        <span class="quiet">Research definition</span>
+                    </div>
+
+                    {% if experiment.description %}
+                    <p class="description">{{ experiment.description }}</p>
+                    {% endif %}
+
+                    <div class="detail-grid">
+                        <div class="detail">
+                            <span>Version</span>
+                            <strong>{{ experiment.version }}</strong>
+                            <small>Experiment revision</small>
+                        </div>
+
+                        <div class="detail">
+                            <span>Status</span>
+                            <strong class="status-text status-text-{{ experiment.status }}">
+                                {{ experiment.status|capitalize }}
+                            </strong>
+                            <small>Execution lifecycle</small>
+                        </div>
+
+                        <div class="detail">
+                            <span>Scenarios</span>
+                            <strong>{{ experiment.scenarios|length }}</strong>
+                            <small>Selected configurations</small>
+                        </div>
+
+                        <div class="detail">
+                            <span>Algorithms</span>
+                            <strong>{{ experiment.algorithms|length }}</strong>
+                            <small>Selected implementations</small>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Scenarios -->
+                <section class="panel" id="scenarios">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="section-kicker">02 / Scenarios</span>
+                            <h2>Selected scenarios</h2>
+                        </div>
+                        <span class="quiet">{{ experiment.scenarios|length }} configured</span>
+                    </div>
+
+                    <p class="description">
+                        Each scenario is pinned to a specific version.
+                        Later changes to the original scenario do not affect this experiment.
+                    </p>
+
+                    <div class="resource-list">
+                        {% for scenario in experiment.scenarios %}
+                        <article class="resource-card">
+                            <div class="resource-top">
+                                <div class="resource-identity">
+                                    <span class="resource-mark mark-scenario">{{ loop.index }}</span>
+                                    <div>
+                                        <h3>
+                                            <a href="{{ url_for('scenario_view', id=scenario.id) }}">
+                                                {{ scenario.name|default(scenario.id) }}
+                                                <span class="external-mark">↗</span>
+                                            </a>
+                                        </h3>
+                                        <span class="mono muted">{{ scenario.id }}</span>
+                                    </div>
+                                </div>
+
+                                <span class="chip chip-blue">v{{ scenario.version }}</span>
+                            </div>
+
+                            {% if scenario.sweep %}
+                            <div class="sweep-section">
+                                <div class="sweep-heading">
+                                    <span class="mini-icon">⇄</span>
+                                    <strong>Parameter sweep</strong>
+                                    <span class="quiet">{{ scenario.sweep|length }} parameters</span>
+                                </div>
+
+                                <div class="sweep-list">
+                                    {% for path, values in scenario.sweep.items() %}
+                                    <div class="sweep-item">
+                                        <code>{{ path }}</code>
+                                        <div class="sweep-values">
+                                            {% for value in values %}
+                                            <span class="value-chip">{{ value|tojson }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="resource-foot">
+                                <span class="muted">No parameter sweep</span>
+                                <span>Single scenario configuration</span>
+                            </div>
+                            {% endif %}
+                        </article>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <!-- Environments -->
+                <section class="panel" id="environments">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="section-kicker">03 / Environments</span>
+                            <h2>Execution environments</h2>
+                        </div>
+                        <span class="quiet">{{ experiment.environments|length }} selected</span>
+                    </div>
+
+                    <p class="description">
+                        Environments determine where the selected algorithms and scenarios will be executed.
+                    </p>
+
+                    <div class="resource-list compact-list">
+                        {% for environment_id in experiment.environments %}
+                        <article class="resource-card resource-card-inline">
+                            <div class="resource-identity">
+                                <span class="resource-mark mark-environment">{{ loop.index }}</span>
+                                <div>
+                                    <h3>
+                                        <a href="{{ url_for('environment_view', id=environment_id) }}">
+                                            {{ environment_names.get(environment_id, environment_id) }}
+                                            <span class="external-mark">↗</span>
+                                        </a>
+                                    </h3>
+                                    <span class="mono muted">{{ environment_id }}</span>
+                                </div>
+                            </div>
+
+                            <span class="chip">Environment</span>
+                        </article>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <!-- Algorithms -->
+                <section class="panel" id="algorithms">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="section-kicker">04 / Algorithms</span>
+                            <h2>Selected algorithms</h2>
+                        </div>
+                        <span class="quiet">{{ experiment.algorithms|length }} selected</span>
+                    </div>
+
+                    <p class="description">
+                        Each algorithm can optionally use a profile and environment-specific
+                        parameter overrides.
+                    </p>
+
+                    <div class="resource-list">
+                        {% for algorithm in experiment.algorithms %}
+                        <article class="resource-card">
+                            <div class="resource-top">
+                                <div class="resource-identity">
+                                    <span class="resource-mark mark-algorithm">{{ loop.index }}</span>
+                                    <div>
+                                        <h3>
+                                            <a href="{{ url_for('algorithm_view', id=algorithm.id) }}">
+                                                {{ algorithm.name|default(algorithm.id) }}
+                                                <span class="external-mark">↗</span>
+                                            </a>
+                                        </h3>
+                                        <span class="mono muted">{{ algorithm.id }}</span>
+                                    </div>
+                                </div>
+
+                                {% if algorithm.profile %}
+                                <span class="chip chip-blue">Profile: {{ algorithm.profile }}</span>
+                                {% else %}
+                                <span class="chip">Default profile</span>
+                                {% endif %}
+                            </div>
+
+                            {% if algorithm.parameter_overrides %}
+                            <div class="override-section">
+                                <div class="sweep-heading">
+                                    <span class="mini-icon">⚙</span>
+                                    <strong>Parameter overrides</strong>
+                                    <span class="chip chip-amber">Exploratory</span>
+                                </div>
+
+                                {% for environment_type, parameters in algorithm.parameter_overrides.items() %}
+                                <div class="override-group">
+                                    <div class="override-heading">
+                                        <strong>{{ environment_type|upper }}</strong>
+                                        <span class="quiet">{{ parameters|length }} parameters</span>
+                                    </div>
+
+                                    <pre class="json-preview">{{ parameters|tojson(indent=2) }}</pre>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="resource-foot">
+                                <span class="muted">No parameter overrides</span>
+                                <span>Standard algorithm configuration</span>
+                            </div>
+                            {% endif %}
+                        </article>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <!-- Execution -->
+                <section class="panel" id="execution">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="section-kicker">05 / Execution</span>
+                            <h2>Repetitions & seeds</h2>
+                        </div>
+                        <span class="quiet">Run configuration</span>
+                    </div>
+
+                    <div class="split-details">
+                        <div class="subpanel">
+                            <div class="subpanel-title">
+                                <span class="mini-icon">↻</span>
+                                <h3>Repetitions</h3>
+                            </div>
+
+                            {% if experiment.repetitions is not none %}
+                            <strong class="execution-value">{{ experiment.repetitions }}</strong>
+                            <span class="execution-label">Experiment override</span>
+                            {% else %}
+                            <strong class="execution-value">Scenario default</strong>
+                            <span class="execution-label">Each scenario uses its own repetition count</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="subpanel">
+                            <div class="subpanel-title">
+                                <span class="mini-icon">⌁</span>
+                                <h3>Seeds</h3>
+                            </div>
+
+                            {% if experiment.seeds is not none %}
+                            <strong class="execution-value">Custom strategy</strong>
+                            <span class="execution-label">Experiment seed override</span>
+                            {% else %}
+                            <strong class="execution-value">Scenario default</strong>
+                            <span class="execution-label">Each scenario uses its own seed configuration</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if experiment.seeds is not none %}
+                    <h3 class="subheading">Seed configuration</h3>
+                    <pre class="json-preview">{{ experiment.seeds|tojson(indent=2) }}</pre>
+                    {% endif %}
+
+                    {% if experiment.repetitions is none and experiment.seeds is none %}
+                    <div class="empty-state">
+                        <span class="empty-icon">↳</span>
+                        <div>
+                            <strong>Using scenario defaults</strong>
+                            <p>Repetitions and seed strategies are inherited independently from each selected scenario.</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </section>
+
+                <!-- Notes -->
+                {% if experiment.notes %}
+                <section class="panel" id="notes">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="section-kicker">Additional information</span>
+                            <h2>Experiment notes</h2>
+                        </div>
+                    </div>
+
+                    <p class="description notes-text">{{ experiment.notes }}</p>
+                </section>
+                {% endif %}
+
+            </div>
+
+            <!-- Sidebar -->
+            <aside class="side-column">
+
+                <section class="panel side-panel">
+                    <span class="section-kicker">Execution</span>
+                    <h2>Experiment composition</h2>
+
+                    <div class="composition-number">
+                        <strong>{{ experiment.scenarios|length }}</strong>
+                        <span>scenarios</span>
+                    </div>
+
+                    <div class="composition-row">
+                        <span>Environments</span>
+                        <strong>{{ experiment.environments|length }}</strong>
+                    </div>
+
+                    <div class="composition-row">
+                        <span>Algorithms</span>
+                        <strong>{{ experiment.algorithms|length }}</strong>
+                    </div>
+
+                    <div class="composition-row">
+                        <span>Parameter sweeps</span>
+                        <strong>
+                            {{ experiment.scenarios|selectattr('sweep')|list|length }}
+                        </strong>
+                    </div>
+
+                    <div class="composition-row">
+                        <span>Overrides</span>
+                        <strong>
+                            {{ experiment.algorithms|selectattr('parameter_overrides')|list|length }}
+                        </strong>
+                    </div>
+
+                    <p class="help">
+                        Parameter sweeps expand into scenario variants using
+                        Cartesian products of their configured values.
+                    </p>
+                </section>
+
+                <section class="panel side-panel">
+                    <span class="section-kicker">Lifecycle</span>
+                    <h2>Experiment status</h2>
+
+                    <div class="lifecycle">
+                        {% for state in ['draft', 'planned', 'frozen', 'running', 'completed'] %}
+                        <div class="lifecycle-item {% if state == experiment.status %}current{% elif experiment.status in ['stopped', 'failed'] and state in ['completed'] %}future{% elif state in ['draft', 'planned', 'frozen', 'running', 'completed'] and loop.index0 < ['draft', 'planned', 'frozen', 'running', 'completed'].index(experiment.status) if experiment.status in ['draft', 'planned', 'frozen', 'running', 'completed'] else false %}past{% endif %}">
+                            <span class="lifecycle-dot"></span>
+                            <span>{{ state|capitalize }}</span>
+                        </div>
+                        {% endfor %}
+
+                        {% if experiment.status in ['stopped', 'failed'] %}
+                        <div class="lifecycle-item current">
+                            <span class="lifecycle-dot"></span>
+                            <span>{{ experiment.status|capitalize }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    {% if experiment.status == 'draft' %}
+                    <p class="help">This experiment is editable and has not yet been validated.</p>
+                    {% elif experiment.status == 'planned' %}
+                    <p class="help">The experiment has been validated and its run list has been previewed.</p>
+                    {% elif experiment.status == 'frozen' %}
+                    <p class="help">Run records have been created. The experiment configuration is immutable.</p>
+                    {% elif experiment.status == 'running' %}
+                    <p class="help">Experiment execution is currently in progress.</p>
+                    {% elif experiment.status == 'completed' %}
+                    <p class="help">All experiment runs have finished.</p>
+                    {% elif experiment.status == 'stopped' %}
+                    <p class="help">Experiment execution was stopped.</p>
+                    {% elif experiment.status == 'failed' %}
+                    <p class="help">Experiment execution failed.</p>
+                    {% endif %}
+                </section>
+
+                {% if experiment.status in ['frozen', 'running', 'completed', 'stopped', 'failed'] %}
+                <section class="panel side-panel">
+                    <span class="section-kicker">Frozen configuration</span>
+                    <h2>Freeze information</h2>
+
+                    {% if experiment.frozen_utc %}
+                    <div class="kv">
+                        <span>Frozen at</span>
+                        <strong>{{ experiment.frozen_utc }}</strong>
+                    </div>
+                    {% endif %}
+
+                    {% if experiment.fingerprint %}
+                    <div class="fingerprint-box">
+                        <div class="fingerprint-heading">
+                            <strong>Run definition hash</strong>
+                            <button class="copy" type="button"
+                                data-copy="{{ experiment.fingerprint }}">Copy</button>
+                        </div>
+                        <code>{{ experiment.fingerprint }}</code>
+                    </div>
+                    {% endif %}
+
+                    <p class="help">
+                        The fingerprint identifies the complete set of frozen run definitions.
+                    </p>
+                </section>
+                {% endif %}
+
+                {% if experiment.labels %}
+                <section class="panel side-panel">
+                    <span class="section-kicker">Metadata</span>
+                    <h2>Labels</h2>
+
+                    {% for key, value in experiment.labels.items() %}
+                    <div class="label-row">
+                        <span>{{ key }}</span>
+                        <strong>{{ value }}</strong>
+                    </div>
+                    {% endfor %}
+                </section>
+                {% endif %}
+
+            </aside>
+        </section>
+
+        <footer class="footer">
+            <span>Experiment viewer</span>
+            <span>Schema <span class="mono">{{ experiment.schema }}</span></span>
+        </footer>
+    </main>
+
+    <script>
+        document.querySelectorAll('[data-copy]').forEach((button) => {
+            button.addEventListener('click', async () => {
+                await navigator.clipboard.writeText(button.dataset.copy);
+
+                const original = button.textContent;
+                button.textContent = 'Copied';
+
+                window.setTimeout(() => {
+                    button.textContent = original;
+                }, 1200);
+            });
+        });
+    </script>
+</body>
+
+</html>

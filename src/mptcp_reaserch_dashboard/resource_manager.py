@@ -101,7 +101,6 @@ def is_experiment_valid(data: mptcp_types.Experiment) -> bool:
         yield err.x_profile(data, db)
         yield err.x_alg_dup(data)
         yield err.x_sweep(data)
-        yield err.w_profile(data, db)
     
     try:
         experiment_validator.validate(data)

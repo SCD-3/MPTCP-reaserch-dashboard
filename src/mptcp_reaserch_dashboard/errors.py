@@ -256,11 +256,17 @@ def x_profile(data: mptcp_types.Experiment, db: pymongo.database.Database[typing
     for algo in data['algorithms']:
         algo_found = algorithms.find_one({'id': algo['id']})
         
-        if algo_found is not None and algo_found['profiles'] is not None:
-            if algo['profile'] is None or algo['profile'] not in algo_found['profiles']:
+        if algo_found is None:
+            continue
+        
+        profiles = algo_found.get('profiles')
+        profiles_to_find = algo.get('profile')
+        
+        if profiles is not None:
+            if profiles_to_find is None or profiles_to_find not in [i['id'] for i in profiles]:
                 return True
         else:
-            if algo['profile'] is not None:
+            if profiles_to_find is not None:
                 return True
         
     return False
@@ -268,7 +274,7 @@ def x_profile(data: mptcp_types.Experiment, db: pymongo.database.Database[typing
 
 def x_alg_dup(data: mptcp_types.Experiment) -> bool:
     
-    unique_algos = {(alg['id'], alg['profile']) for alg in data['algorithms']}
+    unique_algos = {(alg['id'], alg.get('profile')) for alg in data['algorithms']}
     return len(unique_algos) != len(data['algorithms'])
 
 
