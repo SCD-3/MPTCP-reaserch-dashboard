@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Environment · {{ environment.name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/environments/environment-view.css') }}">
+</head>
+
+<body>
+    <main class="page">
+        <header class="topbar">
+            <a class="back-link" href="{{ url_for('environments_list') }}">← <span>Environments</span></a>
+            <div class="top-actions">
+                <span class="version">{{ environment.type|upper }}</span>
+                <a class="button button-secondary"
+                    href="{{ url_for('environment_edit', id=environment.id) }}">Edit environment</a>
+            </div>
+        </header>
+
+        <section class="hero">
+            <div class="eyebrow">
+                <span class="status-dot {% if not environment.is_active %}inactive{% endif %}"></span>
+                Environment
+                <span class="chip {% if environment.is_active %}chip-green{% else %}chip-red{% endif %}">
+                    {{ 'Active' if environment.is_active else 'Inactive' }}
+                </span>
+            </div>
+
+            <div class="hero-main">
+                <div>
+                    <h1>{{ environment.name }}</h1>
+
+                    {% if environment.description %}
+                    <p class="subtitle">{{ environment.description }}</p>
+                    {% endif %}
+
+                    <div class="identity">
+                        <span class="mono">{{ environment.id }}</span>
+                        <button class="copy" type="button" data-copy="{{ environment.id }}">Copy ID</button>
+                    </div>
+                </div>
+
+                <div class="hero-stats">
+                    <div>
+                        <strong>{{ environment.capabilities.min_paths|default(1) }}–{{
+                            environment.capabilities.max_paths }}</strong>
+                        <span>Supported paths</span>
+                    </div>
+                    <div>
+                        <strong>{{ environment.capabilities.topology_modes|length }}</strong>
+                        <span>Topologies</span>
+                    </div>
+                    <div>
+                        <strong>{{ environment.capabilities.traffic_types|length }}</strong>
+                        <span>Traffic types</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chips">
+                <span class="chip chip-blue">{{ environment.type|upper }}</span>
+
+                {% if environment.host %}
+                <span class="chip">{{ environment.host }}</span>
+                {% endif %}
+
+                {% if environment.platform_profile %}
+                <span class="chip">{{ environment.platform_profile }}</span>
+                {% endif %}
+
+                {% if environment.capabilities.cross_traffic %}
+                <span class="chip chip-green">Cross traffic</span>
+                {% endif %}
+
+                {% if environment.capabilities.read_schedule %}
+                <span class="chip">Read schedule</span>
+                {% endif %}
+            </div>
+        </section>
+
+        <nav class="section-nav" aria-label="Page sections">
+            <a href="#overview" class="active">Overview</a>
+            <a href="#capabilities">Capabilities</a>
+            <a href="#events">Events & generators</a>
+            <a href="#receiver">Receiver</a>
+            <a href="#fingerprint">Fingerprint</a>
+        </nav>
+
+        <section class="content-grid" id="overview">
+            <div class="main-column">
+
+                <!-- Overview -->
+                <section class="panel">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="section-kicker">01 / Overview</span>
+                            <h2>Environment configuration</h2>
+                        </div>
+                        <span class="quiet">Execution instance</span>
+                    </div>
+
+                    {% if environment.description %}
+                    <p class="description">{{ environment.description }}</p>
+                    {% endif %}
+
+                    <div class="detail-grid">
+                        <div class="detail">
+                            <span>Environment type</span>
+                            <strong>{{ environment.type|upper }}</strong>
+                            <small>Execution backend</small>
+                        </div>
+
+                        <div class="detail">
+                            <span>Host</span>
+                            <strong>{{ environment.host or 'Not specified' }}</strong>
+                            <small>Machine name</small>
+                        </div>
+
+                        <div class="detail">
+                            <span>Platform profile</span>
+                            <strong>{{ environment.platform_profile or 'Default' }}</strong>
+                            <small>Transport stack</small>
+                        </div>
+
+                        <div class="detail">
+                            <span>Status</span>
+                            <strong class="{% if environment.is_active %}success-text{% else %}danger-text{% endif %}">
+                                {{ 'Active' if environment.is_active else 'Inactive' }}
+                            </strong>
+                            <small>Environment availability</small>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Capabilities -->
+                <section class="panel" id="capabilities">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="section-kicker">02 / Capabilities</span>
+                            <h2>Supported scenario features</h2>
+                        </div>
+                        <span class="quiet">Execution constraints</span>
+                    </div>
+
+                    <p class="description">
+                        These capabilities determine which scenario configurations can be executed
+                        by this environment.
+                    </p>
+
+                    <div class="capability-grid">
+                        <div class="capability-card">
+                            <div class="capability-heading">
+                                <span class="mini-icon">⇄</span>
+                                <h3>Network paths</h3>
+                            </div>
+
+                            <strong class="capability-value">
+                                {{ environment.capabilities.min_paths|default(1) }}–{{
+                                    environment.capabilities.max_paths }}
+                            </strong>
+                            <span class="capability-description">Supported number of paths</span>
+                        </div>
+
+                        <div class="capability-card">
+                            <div class="capability-heading">
+                                <span class="mini-icon">⇢</span>
+                                <h3>Cross traffic</h3>
+                            </div>
+
+                            <strong class="capability-value">
+                                {{ 'Supported' if environment.capabilities.cross_traffic|default(false) else 'Disabled' }}
+                            </strong>
+                            <span class="capability-description">Additional competing flows</span>
+                        </div>
+
+                        <div class="capability-card">
+                            <div class="capability-heading">
+                                <span class="mini-icon">↓</span>
+                                <h3>Read schedule</h3>
+                            </div>
+
+                            <strong class="capability-value">
+                                {{ 'Supported' if environment.capabilities.read_schedule|default(true) else 'Disabled' }}
+                            </strong>
+                            <span class="capability-description">Receiver read scheduling</span>
+                        </div>
+
+                        <div class="capability-card">
+                            <div class="capability-heading">
+                                <span class="mini-icon">▤</span>
+                                <h3>Queue limit</h3>
+                            </div>
+
+                            <strong class="capability-value">
+                                {{ environment.capabilities.supported_queue_pkts_max or 'Unlimited' }}
+                            </strong>
+                            <span class="capability-description">
+                                Maximum validated queue size in packets
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="split-details">
+                        <div class="subpanel">
+                            <div class="subpanel-title">
+                                <span class="mini-icon">⌘</span>
+                                <h3>Topology modes</h3>
+                            </div>
+
+                            <div class="tag-list">
+                                {% for mode in environment.capabilities.topology_modes %}
+                                <span class="chip chip-blue">{{ mode|capitalize }}</span>
+                                {% endfor %}
+                            </div>
+
+                            <p class="help">
+                                {% if 'shared' in environment.capabilities.topology_modes %}
+                                Shared bottleneck topologies are supported.
+                                {% endif %}
+                                {% if 'disjoint' in environment.capabilities.topology_modes %}
+                                Independent bottleneck topologies are supported.
+                                {% endif %}
+                            </p>
+                        </div>
+
+                        <div class="subpanel">
+                            <div class="subpanel-title">
+                                <span class="mini-icon">⇢</span>
+                                <h3>Traffic types</h3>
+                            </div>
+
+                            <div class="tag-list">
+                                {% for type in environment.capabilities.traffic_types %}
+                                <span class="chip">{{ type|capitalize }}</span>
+                                {% endfor %}
+                            </div>
+
+                            <p class="help">Supported traffic generation modes.</p>
+                        </div>
+                    </div>
+
+                    <div class="subpanel subpanel-spaced">
+                        <div class="subpanel-title">
+                            <span class="mini-icon">⌁</span>
+                            <h3>Packet loss models</h3>
+                        </div>
+
+                        <div class="tag-list">
+                            {% for model in environment.capabilities.loss_models %}
+                            <span class="chip {% if model == 'none' %}chip-green{% endif %}">
+                                {{ model|replace('-', ' ')|title }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    {% if environment.capabilities.loss_applies_to %}
+                    <div class="subpanel subpanel-spaced">
+                        <div class="subpanel-title">
+                            <span class="mini-icon">⇣</span>
+                            <h3>Loss application</h3>
+                        </div>
+
+                        <div class="tag-list">
+                            {% for target in environment.capabilities.loss_applies_to %}
+                            <span class="chip">{{ target|capitalize }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </section>
+
+                <!-- Events and generators -->
+                <section class="panel" id="events">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="section-kicker">03 / Dynamics</span>
+                            <h2>Events & generators</h2>
+                        </div>
+                    </div>
+
+                    <div class="split-details">
+                        <div class="subpanel">
+                            <div class="subpanel-title">
+                                <span class="mini-icon">◷</span>
+                                <h3>Timed event actions</h3>
+                            </div>
+
+                            {% if environment.capabilities.event_actions %}
+                            <div class="tag-list">
+                                {% for action in environment.capabilities.event_actions %}
+                                <span class="chip">
+                                    {{ action|replace('set-', '')|replace('-', ' ')|title }}
+                                </span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="empty-state compact">
+                                <strong>No event actions supported</strong>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="subpanel">
+                            <div class="subpanel-title">
+                                <span class="mini-icon">⌁</span>
+                                <h3>Random generators</h3>
+                            </div>
+
+                            {% if environment.capabilities.generator_types %}
+                            <div class="tag-list">
+                                {% for generator in environment.capabilities.generator_types %}
+                                <span class="chip">
+                                    {{ generator|replace('-', ' ')|title }}
+                                </span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="empty-state compact">
+                                <strong>No generators supported</strong>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Receiver -->
+                <section class="panel" id="receiver">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="section-kicker">04 / Receiver</span>
+                            <h2>Receiver capabilities</h2>
+                        </div>
+                    </div>
+
+                    <div class="subpanel">
+                        <div class="subpanel-title">
+                            <span class="mini-icon">↓</span>
+                            <h3>Read scheduling</h3>
+                        </div>
+
+                        <div class="kv">
+                            <span>Read schedule support</span>
+                            <strong>
+                                {{ 'Enabled' if environment.capabilities.read_schedule|default(true) else 'Disabled' }}
+                            </strong>
+                        </div>
+
+                        <p class="help">
+                            Determines whether the environment supports
+                            receiver.read_schedule scenario configuration.
+                        </p>
+                    </div>
+
+                    {% if environment.capabilities.supported_queue_pkts_max %}
+                    <div class="traffic-summary">
+                        <div>
+                            <span class="traffic-icon">▤</span>
+                            <div>
+                                <strong>Validated queue range</strong>
+                                <p>
+                                    Queues above {{ environment.capabilities.supported_queue_pkts_max }}
+                                    packets are allowed but classified as exploratory.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </section>
+
+                <!-- Scope notes -->
+                {% if environment.scope_notes %}
+                <section class="panel">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="section-kicker">05 / Limitations</span>
+                            <h2>Scope notes</h2>
+                        </div>
+                        <span class="quiet">{{ environment.scope_notes|length }} notes</span>
+                    </div>
+
+                    <div class="notes-list">
+                        {% for note in environment.scope_notes %}
+                        <div class="note-item">
+                            <span class="note-mark">!</span>
+                            <p>{{ note }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </section>
+                {% endif %}
+
+            </div>
+
+            <!-- Sidebar -->
+            <aside class="side-column">
+
+                <section class="panel side-panel">
+                    <span class="section-kicker">Environment</span>
+                    <h2>Execution profile</h2>
+
+                    <div class="run-number">
+                        <strong>{{ environment.capabilities.max_paths }}</strong>
+                        <span>maximum supported network paths</span>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="kv">
+                        <span>Type</span>
+                        <strong>{{ environment.type|upper }}</strong>
+                    </div>
+
+                    <div class="kv">
+                        <span>Host</span>
+                        <strong>{{ environment.host or 'Not specified' }}</strong>
+                    </div>
+
+                    <div class="kv">
+                        <span>Topology modes</span>
+                        <strong>{{ environment.capabilities.topology_modes|length }}</strong>
+                    </div>
+
+                    <div class="kv">
+                        <span>Loss models</span>
+                        <strong>{{ environment.capabilities.loss_models|length }}</strong>
+                    </div>
+
+                    <p class="help">
+                        Capabilities are used to validate scenario configurations before execution.
+                    </p>
+                </section>
+
+                <section class="panel side-panel">
+                    <span class="section-kicker">Validation</span>
+                    <h2>Feature support</h2>
+
+                    {% set capabilities = environment.capabilities %}
+
+                    <div class="label-row">
+                        <span>Cross traffic</span>
+                        <strong>{{ 'Yes' if capabilities.cross_traffic|default(false) else 'No' }}</strong>
+                    </div>
+
+                    <div class="label-row">
+                        <span>Read schedule</span>
+                        <strong>{{ 'Yes' if capabilities.read_schedule|default(true) else 'No' }}</strong>
+                    </div>
+
+                    <div class="label-row">
+                        <span>Timed events</span>
+                        <strong>{{ 'Yes' if capabilities.event_actions else 'No' }}</strong>
+                    </div>
+
+                    <div class="label-row">
+                        <span>Generators</span>
+                        <strong>{{ 'Yes' if capabilities.generator_types else 'No' }}</strong>
+                    </div>
+
+                    <div class="label-row">
+                        <span>Queue validation</span>
+                        <strong>{{ 'Limited' if capabilities.supported_queue_pkts_max else 'Unspecified' }}</strong>
+                    </div>
+                </section>
+
+                {% if environment.fingerprint %}
+                <section class="panel side-panel advanced" id="fingerprint">
+                    <div class="advanced-heading">
+                        <div>
+                            <span class="section-kicker">Advanced</span>
+                            <h2>Fingerprint</h2>
+                        </div>
+                        <span class="chip">Hashes</span>
+                    </div>
+
+                    <p class="help">
+                        Kernel, binary and harness identifiers.
+                        Runs are comparable only when their fingerprints match.
+                    </p>
+
+                    {% for key, value in environment.fingerprint.items() %}
+                    <div class="fingerprint-item">
+                        <div class="fingerprint-heading">
+                            <strong>{{ key }}</strong>
+                            <button class="copy" type="button" data-copy="{{ value }}">Copy</button>
+                        </div>
+                        <code>{{ value }}</code>
+                    </div>
+                    {% endfor %}
+                </section>
+                {% endif %}
+
+            </aside>
+        </section>
+
+        <footer class="footer">
+            <span>Environment viewer</span>
+            <span>Schema <span class="mono">{{ environment.schema }}</span></span>
+        </footer>
+    </main>
+
+    <script>
+        document.querySelectorAll('[data-copy]').forEach((button) => {
+            button.addEventListener('click', async () => {
+                await navigator.clipboard.writeText(button.dataset.copy);
+
+                const original = button.textContent;
+                button.textContent = 'Copied';
+
+                window.setTimeout(() => {
+                    button.textContent = original;
+                }, 1200);
+            });
+        });
+    </script>
+</body>
+
+</html>
