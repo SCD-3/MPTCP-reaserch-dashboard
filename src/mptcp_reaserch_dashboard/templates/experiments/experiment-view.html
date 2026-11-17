@@ -16,8 +16,8 @@
             <div class="top-actions">
                 <span class="version">Version {{ experiment.version }}</span>
                 {% if experiment.status == 'draft' %}
-                <a class="button button-secondary"
-                    href="{{ url_for('experiment_edit', id=experiment.id) }}">Edit experiment</a>
+                <a class="button button-secondary" href="{{ url_for('experiment_edit', id=experiment.id) }}">Edit
+                    experiment</a>
                 {% endif %}
             </div>
         </header>
@@ -67,7 +67,8 @@
                 <span class="chip">{{ key }} · {{ value }}</span>
                 {% endfor %}
 
-                {% if experiment.status == 'frozen' or experiment.status in ['running', 'completed', 'stopped', 'failed'] %}
+                {% if experiment.status == 'frozen' or experiment.status in ['running', 'completed', 'stopped',
+                'failed'] %}
                 <span class="chip chip-green">Configuration frozen</span>
                 {% else %}
                 <span class="chip chip-blue">Configuration editable</span>
@@ -222,7 +223,7 @@
                                 <div>
                                     <h3>
                                         <a href="{{ url_for('environment_view', id=environment_id) }}">
-                                            {{ environment_names.get(environment_id, environment_id) }}
+                                            {{ environment_id }}
                                             <span class="external-mark">↗</span>
                                         </a>
                                     </h3>
@@ -357,7 +358,8 @@
                         <span class="empty-icon">↳</span>
                         <div>
                             <strong>Using scenario defaults</strong>
-                            <p>Repetitions and seed strategies are inherited independently from each selected scenario.</p>
+                            <p>Repetitions and seed strategies are inherited independently from each selected scenario.
+                            </p>
                         </div>
                     </div>
                     {% endif %}
@@ -426,12 +428,26 @@
                     <h2>Experiment status</h2>
 
                     <div class="lifecycle">
-                        {% for state in ['draft', 'planned', 'frozen', 'running', 'completed'] %}
-                        <div class="lifecycle-item {% if state == experiment.status %}current{% elif experiment.status in ['stopped', 'failed'] and state in ['completed'] %}future{% elif state in ['draft', 'planned', 'frozen', 'running', 'completed'] and loop.index0 < ['draft', 'planned', 'frozen', 'running', 'completed'].index(experiment.status) if experiment.status in ['draft', 'planned', 'frozen', 'running', 'completed'] else false %}past{% endif %}">
+                        {% for state in states %}
+                        <div class="lifecycle-item
+    {% if state == experiment.status %}
+current
+    {% elif current_index >= 0 and loop.index0 < current_index %}
+past
+    {% elif experiment.status in ['stopped', 'failed'] and state == 'completed' %}
+future
+    {% endif %}">
                             <span class="lifecycle-dot"></span>
                             <span>{{ state|capitalize }}</span>
                         </div>
                         {% endfor %}
+
+                        {% if experiment.status in ['stopped', 'failed'] %}
+                        <div class="lifecycle-item current">
+                            <span class="lifecycle-dot"></span>
+                            <span>{{ experiment.status|capitalize }}</span>
+                        </div>
+                        {% endif %}
 
                         {% if experiment.status in ['stopped', 'failed'] %}
                         <div class="lifecycle-item current">
@@ -474,8 +490,7 @@
                     <div class="fingerprint-box">
                         <div class="fingerprint-heading">
                             <strong>Run definition hash</strong>
-                            <button class="copy" type="button"
-                                data-copy="{{ experiment.fingerprint }}">Copy</button>
+                            <button class="copy" type="button" data-copy="{{ experiment.fingerprint }}">Copy</button>
                         </div>
                         <code>{{ experiment.fingerprint }}</code>
                     </div>
