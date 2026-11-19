@@ -89,7 +89,12 @@ def api_experiment_new():
 
 @app.get('/api/experiment/<id>')
 def api_experiment_get(id: str):
-    experiment = mptcp_resource.experiment_get(id)
+    try:
+        version = int(flask.request.args.get('version', 0)) # type: ignore
+    except TypeError:
+        version = 0
+        
+    experiment = mptcp_resource.experiment_get(id, version)
     
     if experiment is None:
         return 'not found', 404
@@ -114,9 +119,10 @@ def api_run_new():
         return 'bad data', 400
     return 'ok', 200
 
-@app.get('/api/run/<id>')
+@app.get('/api/run/<path:id>')
 def api_run_get(id: str):
     run = mptcp_resource.run_get(id)
+    print('hello')
     
     if run is None:
         return 'not found', 404
@@ -143,7 +149,12 @@ def api_scenario_new():
 
 @app.get('/api/scenario/<id>')
 def api_scenario_get(id: str):
-    scenario = mptcp_resource.scenario_get(id)
+    try:
+        version = int(flask.request.args.get('version', 0)) # type: ignore
+    except TypeError:
+        version = 0
+        
+    scenario = mptcp_resource.scenario_get(id, version)
     
     if scenario is None:
         return 'not found', 404
@@ -239,7 +250,7 @@ def experiment_edit(id: str):
 
 
 
-@app.get('/run/<id>')
+@app.get('/run/<path:id>')
 def run_view(id: str):
     response = api_run_get(id)
     
@@ -254,7 +265,7 @@ def runs_list():
     
     return flask.render_template('runs/run-list.html', runs=response[0].json)
 
-@app.get('/run/<id>/edit')
+@app.get('/run/<path:id>/edit')
 def run_edit(id: str):
     response = api_run_get(id)
     

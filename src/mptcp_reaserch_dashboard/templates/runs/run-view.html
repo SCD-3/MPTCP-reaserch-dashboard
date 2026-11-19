@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Run · {{ run.run_id }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/runs/run-view.css') }}">
+</head>
+
+<body>
+    <main class="page">
+        <header class="topbar">
+            <a class="back-link" href="{{ url_for('runs_list') }}">← <span>Runs</span></a>
+            <div class="top-actions">
+                <span class="status status-{{ run.status }}">{{ run.status|capitalize }}</span>
+                <a class="button button-secondary"
+                    href="{{ url_for('experiment_view', id=run.experiment_id) }}">
+                    View experiment
+                </a>
+            </div>
+        </header>
+
+        <section class="hero">
+            <div class="eyebrow">
+                <span class="status-dot status-dot-{{ run.status }}"></span>
+                Run record
+            </div>
+
+            <div class="hero-main">
+                <div>
+                    <h1>Repetition {{ "%02d"|format(run.repetition) }}</h1>
+                    <p class="subtitle">
+                        {{ run.algorithm.id }}
+                        {% if run.algorithm.profile %} · {{ run.algorithm.profile }}{% endif %}
+                        on {{ run.environment_id }}
+                    </p>
+
+                    <div class="identity">
+                        <span class="mono run-id">{{ run.run_id }}</span>
+                        <button class="copy" type="button" data-copy="{{ run.run_id|e }}">
+                            Copy ID
+                        </button>
+                    </div>
+                </div>
+
+                <div class="hero-stats">
+                    <div>
+                        <strong>{{ run.repetition }}</strong>
+                        <span>Repetition</span>
+                    </div>
+                    <div>
+                        <strong class="mono">{{ run.seed }}</strong>
+                        <span>Seed</span>
+                    </div>
+                    <div>
+                        <strong>{{ run.attempts|length if run.attempts is defined else 0 }}</strong>
+                        <span>Attempts</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chips">
+                <span class="chip chip-blue">{{ run.scope.class|capitalize }}</span>
+                <span class="chip">{{ run.status|capitalize }}</span>
+                {% if run.algorithm.profile %}
+                <span class="chip">Profile · {{ run.algorithm.profile }}</span>
+                {% endif %}
+                {% if run.scenario.variant_id %}
+                <span class="chip">Variant · {{ run.scenario.variant_id }}</span>
+                {% endif %}
+            </div>
+        </section>
+
+        <nav class="section-nav" aria-label="Page sections">
+            <a href="#overview" class="active">Overview</a>
+            <a href="#configuration">Configuration</a>
+            <a href="#execution">Execution</a>
+            <a href="#results">Results</a>
+        </nav>
+
+        <section class="content-grid" id="overview">
+            <div class="main-column">
+
+                <!-- Overview -->
+                <section class="panel">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="section-kicker">01 / Overview</span>
+                            <h2>Run information</h2>
+                        </div>
+                        <span class="quiet">Execution identity</span>
+                    </div>
+
+                    <div class="detail-grid">
+                        <div class="detail">
+                            <span>Experiment</span>
+                            <strong>
+                                <a href="{{ url_for('experiment_view', id=run.experiment_id) }}">
+                                    {{ run.experiment_id }}
+                                </a>
+                            </strong>
+                        </div>
+
+                        <div class="detail">
+                            <span>Scenario</span>
+                            <strong>
+                                <a href="{{ url_for('scenario_view', id=run.scenario.id, version=run.scenario.version) }}">
+                                    {{ run.scenario.id }}
+                                </a>
+                            </strong>
+                            <small>Version {{ run.scenario.version }}</small>
+                        </div>
+
+                        <div class="detail">
+                            <span>Environment</span>
+                            <strong>
+                                <a href="{{ url_for('environment_view', id=run.environment_id) }}">
+                                    {{ run.environment_id }}
+                                </a>
+                            </strong>
+                        </div>
+
+                        <div class="detail">
+                            <span>Algorithm</span>
+                            <strong>
+                                <a href="{{ url_for('algorithm_view', id=run.algorithm.id) }}">
+                                    {{ run.algorithm.id }}
+                                </a>
+                            </strong>
+                            {% if run.algorithm.profile %}
+                            <small>Profile: {{ run.algorithm.profile }}</small>
+                            {% endif %}
+                        </div>
+
+                        <div class="detail">
+                            <span>Repetition</span>
+                            <strong>{{ run.repetition }}</strong>
+                        </div>
+
+                        <div class="detail">
+                            <span>Random seed</span>
+                            <strong class="mono">{{ run.seed }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="related-links">
+                        <a href="{{ url_for('experiment_view', id=run.experiment_id) }}">
+                            <span>Experiment</span>
+                            <strong>{{ run.experiment_id }} ↗</strong>
+                        </a>
+                        <a href="{{ url_for('scenario_view', id=run.scenario.id, version=run.scenario.version) }}">
+                            <span>Scenario</span>
+                            <strong>{{ run.scenario.id }} ↗</strong>
+                        </a>
+                        <a href="{{ url_for('environment_view', id=run.environment_id) }}">
+                            <span>Environment</span>
+                            <strong>{{ run.environment_id }} ↗</strong>
+                        </a>
+                        <a href="{{ url_for('algorithm_view', id=run.algorithm.id) }}">
+                            <span>Algorithm</span>
+                            <strong>{{ run.algorithm.id }} ↗</strong>
+                        </a>
+                    </div>
+                </section>
+
+                <!-- Compatibility -->
+                <section class="panel" id="compatibility">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="section-kicker">02 / Compatibility</span>
+                            <h2>Execution scope</h2>
+                        </div>
+                        <span class="chip {% if run.scope.class == 'supported' %}chip-green{% else %}chip-amber{% endif %}">
+                            {{ run.scope.class|capitalize }}
+                        </span>
+                    </div>
+
+                    {% if run.scope.reasons %}
+                    <div class="reason-list">
+                        {% for reason in run.scope.reasons %}
+                        <div class="reason-item">
+                            <span class="reason-mark">!</span>
+                            <p>{{ reason }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <span class="empty-icon">✓</span>
+                        <div>
+                            <strong>No compatibility warnings</strong>
+                            <p>No additional scope limitations were recorded for this run.</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </section>
+
+                <!-- Snapshot -->
+                <section class="panel" id="configuration">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="section-kicker">03 / Configuration</span>
+                            <h2>Frozen snapshot</h2>
+                        </div>
+                        <span class="quiet">Configuration at freeze time</span>
+                    </div>
+
+                    <p class="description">
+                        This run uses a resolved snapshot of its configuration.
+                        Changes to catalogue entries do not modify this record.
+                    </p>
+
+                    <div class="snapshot-links">
+                        <a href="{{ url_for('scenario_view', id=run.scenario.id, version=run.scenario.version) }}">
+                            <span class="snapshot-icon">S</span>
+                            <span>
+                                <strong>Scenario</strong>
+                                <small>{{ run.scenario.id }} · v{{ run.scenario.version }}</small>
+                            </span>
+                            <span class="snapshot-arrow">↗</span>
+                        </a>
+
+                        <a href="{{ url_for('algorithm_view', id=run.algorithm.id) }}">
+                            <span class="snapshot-icon">A</span>
+                            <span>
+                                <strong>Algorithm</strong>
+                                <small>
+                                    {{ run.algorithm.id }}
+                                    {% if run.algorithm.version %} · {{ run.algorithm.version }}{% endif %}
+                                </small>
+                            </span>
+                            <span class="snapshot-arrow">↗</span>
+                        </a>
+
+                        <a href="{{ url_for('environment_view', id=run.environment_id) }}">
+                            <span class="snapshot-icon">E</span>
+                            <span>
+                                <strong>Environment</strong>
+                                <small>{{ run.environment_id }}</small>
+                            </span>
+                            <span class="snapshot-arrow">↗</span>
+                        </a>
+                    </div>
+
+                    {% if run.scenario.sweep_values %}
+                    <h3 class="subheading">Sweep values</h3>
+                    <div class="table-wrap">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Resolved value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for key, value in run.scenario.sweep_values.items() %}
+                                <tr>
+                                    <td class="mono">{{ key }}</td>
+                                    <td>{{ value|tojson }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
+
+                    {% if run.algorithm.implementation_hash %}
+                    <div class="hash-row">
+                        <span>Implementation hash</span>
+                        <code>{{ run.algorithm.implementation_hash }}</code>
+                    </div>
+                    {% endif %}
+                </section>
+
+                <!-- Expanded events -->
+                {% if run.snapshot.expanded_events %}
+                <section class="panel">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="section-kicker">04 / Network dynamics</span>
+                            <h2>Expanded events</h2>
+                        </div>
+                        <span class="quiet">
+                            {{ run.snapshot.expanded_events|length }} events
+                        </span>
+                    </div>
+
+                    <p class="description">
+                        Events after expanding the scenario generators using this run's seed.
+                        These are the events that were actually applied.
+                    </p>
+
+                    <pre class="json-preview">{{ run.snapshot.expanded_events|tojson(indent=2) }}</pre>
+                </section>
+                {% endif %}
+
+                <!-- Execution attempts -->
+                <section class="panel" id="execution">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="section-kicker">05 / Execution</span>
+                            <h2>Execution attempts</h2>
+                        </div>
+                        <span class="quiet">
+                            {{ run.attempts|length if run.attempts is defined else 0 }} recorded
+                        </span>
+                    </div>
+
+                    {% if run.attempts %}
+                    <div class="attempt-list">
+                        {% for attempt in run.attempts %}
+                        <article class="attempt-card">
+                            <div class="attempt-heading">
+                                <div>
+                                    <span class="section-kicker">Attempt {{ loop.index }}</span>
+                                    <strong>{{ attempt.outcome|default('In progress')|capitalize }}</strong>
+                                </div>
+                                {% if attempt.outcome %}
+                                <span class="status status-{{ attempt.outcome }}">
+                                    {{ attempt.outcome|capitalize }}
+                                </span>
+                                {% else %}
+                                <span class="status status-running">In progress</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="attempt-details">
+                                <div>
+                                    <span>Started</span>
+                                    <strong>{{ attempt.started_utc }}</strong>
+                                </div>
+
+                                <div>
+                                    <span>Finished</span>
+                                    <strong>{{ attempt.finished_utc|default('—', true) }}</strong>
+                                </div>
+
+                                <div>
+                                    <span>Exit code</span>
+                                    <strong>{{ attempt.exit_code|default('—', true) }}</strong>
+                                </div>
+
+                                <div>
+                                    <span>Wall time</span>
+                                    <strong>
+                                        {% if attempt.wall_s is defined %}
+                                        {{ attempt.wall_s|round(3) }} s
+                                        {% else %}
+                                        —
+                                        {% endif %}
+                                    </strong>
+                                </div>
+                            </div>
+                        </article>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <span class="empty-icon">⌁</span>
+                        <div>
+                            <strong>No execution attempts</strong>
+                            <p>This run has not recorded an execution attempt yet.</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </section>
+
+                <!-- Results -->
+                <section class="panel" id="results">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="section-kicker">06 / Results</span>
+                            <h2>Metrics output</h2>
+                        </div>
+                        {% if run.results and run.results.format %}
+                        <span class="chip chip-green">{{ run.results.format }}</span>
+                        {% endif %}
+                    </div>
+
+                    {% if run.results %}
+                    <div class="result-card">
+                        <div class="result-icon">↗</div>
+                        <div class="result-info">
+                            <strong>Metrics document</strong>
+                            <span class="mono">{{ run.results.path }}</span>
+                        </div>
+                        <span class="chip chip-green">Available</span>
+                    </div>
+
+                    {% if run.results.outputs_sha256 %}
+                    <h3 class="subheading">Output checksums</h3>
+                    <div class="hash-list">
+                        {% for name, digest in run.results.outputs_sha256.items() %}
+                        <div class="hash-row">
+                            <span>{{ name }}</span>
+                            <code>{{ digest }}</code>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <div class="empty-state">
+                        <span class="empty-icon">∅</span>
+                        <div>
+                            <strong>No results available</strong>
+                            <p>This run does not have a metrics document attached.</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </section>
+
+                {% if run.status_reason %}
+                <section class="panel">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="section-kicker">Status details</span>
+                            <h2>Reason</h2>
+                        </div>
+                    </div>
+                    <p class="description">{{ run.status_reason }}</p>
+                </section>
+                {% endif %}
+
+            </div>
+
+            <!-- Sidebar -->
+            <aside class="side-column">
+                <section class="panel side-panel">
+                    <span class="section-kicker">Run status</span>
+                    <h2>Execution state</h2>
+
+                    <div class="status-large status-{{ run.status }}">
+                        {{ run.status|capitalize }}
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="kv">
+                        <span>Repetition</span>
+                        <strong>{{ run.repetition }}</strong>
+                    </div>
+                    <div class="kv">
+                        <span>Seed</span>
+                        <strong class="mono">{{ run.seed }}</strong>
+                    </div>
+                    <div class="kv">
+                        <span>Attempts</span>
+                        <strong>{{ run.attempts|length if run.attempts is defined else 0 }}</strong>
+                    </div>
+                    <div class="kv">
+                        <span>Scope</span>
+                        <strong>{{ run.scope.class|capitalize }}</strong>
+                    </div>
+                </section>
+
+                <section class="panel side-panel">
+                    <span class="section-kicker">Paired comparison</span>
+                    <h2>Condition hash</h2>
+
+                    {% if run.condition_hash %}
+                    <p class="help">
+                        Runs with the same condition hash share the same scenario conditions,
+                        environment and repetition. They can be used for paired comparisons.
+                    </p>
+                    <div class="hash-box">
+                        <code>{{ run.condition_hash }}</code>
+                        <button class="copy" type="button" data-copy="{{ run.condition_hash|e }}">
+                            Copy hash
+                        </button>
+                    </div>
+                    {% else %}
+                    <p class="help">No condition hash was recorded for this run.</p>
+                    {% endif %}
+                </section>
+
+                <section class="panel side-panel">
+                    <span class="section-kicker">Identifiers</span>
+                    <h2>Related records</h2>
+
+                    <div class="kv">
+                        <span>Experiment</span>
+                        <a href="{{ url_for('experiment_view', id=run.experiment_id) }}">Open ↗</a>
+                    </div>
+                    <div class="kv">
+                        <span>Scenario</span>
+                        <a href="{{ url_for('scenario_view', id=run.scenario.id, version=run.scenario.version) }}">Open ↗</a>
+                    </div>
+                    <div class="kv">
+                        <span>Environment</span>
+                        <a href="{{ url_for('environment_view', id=run.environment_id) }}">Open ↗</a>
+                    </div>
+                    <div class="kv">
+                        <span>Algorithm</span>
+                        <a href="{{ url_for('algorithm_view', id=run.algorithm.id) }}">Open ↗</a>
+                    </div>
+                </section>
+            </aside>
+        </section>
+
+        <footer class="footer">
+            <span>Run viewer</span>
+            <span>Schema <span class="mono">{{ run.schema }}</span></span>
+        </footer>
+    </main>
+
+    <script>
+        document.querySelectorAll('[data-copy]').forEach((button) => {
+            button.addEventListener('click', async () => {
+                await navigator.clipboard.writeText(button.dataset.copy);
+
+                const original = button.textContent;
+                button.textContent = 'Copied';
+
+                window.setTimeout(() => {
+                    button.textContent = original;
+                }, 1200);
+            });
+        });
+    </script>
+</body>
+
+</html>

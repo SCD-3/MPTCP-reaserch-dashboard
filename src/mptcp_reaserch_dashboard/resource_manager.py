@@ -54,6 +54,10 @@ common_registry = referencing.Registry().with_resource( # type: ignore
     common_schema["$id"],
     referencing.Resource.from_contents(common_schema)
 )
+scenario_registry = referencing.Registry().with_resource( # type: ignore
+    algorithm_schema["$id"],
+    referencing.Resource.from_contents(scenario_schema)
+)
 
 algorithm_validator = jsonschema.Draft202012Validator(
     algorithm_schema,
@@ -69,7 +73,7 @@ experiment_validator = jsonschema.Draft202012Validator(
 )
 run_validator = jsonschema.Draft202012Validator(
     run_schema,
-    registry=common_registry # type: ignore
+    registry=common_registry.combine(scenario_registry) # type: ignore
 )
 scenario_validator = jsonschema.Draft202012Validator(
     scenario_schema,
@@ -194,20 +198,14 @@ def experiment_insert(data: mptcp_types.Experiment):
     
     experiments.insert_one(data)
 
-def experiment_get(id: str, version: typing.Optional[int] = None):
-    if version is None:
-        all_experiments = list(experiments.find({ 'id': id }))
-        
-        for experiment in all_experiments:
-            if experiment['version'] == len(all_experiments):
-                res = experiment
-                del res['_id'] #type: ignore
-                return res
-    else:
-        res = experiments.find_one({ 'id': id, 'version': version })
-        if res is not None:
+def experiment_get(id: str, version: int = 0):
+    all_experiments = list(experiments.find({ 'id': id }))
+    
+    for experiment in all_experiments:
+        if experiment['version'] == (version or len(all_experiments)):
+            res = experiment
             del res['_id'] #type: ignore
-        return res
+            return res
 
 def experiment_get_all(filter: typing.Optional[dict[str, typing.Any]] = None):
     out: list[mptcp_types.Experiment] = []
@@ -226,7 +224,7 @@ def run_insert(data: mptcp_types.Run):
     runs.insert_one(data)
 
 def run_get(id: str):
-    res = runs.find_one({ 'id': id })
+    res = runs.find_one({ 'run_id': id })
     if res is not None:
         del res['_id'] #type: ignore
     return res
@@ -252,19 +250,14 @@ def scenario_insert(data: mptcp_types.Scenario):
     
     scenarios.insert_one(data)
 
-def scenario_get(id: str, version: typing.Optional[int] = None):
-    if version is None:
+def scenario_get(id: str, version: int = 0):
         all_scenarios = list(scenarios.find({ 'id': id }))
         
         for scenario in all_scenarios:
-            if scenario['version'] == len(all_scenarios):
+            if scenario['version'] == (version or len(all_scenarios)):
                 res = scenario
                 del res['_id'] #type: ignore
                 return res
-    else:
-        res = scenarios.find_one({ 'id': id, 'version': version })
-        del res['_id'] #type: ignore
-        return res
 
 def scenario_get_all(filter: typing.Optional[dict[str, typing.Any]] = None):
     out: list[mptcp_types.Scenario] = []

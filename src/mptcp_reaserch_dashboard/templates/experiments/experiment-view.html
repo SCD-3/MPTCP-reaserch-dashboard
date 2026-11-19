@@ -157,7 +157,7 @@
                                     <span class="resource-mark mark-scenario">{{ loop.index }}</span>
                                     <div>
                                         <h3>
-                                            <a href="{{ url_for('scenario_view', id=scenario.id) }}">
+                                            <a href="{{ url_for('scenario_view', id=scenario.id, version=scenario.version) }}">
                                                 {{ scenario.name|default(scenario.id) }}
                                                 <span class="external-mark">↗</span>
                                             </a>
