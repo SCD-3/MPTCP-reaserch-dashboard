@@ -90,8 +90,11 @@ def api_experiment_new():
 @app.get('/api/experiment/<id>')
 def api_experiment_get(id: str):
     try:
-        version = int(flask.request.args.get('version', 0)) # type: ignore
-    except TypeError:
+        version = int(flask.request.args.get('version', 0))
+        if version < 0:
+            raise ValueError
+        
+    except TypeError, ValueError:
         version = 0
         
     experiment = mptcp_resource.experiment_get(id, version)
@@ -151,7 +154,10 @@ def api_scenario_new():
 def api_scenario_get(id: str):
     try:
         version = int(flask.request.args.get('version', 0)) # type: ignore
-    except TypeError:
+        if version < 0:
+            raise ValueError
+        
+    except TypeError, ValueError:
         version = 0
         
     scenario = mptcp_resource.scenario_get(id, version)
