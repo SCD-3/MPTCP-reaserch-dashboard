@@ -1,0 +1,257 @@
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+        radial-gradient(ellipse at 50% -18%, rgba(64, 105, 177, .19), transparent 48%),
+        var(--bg, #0c111b);
+    color: var(--text, #e8edf6);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+}
+
+a {
+    text-decoration: none;
+}
+
+.page {
+    width: min(1100px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 48px 0 80px;
+}
+
+.topbar {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 28px;
+}
+
+.eyebrow {
+    color: var(--muted, #8491a5);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+h1 {
+    margin: 8px 0 5px;
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -.04em;
+}
+
+.subtitle {
+    margin: 0;
+    color: var(--muted, #8491a5);
+}
+
+.scenario-count {
+    flex-shrink: 0;
+    padding: 7px 12px;
+    border: 1px solid var(--border, #263246);
+    border-radius: 8px;
+    color: var(--muted, #a2aec0);
+    font-size: 12px;
+}
+
+.scenario-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.scenario-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(220px, 1.4fr) minmax(280px, 1fr);
+    gap: 20px 32px;
+    padding: 22px 48px 22px 22px;
+    border: 1px solid var(--border, #263246);
+    border-radius: 12px;
+    background: var(--panel, #131c2a);
+    color: inherit;
+    transition:
+        border-color .15s ease,
+        background .15s ease,
+        transform .15s ease;
+}
+
+.scenario-card:hover {
+    border-color: var(--accent, #547fc4);
+    background: var(--panel-hover, #172337);
+    transform: translateY(-1px);
+}
+
+.scenario-heading {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.scenario-heading h2 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 650;
+    letter-spacing: -.02em;
+}
+
+.version {
+    padding: 3px 7px;
+    border-radius: 5px;
+    background: rgba(95, 132, 190, .14);
+    color: #91b5ed;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.scenario-id {
+    margin: 6px 0 0;
+    color: var(--muted, #8491a5);
+    font-family: monospace;
+    font-size: 11px;
+    overflow-wrap: anywhere;
+}
+
+.description {
+    margin: 12px 0 0;
+    color: var(--muted, #a2aec0);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.scenario-meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 20px;
+    align-content: center;
+}
+
+.meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+
+.meta-label,
+.paths-label {
+    color: var(--muted, #8491a5);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.meta-item strong {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.paths {
+    grid-column: 1 / -1;
+    padding-top: 14px;
+    border-top: 1px solid var(--border, #263246);
+}
+
+.paths-label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.path-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.path-item {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px 12px;
+    padding: 8px 11px;
+    border: 1px solid var(--border, #263246);
+    border-radius: 7px;
+    background: rgba(255, 255, 255, .025);
+    color: var(--muted, #a2aec0);
+    font-size: 11px;
+}
+
+.path-name {
+    color: var(--text, #e8edf6);
+    font-weight: 650;
+}
+
+.loss {
+    color: #d4a96d;
+}
+
+.card-arrow {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: var(--muted, #8491a5);
+    font-size: 18px;
+    transition: transform .15s ease, color .15s ease;
+}
+
+.scenario-card:hover .card-arrow {
+    color: var(--text, #e8edf6);
+    transform: translateX(3px);
+}
+
+.empty-state {
+    padding: 56px 24px;
+    border: 1px dashed var(--border, #263246);
+    border-radius: 12px;
+    text-align: center;
+}
+
+.empty-state h2 {
+    margin: 0 0 8px;
+    font-size: 17px;
+}
+
+.empty-state p {
+    margin: 0;
+    color: var(--muted, #8491a5);
+}
+
+@media (max-width: 700px) {
+    .page {
+        width: min(100% - 28px, 540px);
+        padding-top: 30px;
+    }
+
+    .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .scenario-card {
+        grid-template-columns: 1fr;
+        gap: 18px;
+        padding: 18px 40px 18px 18px;
+    }
+
+    .scenario-meta {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .paths {
+        grid-column: 1;
+    }
+}

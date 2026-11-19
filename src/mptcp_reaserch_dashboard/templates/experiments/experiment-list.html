@@ -1,0 +1,153 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Experiments</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/experiments/experiments-list.css') }}">
+</head>
+
+<body>
+    <main class="page">
+        <header class="topbar">
+            <div>
+                <span class="eyebrow">MPTCP Research Dashboard</span>
+                <h1>Experiments</h1>
+                <p class="subtitle">Research configurations and execution plans.</p>
+            </div>
+
+            <span class="experiment-count">
+                {{ experiments|length }}
+                experiment{% if experiments|length != 1 %}s{% endif %}
+            </span>
+        </header>
+
+        {% if experiments %}
+        <section class="experiment-list">
+            {% for experiment in experiments %}
+            <a class="experiment-card"
+               href="{{ url_for('experiment_view', id=experiment.id, version=experiment.version) }}">
+
+                <div class="card-header">
+                    <div class="experiment-heading">
+                        <h2>{{ experiment.name }}</h2>
+                        <span class="version">v{{ experiment.version }}</span>
+                    </div>
+
+                    <span class="status status-{{ experiment.status }}">
+                        {{ experiment.status|capitalize }}
+                    </span>
+                </div>
+
+                <p class="experiment-id">{{ experiment.id }}</p>
+
+                {% if experiment.description %}
+                <p class="description">{{ experiment.description }}</p>
+                {% endif %}
+
+                <div class="summary">
+                    <div class="summary-item">
+                        <span class="summary-label">Scenarios</span>
+                        <strong>{{ experiment.scenarios|length }}</strong>
+                    </div>
+
+                    <div class="summary-item">
+                        <span class="summary-label">Environments</span>
+                        <strong>{{ experiment.environments|length }}</strong>
+                    </div>
+
+                    <div class="summary-item">
+                        <span class="summary-label">Algorithms</span>
+                        <strong>{{ experiment.algorithms|length }}</strong>
+                    </div>
+                </div>
+
+                <div class="details">
+                    <div class="detail-section">
+                        <span class="detail-label">Scenarios</span>
+
+                        <div class="chip-list">
+                            {% for scenario in experiment.scenarios %}
+                            <span class="chip">
+                                {{ scenario.id }} <small>v{{ scenario.version }}</small>
+                                {% if scenario.sweep %}
+                                <span class="sweep-indicator" title="Has parameter sweep">Sweep</span>
+                                {% endif %}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <span class="detail-label">Environments</span>
+
+                        <div class="chip-list">
+                            {% for environment in experiment.environments %}
+                            <span class="chip">{{ environment }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <span class="detail-label">Algorithms</span>
+
+                        <div class="chip-list">
+                            {% for algorithm in experiment.algorithms %}
+                            <span class="chip">
+                                {{ algorithm.id }}
+                                {% if algorithm.profile %}
+                                <small>· {{ algorithm.profile }}</small>
+                                {% endif %}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="execution-settings">
+                    <span>
+                        Repetitions:
+                        <strong>
+                            {% if experiment.repetitions is not none %}
+                                Custom
+                            {% else %}
+                                Scenario defaults
+                            {% endif %}
+                        </strong>
+                    </span>
+
+                    <span>
+                        Seeds:
+                        <strong>
+                            {% if experiment.seeds is not none %}
+                                Custom
+                            {% else %}
+                                Scenario defaults
+                            {% endif %}
+                        </strong>
+                    </span>
+
+                    {% if experiment.frozen_utc %}
+                    <span>
+                        Frozen:
+                        <strong>{{ experiment.frozen_utc }}</strong>
+                    </span>
+                    {% endif %}
+                </div>
+
+                <span class="card-arrow" aria-hidden="true">→</span>
+            </a>
+            {% endfor %}
+        </section>
+        {% else %}
+        <section class="empty-state">
+            <h2>No experiments found</h2>
+            <p>There are no experiments available yet.</p>
+        </section>
+        {% endif %}
+    </main>
+</body>
+
+</html>

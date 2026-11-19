@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Scenarios</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/scenarios/scenarios-list.css') }}">
+</head>
+
+<body>
+    <main class="page">
+        <header class="topbar">
+            <div>
+                <span class="eyebrow">MPTCP Research Dashboard</span>
+                <h1>Scenarios</h1>
+                <p class="subtitle">Configured network conditions and traffic profiles.</p>
+            </div>
+
+            <span class="scenario-count">
+                {{ scenarios|length }} scenario{% if scenarios|length != 1 %}s{% endif %}
+            </span>
+        </header>
+
+        {% if scenarios %}
+        <section class="scenario-list">
+            {% for scenario in scenarios %}
+            <a class="scenario-card"
+               href="{{ url_for('scenario_view', id=scenario.id, version=scenario.version) }}">
+
+                <div class="scenario-main">
+                    <div class="scenario-heading">
+                        <h2>{{ scenario.name }}</h2>
+                        <span class="version">v{{ scenario.version }}</span>
+                    </div>
+
+                    <p class="scenario-id">{{ scenario.id }}</p>
+
+                    {% if scenario.description %}
+                    <p class="description">{{ scenario.description }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="scenario-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Duration</span>
+                        <strong>{{ scenario.duration_s }} s</strong>
+                    </div>
+
+                    <div class="meta-item">
+                        <span class="meta-label">Topology</span>
+                        <strong>{{ scenario.topology.mode|capitalize }}</strong>
+                    </div>
+
+                    <div class="meta-item">
+                        <span class="meta-label">Traffic</span>
+                        <strong>{{ scenario.traffic.type|capitalize }}</strong>
+                    </div>
+
+                    <div class="meta-item">
+                        <span class="meta-label">Repetitions</span>
+                        <strong>{{ scenario.defaults.repetitions }}</strong>
+                    </div>
+                </div>
+
+                <div class="paths">
+                    <span class="paths-label">
+                        {{ scenario.paths|length }} network path{% if scenario.paths|length != 1 %}s{% endif %}
+                    </span>
+
+                    <div class="path-list">
+                        {% for path in scenario.paths %}
+                        <div class="path-item">
+                            <span class="path-name">
+                                {{ path.label or path.id }}
+                            </span>
+
+                            <span>
+                                {{ "%.1f"|format(path.bandwidth_bps / 1000000) }} Mbit/s
+                            </span>
+
+                            <span>
+                                {{ "%.1f"|format(path.delay_s * 1000) }} ms
+                            </span>
+
+                            <span class="loss">
+                                {% if not path.loss or path.loss.model == 'none' %}
+                                    No loss
+                                {% elif path.loss.model == 'bernoulli' %}
+                                    {{ "%.2g"|format(path.loss.probability * 100) }}% random loss
+                                {% elif path.loss.model == 'gilbert-elliott' %}
+                                    Burst loss
+                                {% elif path.loss.model == 'list' %}
+                                    {{ path.loss.indices|length }} dropped packets
+                                {% else %}
+                                    {{ path.loss.model }}
+                                {% endif %}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <span class="card-arrow" aria-hidden="true">→</span>
+            </a>
+            {% endfor %}
+        </section>
+        {% else %}
+        <section class="empty-state">
+            <h2>No scenarios found</h2>
+            <p>There are no scenarios available yet.</p>
+        </section>
+        {% endif %}
+    </main>
+</body>
+
+</html>
