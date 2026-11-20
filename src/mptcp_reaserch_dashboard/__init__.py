@@ -10,6 +10,19 @@ import mptcp_reaserch_dashboard.errors as err
 app = flask.Flask(__name__)
 TEMPLATES_BASE_PATH = r'templates/'
 
+
+def parse_version() -> int:
+    try:
+        version = int(flask.request.args.get('version', '0'))
+        if version < 0:
+            raise ValueError
+        
+    except TypeError, ValueError:
+        version = 0
+    
+    return version
+
+
 @app.get('/')
 def index():
     return flask.render_template('index.html')
@@ -49,6 +62,11 @@ def api_algorithm_get_all():
     
     return flask.jsonify(algorithms), 200
 
+@app.delete('/api/algorithm/<id>')
+def api_algorithm_remove(id: str):
+    mptcp_resource.algorithm_remove(id)
+    return 'ok', 200
+
 
 @app.post('/api/environment')
 def api_environment_new():
@@ -76,6 +94,11 @@ def api_environment_get_all():
     
     return flask.jsonify(environments), 200
 
+@app.delete('/api/environment/<id>')
+def api_environment_remove(id: str):
+    mptcp_resource.environment_remove(id)
+    return 'ok', 200
+
 
 @app.post('/api/experiment')
 def api_experiment_new():
@@ -89,13 +112,7 @@ def api_experiment_new():
 
 @app.get('/api/experiment/<id>')
 def api_experiment_get(id: str):
-    try:
-        version = int(flask.request.args.get('version', 0))
-        if version < 0:
-            raise ValueError
-        
-    except TypeError, ValueError:
-        version = 0
+    version = parse_version()
         
     experiment = mptcp_resource.experiment_get(id, version)
     
@@ -110,6 +127,13 @@ def api_experiment_get_all():
     experiments = mptcp_resource.experiment_get_all(filter)
     
     return flask.jsonify(experiments), 200
+
+@app.delete('/api/experiment/<id>')
+def api_experiment_remove(id: str):
+    version = parse_version()
+    
+    mptcp_resource.experiment_remove(id, version)
+    return 'ok', 200
 
 
 @app.post('/api/run')
@@ -139,6 +163,11 @@ def api_run_get_all():
     
     return flask.jsonify(runs), 200
 
+@app.delete('/api/run/<path:id>')
+def api_run_remove(id: str):
+    mptcp_resource.run_remove(id)
+    return 'ok', 200
+
 
 @app.post('/api/scenario')
 def api_scenario_new():
@@ -152,13 +181,7 @@ def api_scenario_new():
 
 @app.get('/api/scenario/<id>')
 def api_scenario_get(id: str):
-    try:
-        version = int(flask.request.args.get('version', 0)) # type: ignore
-        if version < 0:
-            raise ValueError
-        
-    except TypeError, ValueError:
-        version = 0
+    version = parse_version()
         
     scenario = mptcp_resource.scenario_get(id, version)
     
@@ -173,6 +196,13 @@ def api_scenario_get_all():
     scenarios = mptcp_resource.scenario_get_all(filter)
     
     return flask.jsonify(scenarios), 200
+
+@app.delete('/api/scenario/<id>')
+def api_scenario_remove(id: str):
+    version = parse_version()
+    
+    mptcp_resource.scenario_remove(id, version)
+    return 'ok', 200
 
 
 

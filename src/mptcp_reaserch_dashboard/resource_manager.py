@@ -165,6 +165,9 @@ def algorithm_get_all(filter: typing.Optional[dict[str, typing.Any]] = None):
     
     return out
 
+def algorithm_remove(id: str):
+    algorithms.delete_one({ 'id': id })
+
 
 def environment_insert(data: mptcp_types.Environment):
     if not is_environment_valid(data):
@@ -185,6 +188,9 @@ def environment_get_all(filter: typing.Optional[dict[str, typing.Any]] = None):
         out.append(environment)
     
     return out
+
+def environment_remove(id: str):
+    environments.delete_one({ 'id': id })
 
 
 def experiment_insert(data: mptcp_types.Experiment):
@@ -216,6 +222,9 @@ def experiment_get_all(filter: typing.Optional[dict[str, typing.Any]] = None):
     
     return out
 
+def experiment_remove(id: str, version: int):
+    experiments.delete_one({ 'id': id, 'version': version })
+
 
 def run_insert(data: mptcp_types.Run):
     if not is_run_valid(data):
@@ -237,6 +246,9 @@ def run_get_all(filter: typing.Optional[dict[str, typing.Any]] = None):
         out.append(run)
     
     return out
+
+def run_remove(id: str):
+    runs.delete_one({ 'run_id': id })
 
 
 def scenario_insert(data: mptcp_types.Scenario):
@@ -267,3 +279,6 @@ def scenario_get_all(filter: typing.Optional[dict[str, typing.Any]] = None):
         out.append(scenario)
     
     return out
+
+def scenario_remove(id: str, version: int):
+    scenarios.delete_one({ 'id': id, 'version': version })
