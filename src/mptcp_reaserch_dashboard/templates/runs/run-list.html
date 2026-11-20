@@ -1,0 +1,112 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Runs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/runs/runs-list.css') }}">
+</head>
+
+<body>
+    <main class="page">
+        <header class="topbar">
+            <div>
+                <span class="eyebrow">MPTCP Research Dashboard</span>
+                <h1>Runs</h1>
+                <p class="subtitle">Individual executions of experiment configurations.</p>
+            </div>
+
+            <span class="run-count">
+                {{ runs|length }} run{% if runs|length != 1 %}s{% endif %}
+            </span>
+        </header>
+
+        {% if runs %}
+        <section class="run-list">
+            {% for run in runs %}
+            <a class="run-card"
+               href="{{ url_for('run_view', id=run.run_id) }}">
+
+                <div class="run-main">
+                    <div class="run-heading">
+                        <h2>{{ run.scenario.id }}</h2>
+
+                        <span class="status status-{{ run.status }}">
+                            {{ run.status|capitalize }}
+                        </span>
+                    </div>
+
+                    <p class="run-id" title="{{ run.run_id }}">
+                        {{ run.run_id }}
+                    </p>
+
+                    <div class="run-tags">
+                        <span class="tag">
+                            {{ run.scenario.variant_id }}
+                        </span>
+
+                        <span class="tag">
+                            {{ run.scope.class|capitalize }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="run-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Experiment</span>
+                        <strong>{{ run.experiment_id }}</strong>
+                    </div>
+
+                    <div class="meta-item">
+                        <span class="meta-label">Environment</span>
+                        <strong>{{ run.environment_id }}</strong>
+                    </div>
+
+                    <div class="meta-item">
+                        <span class="meta-label">Algorithm</span>
+                        <strong>
+                            {{ run.algorithm.id }}
+                            {% if run.algorithm.profile %}
+                                <span class="secondary">/ {{ run.algorithm.profile }}</span>
+                            {% endif %}
+                        </strong>
+                    </div>
+
+                    <div class="meta-item">
+                        <span class="meta-label">Repetition</span>
+                        <strong>#{{ run.repetition }}</strong>
+                    </div>
+
+                    <div class="meta-item">
+                        <span class="meta-label">Seed</span>
+                        <strong class="seed">{{ run.seed }}</strong>
+                    </div>
+
+                    <div class="meta-item">
+                        <span class="meta-label">Results</span>
+                        <strong>
+                            {% if run.results %}
+                                <span class="result-available">Available</span>
+                            {% else %}
+                                <span class="secondary">Not available</span>
+                            {% endif %}
+                        </strong>
+                    </div>
+                </div>
+
+                <span class="card-arrow" aria-hidden="true">→</span>
+            </a>
+            {% endfor %}
+        </section>
+        {% else %}
+        <section class="empty-state">
+            <h2>No runs found</h2>
+            <p>There are no runs available yet.</p>
+        </section>
+        {% endif %}
+    </main>
+</body>
+
+</html>

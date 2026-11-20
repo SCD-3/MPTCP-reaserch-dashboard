@@ -1,0 +1,119 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Environments</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/environments/environments-list.css') }}">
+</head>
+
+<body>
+    <main class="page">
+        <header class="topbar">
+            <div>
+                <span class="eyebrow">MPTCP Research Dashboard</span>
+                <h1>Environments</h1>
+                <p class="subtitle">Execution environments and their supported capabilities.</p>
+            </div>
+
+            <span class="environment-count">
+                {{ environments|length }} environment{% if environments|length != 1 %}s{% endif %}
+            </span>
+        </header>
+
+        {% if environments %}
+        <section class="environment-list">
+            {% for environment in environments %}
+            <a class="environment-card"
+               href="{{ url_for('environment_view', id=environment.id) }}">
+
+                <div class="environment-main">
+                    <div class="environment-heading">
+                        <h2>{{ environment.name }}</h2>
+
+                        <span class="type">
+                            {{ environment.type }}
+                        </span>
+                    </div>
+
+                    <p class="environment-id">{{ environment.id }}</p>
+
+                    {% if environment.description %}
+                    <p class="description">{{ environment.description }}</p>
+                    {% endif %}
+
+                    <div class="environment-details">
+                        {% if environment.host %}
+                        <span>
+                            <span class="detail-label">Host</span>
+                            {{ environment.host }}
+                        </span>
+                        {% endif %}
+
+                        {% if environment.platform_profile %}
+                        <span>
+                            <span class="detail-label">Profile</span>
+                            {{ environment.platform_profile }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="environment-status">
+                    {% if environment.is_active %}
+                    <span class="status active">Active</span>
+                    {% else %}
+                    <span class="status inactive">Inactive</span>
+                    {% endif %}
+                </div>
+
+                <div class="capabilities">
+                    <div class="capability">
+                        <span class="capability-label">Max paths</span>
+                        <strong>{{ environment.capabilities.max_paths }}</strong>
+                    </div>
+
+                    <div class="capability">
+                        <span class="capability-label">Topologies</span>
+                        <div class="tags">
+                            {% for mode in environment.capabilities.topology_modes %}
+                            <span class="tag">{{ mode }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="capability">
+                        <span class="capability-label">Traffic</span>
+                        <div class="tags">
+                            {% for traffic in environment.capabilities.traffic_types %}
+                            <span class="tag">{{ traffic }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="capability">
+                        <span class="capability-label">Loss models</span>
+                        <div class="tags">
+                            {% for loss in environment.capabilities.loss_models %}
+                            <span class="tag">{{ loss }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <span class="card-arrow" aria-hidden="true">→</span>
+            </a>
+            {% endfor %}
+        </section>
+        {% else %}
+        <section class="empty-state">
+            <h2>No environments found</h2>
+            <p>There are no execution environments available yet.</p>
+        </section>
+        {% endif %}
+    </main>
+</body>
+
+</html>

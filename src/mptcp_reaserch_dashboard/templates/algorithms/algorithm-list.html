@@ -1,0 +1,96 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Algorithms</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/algorithms/algorithms-list.css') }}">
+</head>
+
+<body>
+    <main class="page">
+        <header class="topbar">
+            <div>
+                <span class="eyebrow">MPTCP Research Dashboard</span>
+                <h1>Algorithms</h1>
+                <p class="subtitle">Congestion-control algorithms and their implementations.</p>
+            </div>
+
+            <span class="algorithm-count">
+                {{ algorithms|length }} algorithm{% if algorithms|length != 1 %}s{% endif %}
+            </span>
+        </header>
+
+        {% if algorithms %}
+        <section class="algorithm-list">
+            {% for algorithm in algorithms %}
+            <a class="algorithm-card"
+               href="{{ url_for('algorithm_view', id=algorithm.id) }}">
+
+                <div class="algorithm-main">
+                    <div class="algorithm-heading">
+                        <h2>{{ algorithm.name }}</h2>
+                        <span class="short-name">{{ algorithm.short_name }}</span>
+                    </div>
+
+                    <p class="algorithm-id">{{ algorithm.id }}</p>
+
+                    {% if algorithm.description %}
+                    <p class="description">{{ algorithm.description }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="algorithm-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Type</span>
+                        <span class="type-badge {{ algorithm.type }}">
+                            {{ algorithm.type|capitalize }}
+                        </span>
+                    </div>
+
+                    <div class="meta-item">
+                        <span class="meta-label">Status</span>
+                        <span class="status-badge {{ 'active' if algorithm.is_active else 'inactive' }}">
+                            {{ 'Active' if algorithm.is_active else 'Inactive' }}
+                        </span>
+                    </div>
+
+                    <div class="meta-item">
+                        <span class="meta-label">Profiles</span>
+                        <strong>{{ algorithm.profiles|default([], true)|length }}</strong>
+                    </div>
+                </div>
+
+                <div class="implementations">
+                    <span class="implementations-label">Implementations</span>
+
+                    <div class="implementation-list">
+                        {% for implementation in algorithm.implementations %}
+                        <span class="implementation-badge {{ implementation.status }}">
+                            <span class="implementation-env">
+                                {{ implementation.env_type|upper }}
+                            </span>
+                            <span class="implementation-status">
+                                {{ implementation.status }}
+                            </span>
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <span class="card-arrow" aria-hidden="true">→</span>
+            </a>
+            {% endfor %}
+        </section>
+        {% else %}
+        <section class="empty-state">
+            <h2>No algorithms found</h2>
+            <p>There are no algorithms available in the catalogue.</p>
+        </section>
+        {% endif %}
+    </main>
+</body>
+
+</html>
